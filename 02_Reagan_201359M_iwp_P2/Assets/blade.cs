@@ -4,23 +4,37 @@ using UnityEngine;
 
 public class blade : MonoBehaviour
 {
-    
+
 
     // Handle collisions with other objects
-    void OnCollisionEnter2D(Collision2D collision)
+    void OnTriggerEnter2D(Collider2D collision)
     {
-
-        if (collision.gameObject.CompareTag("Enemy"))
+        
+        if (collision.gameObject.CompareTag("Enemy")
+            && collision.gameObject.GetComponent<Enemy>().immunity_timer <= 0.0f)
         {
             Debug.Log("HIT ENEMY");
 
-            // Calculate the direction from this object to the enemy
-            Vector2 directionToEnemy = (collision.transform.position - transform.position).normalized;
+            Enemy enemyScript = collision.gameObject.GetComponent<Enemy>();
+            Player playerscript = GetComponentInParent<Transform>().GetComponentInParent<Weapon>().playerscript;
 
+            // Calculate the direction from this object to the enemy
+            Vector2 directionToEnemy = 
+                (collision.transform.position - playerscript.playerTransform.position).normalized;
             // Set a force to launch the object in the opposite direction
-            float launchForce = 1.0f; // Adjust the force as needed
-            Rigidbody2D rb = collision.gameObject.GetComponent<Rigidbody2D>();
-            rb.AddForce(-directionToEnemy * launchForce, ForceMode2D.Impulse);
+            float launchForce = .1f * Time.deltaTime; // Adjust the force as needed
+            enemyScript.enemyrb.AddForce(directionToEnemy * launchForce, ForceMode2D.Impulse);
+
+            //DAMAGE ENEMY
+            int playerDamage = playerscript.damage;
+            enemyScript.health -= playerDamage;
+
+            //SET ENEMY TO HURT STATE
+            enemyScript.currentState = Enemy.EnemyState.HURT;
+            enemyScript.immunity_timer = .5f;
+            enemyScript.hurt_timer = 0.0f;
+
+            Debug.Log("ENEMY HEALTH " + enemyScript.health);
 
         }
 

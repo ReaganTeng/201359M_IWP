@@ -7,6 +7,14 @@ TagManager:
   - WallTilemap
   - FloorTilemap
   - Enemy
+  - GameMGT
+  - HPBar
+  - GameCompletePanel
+  - ShopPanel
+  - UnbreakableWall
+  - ShopItemPanel
+  - DayPanel
+  - ATMPanel
   layers:
   - Default
   - TransparentFX
@@ -14,7 +22,7 @@ TagManager:
   - 
   - Water
   - UI
-  - 
+  - WallTilemap
   - 
   - 
   - 

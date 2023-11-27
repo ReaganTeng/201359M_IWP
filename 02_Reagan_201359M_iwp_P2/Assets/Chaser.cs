@@ -16,31 +16,71 @@ public class Chaser : Enemy
 
     public ChaserAttackPattern currentAttackPattern;
 
+    private void Start()
+    {
 
+    }
+
+    float stage1 = 1;
+    float stage2 = 2;
 
     protected override void Update()
     {
         base.Update();
 
+
         // Implement state-specific behavior in derived classes
         switch (currentState)
         {
             case EnemyState.ABOUT_TO_ATTACK:
-                FollowPlayer();
-                if(distance <= 1.0f)
                 {
-                    currentState = EnemyState.ATTACK;
+                    if (distance <= 1.0f)
+                    {
+                        animator.SetFloat("AttackStage", stage1);
+                        if (animator.GetCurrentAnimatorStateInfo(0).IsName("attack")
+                            && animator.GetFloat("AttackStage") == stage1
+                            && animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f)
+                        {
+                            
+                            currentState = EnemyState.ATTACK;
+                        }
+                    }
+                    else
+                    {
+                        FollowPlayer();
+                    }
+                    break;
                 }
-                break;
             case EnemyState.ATTACK:
-                switch (currentAttackPattern)
                 {
-                    case ChaserAttackPattern.SWIPE:
-                    case ChaserAttackPattern.POUNCE:
-                        //currentState = EnemyState.CHASE;
-                        break;
+                    if (animator.GetFloat("AttackStage") == stage1)
+                    {
+                        animator.SetFloat("AttackStage", stage2);
+                        animator.Play("attack", 0, 0f);
+                    }
+
+                    switch (currentAttackPattern)
+                    {
+                        case ChaserAttackPattern.SWIPE:
+                        case ChaserAttackPattern.POUNCE:
+                            animator.SetFloat("AttackStage", stage2);
+
+                            if (animator.GetCurrentAnimatorStateInfo(0).IsName("attack")
+                             && animator.GetFloat("AttackStage") == stage2
+                           && animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f
+                           && attackcooldown <= 0.0)
+                            {
+
+
+                                spriteRenderer.color = Color.white;
+                                animator.SetFloat("AttackStage", 0);
+                                attackcooldown = .5f;
+                                currentState = EnemyState.IDLE;
+                            }
+                            break;
+                    }
+                    break;
                 }
-                break;
             case EnemyState.HURT:
                 break;
         }

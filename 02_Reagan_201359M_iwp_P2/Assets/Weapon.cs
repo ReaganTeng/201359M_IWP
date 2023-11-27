@@ -14,7 +14,7 @@ public class Weapon : MonoBehaviour
     public GameObject handle;
     public GameObject blade;
 
-    Player playerscript;
+   public Player playerscript;
 
 
     private void Awake()
