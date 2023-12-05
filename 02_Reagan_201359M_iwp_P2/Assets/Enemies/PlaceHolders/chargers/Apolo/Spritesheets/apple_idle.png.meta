@@ -20,11 +20,12 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
+    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
-  ignoreMasterTextureLimit: 0
+  ignoreMipmapLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -63,18 +64,20 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  swizzle: 50462976
   cookieLightType: 0
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 16384
+    maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
+    compressionQuality: 100
+    crunchedCompression: 1
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -87,6 +90,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -99,6 +103,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -111,6 +116,33 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 16384
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: iPhone
+    maxTextureSize: 16384
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
@@ -1387,69 +1419,68 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      apple_idle_11: -1864894689
-      apple_idle_2: -1428709381
-      apple_idle_37: -758600986
-      apple_idle_55: -323770264
-      apple_idle_15: 306659825
-      apple_idle_14: 1169868612
-      apple_idle_57: -1125760233
-      apple_idle_28: -2048327572
-      apple_idle_44: 1630942208
-      apple_idle_33: 1377002354
-      apple_idle_53: 763138763
-      apple_idle_13: -725536436
-      apple_idle_4: 1645111195
-      apple_idle_6: -990390198
-      apple_idle_23: 187147194
-      apple_idle_32: 1881088222
-      apple_idle_21: 1741899477
-      apple_idle_46: 378373794
-      apple_idle_22: -2040096477
-      apple_idle_7: 1919961239
-      apple_idle_17: -470630976
-      apple_idle_42: 2096835109
-      apple_idle_54: -1798960772
-      apple_idle_12: -1702557831
-      apple_idle_35: -1893141033
-      apple_idle_20: 576019107
-      apple_idle_56: 821914395
-      apple_idle_38: -1066901043
-      apple_idle_5: -1425150496
-      apple_idle_27: 219704049
-      apple_idle_47: 1111378202
-      apple_idle_16: 85488284
-      apple_idle_1: 1293839565
-      apple_idle_18: 2138200118
-      apple_idle_36: 712420411
-      apple_idle_41: 137073067
-      apple_idle_51: 572938112
-      apple_idle_58: 74790883
-      apple_idle_9: 1099102119
-      apple_idle_52: -730641253
-      apple_idle_19: -1393419330
-      apple_idle_29: 2091536286
-      apple_idle_31: 975096633
       apple_idle_0: 318202985
-      apple_idle_25: 1064640704
-      apple_idle_50: -1673684843
-      apple_idle_8: 224625421
-      apple_idle_34: 576294725
-      apple_idle_43: -161996289
-      apple_idle_40: -87339942
-      apple_idle_45: 1579117337
-      apple_idle_30: 1480223812
-      apple_idle_3: -884256026
-      apple_idle_39: 1805528567
+      apple_idle_1: 1293839565
       apple_idle_10: -2057242890
+      apple_idle_11: -1864894689
+      apple_idle_12: -1702557831
+      apple_idle_13: -725536436
+      apple_idle_14: 1169868612
+      apple_idle_15: 306659825
+      apple_idle_16: 85488284
+      apple_idle_17: -470630976
+      apple_idle_18: 2138200118
+      apple_idle_19: -1393419330
+      apple_idle_2: -1428709381
+      apple_idle_20: 576019107
+      apple_idle_21: 1741899477
+      apple_idle_22: -2040096477
+      apple_idle_23: 187147194
+      apple_idle_24: 1246270843
+      apple_idle_25: 1064640704
+      apple_idle_26: 56848297
+      apple_idle_27: 219704049
+      apple_idle_28: -2048327572
+      apple_idle_29: 2091536286
+      apple_idle_3: -884256026
+      apple_idle_30: 1480223812
+      apple_idle_31: 975096633
+      apple_idle_32: 1881088222
+      apple_idle_33: 1377002354
+      apple_idle_34: 576294725
+      apple_idle_35: -1893141033
+      apple_idle_36: 712420411
+      apple_idle_37: -758600986
+      apple_idle_38: -1066901043
+      apple_idle_39: 1805528567
+      apple_idle_4: 1645111195
+      apple_idle_40: -87339942
+      apple_idle_41: 137073067
+      apple_idle_42: 2096835109
+      apple_idle_43: -161996289
+      apple_idle_44: 1630942208
+      apple_idle_45: 1579117337
+      apple_idle_46: 378373794
+      apple_idle_47: 1111378202
       apple_idle_48: 325650701
       apple_idle_49: -2145699192
+      apple_idle_5: -1425150496
+      apple_idle_50: -1673684843
+      apple_idle_51: 572938112
+      apple_idle_52: -730641253
+      apple_idle_53: 763138763
+      apple_idle_54: -1798960772
+      apple_idle_55: -323770264
+      apple_idle_56: 821914395
+      apple_idle_57: -1125760233
+      apple_idle_58: 74790883
       apple_idle_59: 1936837930
-      apple_idle_24: 1246270843
-      apple_idle_26: 56848297
-  spritePackingTag: 
+      apple_idle_6: -990390198
+      apple_idle_7: 1919961239
+      apple_idle_8: 224625421
+      apple_idle_9: 1099102119
+  mipmapLimitGroupName: 
   pSDRemoveMatte: 0
-  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 

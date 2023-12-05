@@ -106,15 +106,29 @@ public class Projectile : MonoBehaviour
             //DAMAGE PLAYER
             //collision.gameObject.GetComponent<Player>().immunity_timer = .5f;
 
+            //SHIELD
             if (collisionCharacter.playerShield != null
                 && collisionCharacter.playerShield.shieldActive)
             {
-                collisionCharacter.playerShield.shieldtimer = 0;
+                for (int i = 0; i < collisionCharacter.activeEffects.Count; i++)
+                {
+                    if(collisionCharacter.activeEffects[i].Type == EffectType.SHIELD)
+                    {
+                        //collisionCharacter.activeEffects[i].
+                        collisionCharacter.activeEffects.Remove(collisionCharacter.activeEffects[i]);
+                    }
+                }
+                collisionCharacter.playerShield.shieldActive = false;
+                //collisionCharacter.activeEffects
             }
             else
             {
+                if (collisionCharacter.audioSource != null)
+                {
+                    collisionCharacter.audioSource.clip = collisionCharacter.audioclips[0];
+                    collisionCharacter.audioSource.Play();
+                }
                 collisionCharacter.health -= Damage;
-
             }
 
 

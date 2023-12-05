@@ -51,6 +51,9 @@ public class Enemy : Character
     //START TO INTEGRATE ENEMIES INTO THE MAZE
 
     List<Vector3> potentialDestinations = new List<Vector3>();
+
+
+
     public GameObject positionGO;
 
     public float immunity_timer;
@@ -72,7 +75,7 @@ public class Enemy : Character
         idx = 0;
         listOfPositions = new List<Vector3>();
         //health = UnityEngine.Random.Range(100, 200);
-        health = 1;
+        health = 100;
 
         //Debug.Log("HEALTH SET " + health);
         attacked = false;

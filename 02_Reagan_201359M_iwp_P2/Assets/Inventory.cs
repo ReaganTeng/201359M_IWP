@@ -74,8 +74,8 @@ public class Inventory : MonoBehaviour
                 // Subtract the added amount from the total
                 amount -= amountToAdd;
 
-                PlayerPrefs.SetInt("MoneyEarned", PlayerPrefs.GetInt("MoneyEarned") + item.money);
-                moneyearned.text = $"{PlayerPrefs.GetInt("MoneyEarned")}";
+                PlayerPrefs.SetFloat("MoneyEarned", PlayerPrefs.GetFloat("MoneyEarned") + item.money);
+                moneyearned.text = $"{PlayerPrefs.GetFloat("MoneyEarned")}";
 
                 Destroy(item.gameObject);
                 // If we've added the required amount, break out of the loop

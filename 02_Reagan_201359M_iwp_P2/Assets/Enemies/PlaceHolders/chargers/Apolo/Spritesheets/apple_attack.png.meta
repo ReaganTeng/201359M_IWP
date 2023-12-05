@@ -20,11 +20,12 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
+    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
-  ignoreMasterTextureLimit: 0
+  ignoreMipmapLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -63,18 +64,20 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  swizzle: 50462976
   cookieLightType: 0
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 16384
+    maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
+    compressionQuality: 100
+    crunchedCompression: 1
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -87,6 +90,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -99,6 +103,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -111,6 +116,33 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 16384
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: iPhone
+    maxTextureSize: 16384
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
@@ -652,34 +684,33 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      apple_attack_17: -598125877
-      apple_attack_15: -13655493
-      apple_attack_19: -576241950
-      apple_attack_9: 1843565943
-      apple_attack_13: -1559336892
-      apple_attack_23: 1311439468
-      apple_attack_14: 93351868
-      apple_attack_2: 814417417
-      apple_attack_12: -1143790041
-      apple_attack_16: -170261214
-      apple_attack_21: 1224173883
-      apple_attack_10: 1603491743
-      apple_attack_1: -94714106
-      apple_attack_18: -3236983
-      apple_attack_4: -1719478089
-      apple_attack_24: -1451577050
-      apple_attack_11: -1471945455
-      apple_attack_20: 777104630
-      apple_attack_22: 80297316
       apple_attack_0: 322935726
-      apple_attack_7: 1780701707
+      apple_attack_1: -94714106
+      apple_attack_10: 1603491743
+      apple_attack_11: -1471945455
+      apple_attack_12: -1143790041
+      apple_attack_13: -1559336892
+      apple_attack_14: 93351868
+      apple_attack_15: -13655493
+      apple_attack_16: -170261214
+      apple_attack_17: -598125877
+      apple_attack_18: -3236983
+      apple_attack_19: -576241950
+      apple_attack_2: 814417417
+      apple_attack_20: 777104630
+      apple_attack_21: 1224173883
+      apple_attack_22: 80297316
+      apple_attack_23: 1311439468
+      apple_attack_24: -1451577050
       apple_attack_3: 37811302
+      apple_attack_4: -1719478089
       apple_attack_5: 212357605
       apple_attack_6: 1519391810
+      apple_attack_7: 1780701707
       apple_attack_8: -423400972
-  spritePackingTag: 
+      apple_attack_9: 1843565943
+  mipmapLimitGroupName: 
   pSDRemoveMatte: 0
-  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 

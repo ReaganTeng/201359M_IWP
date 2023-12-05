@@ -84,9 +84,35 @@ public class Chaser : Enemy
                                 animator.SetFloat("AttackStage", 0);
                                 attackcooldown = .5f;
 
+                                Player playerscript = player.GetComponent<Player>();
+                                Character playercharacterscript = player.GetComponent<Character>();
                                 if (distance <= 2.0f)
                                 {
-                                    player.GetComponent<Player>().health -= damage;
+                                    if (playercharacterscript.playerShield != null
+                                    && playercharacterscript.playerShield.shieldActive)
+                                    {
+                                        for (int i = 0; i < playercharacterscript.activeEffects.Count; i++)
+                                        {
+                                            if (playercharacterscript.activeEffects[i].Type == EffectType.SHIELD)
+                                            {
+                                                //collisionCharacter.activeEffects[i].
+                                                playercharacterscript.activeEffects.Remove(playercharacterscript.activeEffects[i]);
+                                            }
+                                        }
+
+                                        playercharacterscript.playerShield.shieldActive = false;
+                                        //collisionCharacter.activeEffects
+                                    }
+                                    else
+                                    {
+                                        if (playercharacterscript.audioSource != null)
+                                        {
+                                            playercharacterscript.audioSource.clip = playercharacterscript.audioclips[0];
+                                            playercharacterscript.audioSource.Play();
+                                        }
+                                        playercharacterscript.health -= damage;
+
+                                    }
                                 }
 
                                 currentState = EnemyState.IDLE;

@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
-using UnityEditor.Build;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Tilemaps;
@@ -14,7 +13,6 @@ using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using Vector2 = UnityEngine.Vector2;
 using static Projectile;
 using static Item;
-using static UnityEditor.Progress;
 using TMPro;
 
 public class Player : Character
@@ -27,6 +25,8 @@ public class Player : Character
     }
 
     public TextMeshProUGUI moneyearnerd;
+
+
 
     //public Slider healthbar;
     String[] tilemaptags;
@@ -56,15 +56,20 @@ public class Player : Character
     public GameObject itemPrefab;
 
 
+   
 
     bool shotsomething;
+
+
 
     protected override void Awake()
     {
         base.Awake();
 
-        PlayerPrefs.SetInt("MoneyEarned", 0);
+        PlayerPrefs.SetFloat("MoneyEarned", 0);
 
+
+       
 
         shotsomething = false;
         playerInventory = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<Inventory>();
@@ -90,6 +95,8 @@ public class Player : Character
         //raycastOrigin = transform;
         //TAGS OF ROOM
         tilemaptags = new string[] { "WallTilemap", "FloorTilemap" };
+
+        moneyearnerd = GameObject.FindGameObjectWithTag("MoneyEarnedText").GetComponent<TextMeshProUGUI>();
     }
 
 
@@ -130,16 +137,33 @@ public class Player : Character
         //IF SAME LAYER AS LAYER TILE
         //Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 0.1f, LayerMask.GetMask("WallTilemap"));
         //Debug.Log("COLLIDERS " + colliders.Length);
-
-        if (!AIMode)
+        
+        if (health > 0)
         {
-            Movement();
-            cameraMovement();
-            Shooting();
+            spriteRenderer.color = Color.white;
+
+            
+            if (!AIMode)
+            {
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    health -= 10;
+                }
+
+                //emissionModule.enabled = true;
+                //Debug.Log($"CURRENT HEALTH IS {health}");
+                Movement();
+                cameraMovement();
+                Shooting();
+            }
+            else
+            {
+                AIMovement();
+            }
         }
         else
         {
-            AIMovement();
+            spriteRenderer.color = Color.black;
         }
 
 
@@ -431,6 +455,9 @@ public class Player : Character
     }
 
 
+
+
+
     void ShootProjectile()
     {
         // Instantiate the projectile
@@ -470,12 +497,19 @@ public class Player : Character
         //USE FOR SUBTRACTION OF MONEY
         GameObject item = Instantiate(itemPrefab, transform.position, Quaternion.identity);
         item.GetComponent<Item>().SetItem(itemchosen, 5);
-        PlayerPrefs.SetInt("MoneyEarned", PlayerPrefs.GetInt("MoneyEarned") - item.GetComponent<Item>().money);
+        PlayerPrefs.SetFloat("MoneyEarned", PlayerPrefs.GetFloat("MoneyEarned") - item.GetComponent<Item>().money);
+        if (PlayerPrefs.GetFloat("MoneyEarned") < 0)
+        {
+            PlayerPrefs.SetFloat("MoneyEarned", 0);
+        }
 
         if (moneyearnerd != null)
         {
-            moneyearnerd.text = $"{PlayerPrefs.GetInt("MoneyEarned")}";
+            moneyearnerd.text = $"{PlayerPrefs.GetFloat("MoneyEarned")}";
         }
+
+
+
         Destroy(item);
         //
 
@@ -516,10 +550,16 @@ public class Player : Character
         //USE FOR SUBTRACTION OF MONEY
         GameObject item = Instantiate(itemPrefab, transform.position, Quaternion.identity);
         item.GetComponent<Item>().SetItem(itemchosen, 5);
-        PlayerPrefs.SetInt("MoneyEarned", PlayerPrefs.GetInt("MoneyEarned") - item.GetComponent<Item>().money);
+        PlayerPrefs.SetFloat("MoneyEarned", PlayerPrefs.GetFloat("MoneyEarned") - item.GetComponent<Item>().money);
+
+        if(PlayerPrefs.GetFloat("MoneyEarned") < 0)
+        {
+            PlayerPrefs.SetFloat("MoneyEarned", 0);
+        }
+
         if (moneyearnerd != null)
         {
-            moneyearnerd.text = $"{PlayerPrefs.GetInt("MoneyEarned")}";
+            moneyearnerd.text = $"{PlayerPrefs.GetFloat("MoneyEarned")}";
         }
         Destroy(item);
         //

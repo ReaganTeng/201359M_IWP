@@ -41,10 +41,8 @@ public class GameManager : MonoBehaviour
         {
             PlayerPrefs.SetInt("RoundsCompleted", 0);
         }
+
         goalamount = 100000;
-
-
-        
     }
 
 
@@ -79,19 +77,14 @@ public class GameManager : MonoBehaviour
         daysLeft.text = $"{daysLeft}";
 
         float moneydonated = PlayerPrefs.GetFloat("MoneyDonated");
-        ATMText.text = $"{moneydonated}/{goalamount}";
-
+        ATMText.text = $"DONATED: {moneydonated}\nLEFT:{goalamount}";
 
         daysLeft.text = $"DAYS LEFT\n{PlayerPrefs.GetInt("DaysLeft")}";
-
-
-
 
         if(PlayerPrefs.GetInt("DaysLeft") > 0)
         {
             GameOverPanel.SetActive(false);
             WinPanel.SetActive(false);
-
         }
 
         if (PlayerPrefs.GetFloat("MoneyDonated") < goalamount
@@ -118,6 +111,13 @@ public class GameManager : MonoBehaviour
             PlayerPrefs.SetFloat("MoneyDonated"
                 , PlayerPrefs.GetFloat("MoneyDonated") + deposit
                 );
+
+            PlayerPrefs.SetFloat("GrossMoney"
+                , PlayerPrefs.GetFloat("GrossMoney") - deposit
+                );
+
+            ATMInputField.text = "";
+
             Debug.Log("MONEY DONATED");
         }
     }

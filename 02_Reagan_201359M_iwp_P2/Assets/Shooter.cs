@@ -77,8 +77,9 @@ public class Shooter : Enemy
 
         if (projectile != null)
         {
-            projectile.GetComponentInParent<Projectile>().projectiletype = ProjectileType.NORMAL;
-            projectile.GetComponent<Projectile>().setdata(damage, projectilespeed,
+            Projectile projectilescript = projectile.GetComponent<Projectile>();
+            projectilescript.projectiletype = ProjectileType.NORMAL;
+            projectilescript.setdata(damage, projectilespeed,
                 (player.transform.position - transform.position).normalized, gameObject);
         }
         spriteRenderer.color = Color.blue;

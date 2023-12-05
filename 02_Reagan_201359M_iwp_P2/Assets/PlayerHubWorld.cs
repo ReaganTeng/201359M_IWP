@@ -11,6 +11,8 @@ public class PlayerHubWorld : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
+        Time.timeScale = 1;
+
         //ATMPanel = GameObject.FindGameObjectWithTag("ATMPanel");
         //shopPanel = GameObject.FindGameObjectWithTag("ShopPanel");
         //dayPanel = GameObject.FindGameObjectWithTag("DayPanel");

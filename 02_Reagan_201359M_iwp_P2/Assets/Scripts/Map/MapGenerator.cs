@@ -12,13 +12,14 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.UIElements;
-using static UnityEditor.PlayerSettings;
-using static UnityEngine.GridBrushBase;
+
 using Debug = UnityEngine.Debug;
 using Random = UnityEngine.Random;
 
 public class MapGenerator : MonoBehaviour
 {
+
+    public compass CompassObject;
 
     public GameObject manualMap;
 
@@ -138,8 +139,8 @@ public class MapGenerator : MonoBehaviour
 
 
         //TEMPORARY
-        //levelGenerated = false;
-        levelGenerated = true;
+        levelGenerated = false;
+        //levelGenerated = true;
 
 
         //NumberOfPaths = UnityEngine.Random.Range(50, 81);
@@ -174,15 +175,16 @@ public class MapGenerator : MonoBehaviour
     public void SpawnTreasure()
     {
 
-        //HARD CODE THE VALUES FIRST
-        float smallestX = -64;
-        float largestX = 0;
-        float smallestY = 0;
-        float largestY = 32;
+        
 
         if (!alltreasuresSpawned)
         {
-            for(int i = 0; i< 40; i++)
+            //HARD CODE THE VALUES FIRST
+            float smallestX = -64;
+            float largestX = 0;
+            float smallestY = 0;
+            float largestY = 32;
+            for (int i = 0; i< 40; i++)
             {
                 int randomX = Random.Range((int)smallestX, (int)largestX + 1);
                 int randomY = Random.Range((int)smallestY, (int)largestY + 1);
@@ -214,20 +216,30 @@ public class MapGenerator : MonoBehaviour
         //}
         //else
         //{
-            gameManager.SetActive(true);
+            if (!gameManager.activeSelf)
+            {
+                gameManager.SetActive(true);
+            }
 
             //if(player == null)
-            if (!gameManager.GetComponent<PlayerManager>().finishedSpawning)
+            if (!playermgt.finishedSpawning)
             {
                 for (int i = 0; i < 2; i++)
                 {
                     player = Instantiate(Player, startingposition, Quaternion.identity);
+
+                    player.GetComponent<SpriteRenderer>().color = 
+                    new Color (
+                        Random.Range(0, 1),
+                        Random.Range(0, 1),
+                        Random.Range(0, 1)
+                        );
                     //player
                     //player = Instantiate(Player, Vector3.zero, Quaternion.identity);
                     //gameManager.players.Add(player);
 
-                    gameManager.GetComponent<PlayerManager>().players.Add(player);
-                    gameManager.GetComponent<PlayerManager>().StartItself();
+                    playermgt.players.Add(player);
+                    playermgt.StartItself();
                 }
             }
 
@@ -237,13 +249,15 @@ public class MapGenerator : MonoBehaviour
             //}
 
             if (!enemiesspawned
-                && gameManager.GetComponent<PlayerManager>().finishedSpawning)
+                && playermgt.finishedSpawning)
             {
                 enemymgt.StartItself();
                 enemiesspawned = true;
             }
-
+            //if()
             SpawnTreasure();
+
+            CompassObject.StartItself();
         //}
     }
 

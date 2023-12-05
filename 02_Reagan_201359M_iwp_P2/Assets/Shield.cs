@@ -9,13 +9,15 @@ public class Shield : MonoBehaviour
     SpriteRenderer sprite;
     //CircleCollider2D circleCollider;
 
+    //public float shieldtimer;
+
+
     [HideInInspector]
-    public float shieldtimer;
     public bool shieldActive;
     public void Awake()
     {
         sprite = GetComponent<SpriteRenderer>();
-        shieldtimer = 0;
+       
         //circleCollider = GetComponent<CircleCollider2D>();
         sprite.enabled = false;
         shieldActive = false;
@@ -24,23 +26,17 @@ public class Shield : MonoBehaviour
 
     private void Update()
     {
-        if(shieldtimer > 0)
+        if (!shieldActive) {
+            sprite.enabled = false;
+            //Debug.Log("SHIELD NOT ACTIVE");
+            //circleCollider.enabled = false;
+        }           
+        else
         {
-            shieldtimer -= Time.deltaTime;
-
-            if(shieldtimer <= 0 )
-            {
-                sprite.enabled = false;
-                shieldActive = false;
-                //circleCollider.enabled = false;
-            }
-            else
-            {
-                sprite.enabled = true;
-                shieldActive = true;
-                //circleCollider.enabled = true;
-            }
+            sprite.enabled = true;
+            //circleCollider.enabled = true;
         }
+        
     }
 
 

@@ -127,16 +127,33 @@ public class Tanker : Enemy
             Debug.Log("BANG Player");
             //DAMAGE PLAYER
             Player player = collision.gameObject.GetComponent<Player>();
+            Character collisionCharacter = collision.gameObject.GetComponent<Character>();
 
-
-            if (player.playerShield != null
-                && player.playerShield.shieldActive)
+            //SHIELD
+            if (collisionCharacter.playerShield != null
+                && collisionCharacter.playerShield.shieldActive)
             {
-                player.playerShield.shieldtimer = 0;
+                for (int i = 0; i < collisionCharacter.activeEffects.Count; i++)
+                {
+                    if (collisionCharacter.activeEffects[i].Type == EffectType.SHIELD)
+                    {
+                        //collisionCharacter.activeEffects[i].
+                        collisionCharacter.activeEffects.Remove(collisionCharacter.activeEffects[i]);
+                    }
+                }
+
+                collisionCharacter.playerShield.shieldActive = false;
+                //collisionCharacter.activeEffects
             }
             else
             {
-                player.health -= damage;
+                if (collisionCharacter.audioSource != null)
+                {
+                    collisionCharacter.audioSource.clip = collisionCharacter.audioclips[0];
+                    collisionCharacter.audioSource.Play();
+                }
+                collisionCharacter.health -= damage;
+
             }
 
 
@@ -152,7 +169,7 @@ public class Tanker : Enemy
 
 
 
-            Debug.Log("PLAYER HEALTH " + collision.gameObject.GetComponent<Player>().health);
+            Debug.Log("PLAYER HEALTH " + player.health);
         }
     }
 }

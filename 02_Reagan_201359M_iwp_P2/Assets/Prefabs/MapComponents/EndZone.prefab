@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: -5462096482930194909}
   m_Layer: 0
   m_Name: EndZone
-  m_TagString: Untagged
+  m_TagString: EndZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -143,3 +143,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cae34e78718b8c458159326aaa1b4b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  GameCompletePanel: {fileID: 0}
+  money: 0

@@ -83,6 +83,8 @@ public class EnemyManager : MonoBehaviour
                 IsPositionValid(randomPosition))
             {
                 GameObject enemy = Instantiate(enemyPrefabs[Random.Range(0, enemyPrefabs.Count)], randomPosition, Quaternion.identity);
+                //GameObject enemy = Instantiate(enemyPrefabs[1], randomPosition, Quaternion.identity);
+
                 enemyList.Add(enemy);
                 enemy.transform.SetParent(enemyparent.transform);
                 takenPos.Add(randomPosition);
@@ -184,7 +186,7 @@ public class EnemyManager : MonoBehaviour
         if (allNotAboutToAttack
             && allnotAttack)
         {
-            Debug.Log("PREPARING TO CHOOSE");
+            //Debug.Log("PREPARING TO CHOOSE");
             timer += 1.0f * Time.deltaTime;
         }
         else
@@ -211,8 +213,10 @@ public class EnemyManager : MonoBehaviour
                 {
                     int enemyindex = Random.Range(0, enemiesInChaseMode.Count);
 
-                    enemiesInChaseMode[enemyindex].GetComponent<Enemy>().currentState = Enemy.EnemyState.ABOUT_TO_ATTACK;
-                    enemiesInChaseMode[enemyindex].GetComponent<Enemy>().spriteRenderer.color = Color.red;
+                    Enemy enemyScript = enemiesInChaseMode[enemyindex].GetComponent<Enemy>();
+
+                    enemyScript.currentState = Enemy.EnemyState.ABOUT_TO_ATTACK;
+                    enemyScript.spriteRenderer.color = Color.red;
                     Debug.Log("ABOUT TO ATTACK");
 
                 }

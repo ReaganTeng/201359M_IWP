@@ -4,23 +4,49 @@ using UnityEngine;
 
 public class Character : MonoBehaviour
 {
-    private List<Effect> activeEffects = new List<Effect>();
+    public List<AudioClip> audioclips;
 
 
     [HideInInspector]
     public int health;
+    [HideInInspector]
     public int damage;
+    [HideInInspector]
     public SpriteRenderer spriteRenderer;
+    [HideInInspector]
     public Shield playerShield;
+    [HideInInspector]
+    public List<Effect> activeEffects = new List<Effect>();
+    [HideInInspector]
+    public ParticleSystem ps;
+    [HideInInspector]
+    ParticleSystem.EmissionModule emissionModule;
+    [HideInInspector]
+    public AudioSource audioSource;
+    float speed;
+
 
 
 
     //bool effectapplied = false;
     protected virtual void Awake()
     {
-        playerShield = GetComponentInChildren<Shield>();
+        audioSource = GetComponent<AudioSource>();
 
+        speed = .1f;
+        playerShield = GetComponentInChildren<Shield>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+
+        ps = GetComponent<ParticleSystem>();
+
+
+        //ps.emission.enabled = true;
+        if (ps != null)
+        {
+            emissionModule = ps.emission;
+            emissionModule.enabled = false;
+
+        }
     }
 
 
@@ -46,20 +72,31 @@ public class Character : MonoBehaviour
         //    }
         //}
 
-
-
         // Update and check duration for each active effect
         for (int i = activeEffects.Count - 1; i >= 0; i--)
         {
             Effect effect = activeEffects[i];
-            effect.UpdateEffect(Time.deltaTime);
+            effect.UpdateEffect(ref health, Time.deltaTime);
+
+            //ENABLE SHIELD
+            if (effect.Type == EffectType.SHIELD)
+            {
+                //Shield sh = GetComponentInChildren<Shield>();
+                if (playerShield != null)
+                {
+                    playerShield.shieldActive = true;
+                }
+            }
+
 
             if (effect.IsExpired)
             {
+                emissionModule.enabled = false;
                 // Remove the expired effect
                 activeEffects.RemoveAt(i);
                 Debug.Log($"{effect.Type} effect expired.");
             }
+
         }
     }
 
@@ -71,11 +108,11 @@ public class Character : MonoBehaviour
         {
             Effect newEffect = CreateEffect(type);
             activeEffects.Add(newEffect);
-            Debug.Log("{type} effect applied.");
+            Debug.Log($"{type} effect applied.");
         }
         else
         {
-            Debug.Log("Player already has {type} effect.");
+            Debug.Log($"Player already has {type} effect.");
         }
     }
 
@@ -91,15 +128,31 @@ public class Character : MonoBehaviour
         switch (type)
         {
             case EffectType.POISON:
-                return new PoisonEffect(10f, 2f, 0.75f);
-            case EffectType.SHIELD:
-                if(playerShield != null)
                 {
-                    playerShield.shieldtimer = 15.0f;
+                    if (ps != null)
+                    {
+                        ParticleSystem.MainModule mainModule = ps.main;
+                        mainModule.startColor = Color.green;
+                        emissionModule.enabled = true;
+                    }
+                    return new PoisonEffect(10f, 2f, 0.75f);
                 }
-                return new ShieldEffect(15f);
+            case EffectType.SHIELD:
+                {
+                    
+                    return new ShieldEffect(15f);
+                }
             case EffectType.BURN:
-                return new BurnEffect(20f, 1f);
+                {
+                    if (ps != null)
+                    {
+                        ParticleSystem.MainModule mainModule = ps.main;
+                        mainModule.startColor = Color.red;
+                        emissionModule.enabled = true;
+                        //Debug.Log("BEGIN BURN");
+                    }
+                    return new BurnEffect(20f, 1f);
+                }
             // Add more cases for additional effects
             default:
                 Debug.LogError("Unknown effect type: {type}");
@@ -124,7 +177,30 @@ public abstract class Effect
     public float Duration { get; protected set; }
     public bool IsExpired { get; protected set; }
 
-    public abstract void UpdateEffect(float deltaTime);
+
+    public Color particleColor { get; protected set; }
+
+
+    //public int health { get; protected set; }
+
+    // Constructor that takes a reference to player's health
+    //public Effect(ref int health)
+    //{
+    //    this.health = health;
+    //}
+
+    public virtual void UpdateEffect(ref int health, float deltaTime)
+    {
+        Duration -= deltaTime;
+        if (Duration <= 0)
+        {
+            IsExpired = true;
+            return;
+        }
+
+        Debug.Log("UPDATING EFFECT");
+       
+    }
 }
 
 // Poison effect
@@ -132,7 +208,7 @@ public class PoisonEffect : Effect
 {
     private float interval;
     private float intervalTimer;
-    private float damage;
+    private int damage;
     private float slowFactor;
     //private float intervalTimer;
     public PoisonEffect(float duration, float interval, float slowFactor)
@@ -142,26 +218,21 @@ public class PoisonEffect : Effect
         Duration = duration;
         this.interval = interval;
         this.slowFactor = slowFactor;
-        damage = 10f; // Adjust the damage amount as needed
+        damage = 10; // Adjust the damage amount as needed
     }
 
-    public override void UpdateEffect(float deltaTime)
+    public override void UpdateEffect(ref int health, float deltaTime)
     {
+        base.UpdateEffect(ref health, deltaTime);
+
         Debug.Log("EFFECT POISON " + interval);
         intervalTimer += Time.deltaTime;
         
-        Duration -= deltaTime;
-        if (Duration <= 0)
-        {
-            IsExpired = true;
-            return;
-        }
-
         // Apply poison damage at intervals
         //if (Mathf.Approximately(Duration % interval, 0f))
         if(intervalTimer >= interval)
         {
-            ApplyDamage();
+            ApplyDamage(ref health);
             intervalTimer = 0;
         }
 
@@ -169,8 +240,10 @@ public class PoisonEffect : Effect
         ApplySpeedReduction();
     }
 
-    private void ApplyDamage()
+    private void ApplyDamage(ref int health)
     {
+        health -= damage;
+        //Debug.Log($"HEALTH REDUCED TO {health}");
         // Implement logic to damage the player
         Debug.Log($"Poison: Player takes {damage} damage.");
     }
@@ -186,22 +259,17 @@ public class PoisonEffect : Effect
 public class ShieldEffect : Effect
 { 
     public ShieldEffect(float duration)
+        //: base(ref health)
     {
-        
         Type = EffectType.SHIELD;
             Duration = duration;
-        
     }
 
-    public override void UpdateEffect(float deltaTime)
+    public override void UpdateEffect(ref int health, float deltaTime)
     {
-        Duration -= deltaTime;
-        if (Duration <= 0)
-        {
-            IsExpired = true;
-            Debug.Log("Shield effect expired.");
-        }
         
+        base.UpdateEffect(ref health, deltaTime);
+
 
         // Implement logic for the shield effect
         Debug.Log("Shield: Player is protected.");
@@ -212,34 +280,42 @@ public class ShieldEffect : Effect
 public class BurnEffect : Effect
 {
     private float interval;
-    private float damage;
+    private int damage;
+
+    private float intervalTimer;
 
     public BurnEffect(float duration, float interval)
+        //base(ref health)
     {
+        intervalTimer = 0;
         Type = EffectType.BURN;
         Duration = duration;
         this.interval = interval;
-        damage = 15f; // Adjust the damage amount as needed
+        damage = 15; // Adjust the damage amount as needed
     }
 
-    public override void UpdateEffect(float deltaTime)
+    public override void UpdateEffect(ref int health, float deltaTime)
     {
-        Duration -= deltaTime;
-        if (Duration <= 0)
-        {
-            IsExpired = true;
-            return;
-        }
+        base.UpdateEffect(ref health, deltaTime);
+
+
+        Debug.Log("UPDATING BURN EFFECT");
 
         // Apply burn damage at intervals
-        if (Mathf.Approximately(Duration % interval, 0f))
+        intervalTimer += Time.deltaTime;
+
+        // Apply poison damage at intervals
+        //if (Mathf.Approximately(Duration % interval, 0f))
+        if (intervalTimer >= interval)
         {
-            ApplyDamage();
+            ApplyDamage(ref health);
+            intervalTimer = 0;
         }
     }
 
-    private void ApplyDamage()
+    private void ApplyDamage(ref int health)
     {
+        health -=damage;
         // Implement logic to damage the player
         Debug.Log($"Burn: Player takes {damage} damage.");
     }

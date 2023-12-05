@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class PlayerManager : MonoBehaviour
 {
@@ -25,18 +25,32 @@ public class PlayerManager : MonoBehaviour
     public float cameraFollowSpeed; // Adjust the camera follow speed as needed
 
     //TEMPORARY
+    [HideInInspector]
+    public GameObject gameOverPanel;
+
+
+
+    
+
+
     private void Awake()
     {
         finishedSpawning = false;
         //StartItself();
+
+        gameOverPanel = GameObject.FindGameObjectWithTag("GameOverPanel");
+
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(false);
+        }
     }
 
 
     public void StartItself()
     {
 
-
-        stuckmode = false;
+        //stuckmode = false;
         numberOfPlayers = players.Count;
         SetPlayerToPlayerMode(currentPlayerIndex);
 
@@ -54,8 +68,6 @@ public class PlayerManager : MonoBehaviour
             }
         }
 
-
-
         healthbar = GameObject.FindGameObjectWithTag("HPBar").GetComponent<Slider>();
         healthbar.minValue = 0;
         healthbar.maxValue = players[currentPlayerIndex].GetComponent<Player>().health;
@@ -71,25 +83,40 @@ public class PlayerManager : MonoBehaviour
 
     private void Update()
     {
-        healthbar.value = players[currentPlayerIndex].GetComponent<Player>().health;
-
-
-        
-
-        if (characterSwitchpanel.activeSelf == true)
+        if (finishedSpawning)
         {
-            //SLOW DOWN TIME
-            Time.timeScale = .1f;
-        }
+            healthbar.value = players[currentPlayerIndex].GetComponent<Player>().health;
 
-        if (players.Count >= 0)
-        {
-            if (Input.GetKeyDown(KeyCode.Tab))
+            bool allDead = players.All(p => p.GetComponent<Player>().health <= 0);
+            if (allDead)
             {
-                //characterSwitchpanel.SetActive(true);
-                SwitchPlayer();
+                gameOverPanel.SetActive(true);
             }
-            cameraFollow();
+
+            if (gameOverPanel.activeSelf)
+            {
+                Time.timeScale = 0;
+            }
+            //if(playerGameObject)
+
+            if (characterSwitchpanel.activeSelf == true)
+            {
+                //SLOW DOWN TIME
+                Time.timeScale = .1f;
+            }
+
+            if (players.Count >= 0)
+            {
+                if (Input.GetKeyDown(KeyCode.Tab)
+                    || (!allDead
+                    && players[currentPlayerIndex].GetComponent<Player>().health <= 0)
+                    )
+                {
+                    //characterSwitchpanel.SetActive(true);
+                    SwitchPlayer();
+                }
+                cameraFollow();
+            }
         }
     }
 
@@ -141,23 +168,28 @@ public class PlayerManager : MonoBehaviour
     {
         int nextPlayerIndex = (currentPlayerIndex + 1) % numberOfPlayers;
         stuckmode = false;
-        currentPlayerIndex = nextPlayerIndex;
-        Debug.Log($"Switching to Player {currentPlayerIndex + 1}");
-        //SET PLAYERS IN PLAYER MODE
-        SetPlayerToPlayerMode(currentPlayerIndex);
 
-        for (int i = 0; i < numberOfPlayers; i++)
+        if (players[nextPlayerIndex].GetComponent<Character>().health > 0)
         {
-            if (i != currentPlayerIndex)
+            currentPlayerIndex = nextPlayerIndex;
+            Debug.Log($"Switching to Player {currentPlayerIndex + 1}");
+            //SET PLAYERS IN PLAYER MODE
+            SetPlayerToPlayerMode(currentPlayerIndex);
+
+            for (int i = 0; i < numberOfPlayers; i++)
             {
-                //SET PLAYERS TO AI MODE
-                SetPlayerToAIMode(i);
+                if (i != currentPlayerIndex)
+                {
+                    //SET PLAYERS TO AI MODE
+                    SetPlayerToAIMode(i);
+                }
+                players[i].GetComponent<Player>().leadingPlayer = players[currentPlayerIndex];
+
             }
-            players[i].GetComponent<Player>().leadingPlayer = players[currentPlayerIndex];
 
+            characterSwitchpanel.SetActive(false);
         }
-
-        characterSwitchpanel.SetActive(false);
+        
     }
 
     void SetPlayerToPlayerMode(int index)

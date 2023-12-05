@@ -20,11 +20,12 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
+    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
-  ignoreMasterTextureLimit: 0
+  ignoreMipmapLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -63,18 +64,20 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  swizzle: 50462976
   cookieLightType: 0
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 16384
+    maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
+    compressionQuality: 100
+    crunchedCompression: 1
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -87,6 +90,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -99,6 +103,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -111,6 +116,33 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 16384
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: iPhone
+    maxTextureSize: 16384
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
@@ -904,46 +936,45 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      apple_death_29: 1640783712
-      apple_death_32: -252754752
-      apple_death_28: 1763062399
-      apple_death_12: -1769867386
-      apple_death_26: 811023408
       apple_death_0: -570577332
-      apple_death_13: -838529330
-      apple_death_7: -37962952
-      apple_death_20: -2086458466
-      apple_death_8: -378617145
-      apple_death_15: 1051653952
-      apple_death_18: -1923295723
-      apple_death_27: 1406959476
-      apple_death_5: 797790118
-      apple_death_30: 1619168565
-      apple_death_16: 551189121
-      apple_death_34: -540924656
-      apple_death_36: 1505925749
-      apple_death_11: 1178974348
-      apple_death_31: 1645082039
-      apple_death_35: 1167965519
       apple_death_1: -2060859146
-      apple_death_3: -1916950154
       apple_death_10: -230401979
-      apple_death_17: -576788874
-      apple_death_4: -1761745816
+      apple_death_11: 1178974348
+      apple_death_12: -1769867386
+      apple_death_13: -838529330
       apple_death_14: -1961384918
-      apple_death_24: 256920884
-      apple_death_6: 24705124
-      apple_death_9: -1322376901
+      apple_death_15: 1051653952
+      apple_death_16: 551189121
+      apple_death_17: -576788874
+      apple_death_18: -1923295723
       apple_death_19: -180310267
-      apple_death_21: 892636591
       apple_death_2: -916311078
+      apple_death_20: -2086458466
+      apple_death_21: 892636591
       apple_death_22: -391322483
-      apple_death_25: -482553947
-      apple_death_33: -1911711784
       apple_death_23: 543697192
-  spritePackingTag: 
+      apple_death_24: 256920884
+      apple_death_25: -482553947
+      apple_death_26: 811023408
+      apple_death_27: 1406959476
+      apple_death_28: 1763062399
+      apple_death_29: 1640783712
+      apple_death_3: -1916950154
+      apple_death_30: 1619168565
+      apple_death_31: 1645082039
+      apple_death_32: -252754752
+      apple_death_33: -1911711784
+      apple_death_34: -540924656
+      apple_death_35: 1167965519
+      apple_death_36: 1505925749
+      apple_death_4: -1761745816
+      apple_death_5: 797790118
+      apple_death_6: 24705124
+      apple_death_7: -37962952
+      apple_death_8: -378617145
+      apple_death_9: -1322376901
+  mipmapLimitGroupName: 
   pSDRemoveMatte: 0
-  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 

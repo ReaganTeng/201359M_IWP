@@ -5,21 +5,64 @@ using UnityEngine.UI;
 
 public class compass : MonoBehaviour
 {
-    public Transform target; // The target the arrow should point to
     Image arrowImage; // The image representing the arrow on the compass
-    public Transform player; // The target the arrow should point to
+
+
+    [HideInInspector]
+    public GameObject[] playerlist;
+    public GameObject player; // The target the arrow should point to
+    public GameObject endzoneTarget; // The target the arrow should point to
+    public bool compassSet;
+
 
     private void Awake()
     {
+
+        compassSet = false;
+
         arrowImage = GetComponent<Image>();
+
+       
+
+
+    }
+
+
+    public void StartItself()
+    {
+        if (!compassSet)
+        {
+            playerlist = GameObject.FindGameObjectsWithTag("Player");
+
+            for (int i = 0; i < playerlist.Length; i++)
+            {
+                if (!playerlist[i].GetComponent<Player>().AIMode)
+                {
+                    player = playerlist[i];
+                    break;
+                }
+            }
+            endzoneTarget = GameObject.FindGameObjectWithTag("EndZone");
+            compassSet = true;
+        }
     }
 
     void Update()
     {
-        if (player != null && target != null && arrowImage != null)
+        if (player != null && endzoneTarget != null && arrowImage != null)
         {
+            for (int i = 0; i < playerlist.Length; i++)
+            {
+                if (!playerlist[i].GetComponent<Player>().AIMode)
+                {
+                    player = playerlist[i];
+                    break;
+                }
+            }
+
+
             // Calculate the direction from the player to the target
-            Vector3 directionToTarget = target.position - player.position;
+            Vector3 directionToTarget = endzoneTarget.transform.position - player.transform.position;
             //Vector3 directionToTarget = player.position - target.position;
 
             // Convert the direction to an angle in degrees

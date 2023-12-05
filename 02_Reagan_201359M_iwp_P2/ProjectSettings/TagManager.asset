@@ -15,6 +15,9 @@ TagManager:
   - ShopItemPanel
   - DayPanel
   - ATMPanel
+  - EndZone
+  - MoneyEarnedText
+  - GameOverPanel
   layers:
   - Default
   - TransparentFX

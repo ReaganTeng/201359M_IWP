@@ -33,7 +33,8 @@ public class Weapon : MonoBehaviour
         if (
             (Input.GetMouseButtonDown(0) || Input.GetAxis("Right Trigger") > .1f)
             && !isRotating
-            && !playerscript.AIMode)
+            && !playerscript.AIMode
+            && playerscript.health > 0)
         {
            BeginAttack();
         }

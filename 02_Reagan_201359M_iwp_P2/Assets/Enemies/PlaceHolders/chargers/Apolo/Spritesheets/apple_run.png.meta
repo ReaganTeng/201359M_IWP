@@ -20,11 +20,12 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
+    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
-  ignoreMasterTextureLimit: 0
+  ignoreMipmapLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -63,18 +64,20 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  swizzle: 50462976
   cookieLightType: 0
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 16384
+    maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
+    compressionQuality: 100
+    crunchedCompression: 1
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -87,6 +90,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -99,6 +103,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -111,6 +116,33 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 16384
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: iPhone
+    maxTextureSize: 16384
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
@@ -1387,69 +1419,68 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      apple_run_23: 293186655
-      apple_run_21: 201391196
-      apple_run_9: -1526864242
-      apple_run_35: -850292365
-      apple_run_25: 2002616932
-      apple_run_30: 544054609
-      apple_run_42: -1205892077
-      apple_run_57: 1465544425
-      apple_run_49: 254657492
-      apple_run_2: -63598596
-      apple_run_29: 1611860181
-      apple_run_32: 867175031
-      apple_run_40: 529496918
-      apple_run_27: 436359295
-      apple_run_47: -740608707
-      apple_run_7: 549414253
-      apple_run_20: 1919126152
-      apple_run_55: 1824112506
-      apple_run_18: -2057696759
-      apple_run_53: 1493750694
-      apple_run_28: 1431123228
-      apple_run_52: -131761067
-      apple_run_17: 613396085
-      apple_run_37: 1177125660
-      apple_run_12: 2130461592
-      apple_run_51: 1516860289
-      apple_run_56: -528441713
-      apple_run_31: 1794758866
-      apple_run_15: 1493450164
-      apple_run_48: 1058992557
-      apple_run_44: 866151714
-      apple_run_3: 574565707
-      apple_run_36: -809468623
-      apple_run_46: 1961057276
-      apple_run_38: -884801141
-      apple_run_58: -909921713
-      apple_run_41: -383968448
-      apple_run_4: -687155546
-      apple_run_24: -881619183
-      apple_run_34: -1707481642
-      apple_run_59: -233996982
-      apple_run_26: -1528320383
-      apple_run_5: -1445580070
-      apple_run_16: 1750215324
-      apple_run_45: 485202723
-      apple_run_6: -1455101650
-      apple_run_54: 463488467
-      apple_run_22: -1156947392
-      apple_run_13: 454150817
-      apple_run_10: 504830800
-      apple_run_19: -1561084162
-      apple_run_33: 1178387702
-      apple_run_1: -1097219925
       apple_run_0: 1790942606
-      apple_run_39: -1125200540
-      apple_run_43: -1025908421
+      apple_run_1: -1097219925
+      apple_run_10: 504830800
       apple_run_11: 1324009429
+      apple_run_12: 2130461592
+      apple_run_13: 454150817
       apple_run_14: -1563135647
-      apple_run_8: -1793831164
+      apple_run_15: 1493450164
+      apple_run_16: 1750215324
+      apple_run_17: 613396085
+      apple_run_18: -2057696759
+      apple_run_19: -1561084162
+      apple_run_2: -63598596
+      apple_run_20: 1919126152
+      apple_run_21: 201391196
+      apple_run_22: -1156947392
+      apple_run_23: 293186655
+      apple_run_24: -881619183
+      apple_run_25: 2002616932
+      apple_run_26: -1528320383
+      apple_run_27: 436359295
+      apple_run_28: 1431123228
+      apple_run_29: 1611860181
+      apple_run_3: 574565707
+      apple_run_30: 544054609
+      apple_run_31: 1794758866
+      apple_run_32: 867175031
+      apple_run_33: 1178387702
+      apple_run_34: -1707481642
+      apple_run_35: -850292365
+      apple_run_36: -809468623
+      apple_run_37: 1177125660
+      apple_run_38: -884801141
+      apple_run_39: -1125200540
+      apple_run_4: -687155546
+      apple_run_40: 529496918
+      apple_run_41: -383968448
+      apple_run_42: -1205892077
+      apple_run_43: -1025908421
+      apple_run_44: 866151714
+      apple_run_45: 485202723
+      apple_run_46: 1961057276
+      apple_run_47: -740608707
+      apple_run_48: 1058992557
+      apple_run_49: 254657492
+      apple_run_5: -1445580070
       apple_run_50: -1204360856
-  spritePackingTag: 
+      apple_run_51: 1516860289
+      apple_run_52: -131761067
+      apple_run_53: 1493750694
+      apple_run_54: 463488467
+      apple_run_55: 1824112506
+      apple_run_56: -528441713
+      apple_run_57: 1465544425
+      apple_run_58: -909921713
+      apple_run_59: -233996982
+      apple_run_6: -1455101650
+      apple_run_7: 549414253
+      apple_run_8: -1793831164
+      apple_run_9: -1526864242
+  mipmapLimitGroupName: 
   pSDRemoveMatte: 0
-  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 
