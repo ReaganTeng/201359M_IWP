@@ -359,10 +359,10 @@ public class Enemy : Character
             }
         }
 
-        if (!GameObject.FindGameObjectWithTag("Player").GetComponent<Player>().AIMode)
-        {
-            player = GameObject.FindGameObjectWithTag("Player");
-        }
+        //if (!GameObject.FindGameObjectWithTag("Player").GetComponent<Player>().AIMode)
+        //{
+        //    player = GameObject.FindGameObjectWithTag("Player");
+        //}
 
 
         //Debug.Log("REFERENCING FROM");

@@ -45,20 +45,33 @@ public class Chaser : Enemy
                         timertochase = 0;
                     }
 
-                    if (distance <= 1.0f)
+                    if (//distance <= 1.0f
+                        //&&
+                        !animator.GetCurrentAnimatorStateInfo(0).IsName("attack")
+                        )
                     {
-                        animator.SetFloat("AttackStage", stage1);
-                        if (animator.GetCurrentAnimatorStateInfo(0).IsName("attack")
+                        if (distance <= 1.0f * 1.5f)
+                        {
+                            animator.SetFloat("AttackStage", stage1);
+                        }
+                        else
+                        {
+                            FollowPlayer();
+                        }
+
+                    }
+                    //else
+                    //{
+                    //    FollowPlayer();
+                    //}
+
+                    if (animator.GetCurrentAnimatorStateInfo(0).IsName("attack")
                             && animator.GetFloat("AttackStage") == stage1
                             && animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f)
-                        {       
-                            currentState = EnemyState.ATTACK;
-                        }
-                    }
-                    else
                     {
-                        FollowPlayer();
+                        currentState = EnemyState.ATTACK;
                     }
+
                     break;
                 }
             case EnemyState.ATTACK:

@@ -82,8 +82,8 @@ public class EnemyManager : MonoBehaviour
                 &&
                 IsPositionValid(randomPosition))
             {
-                GameObject enemy = Instantiate(enemyPrefabs[Random.Range(0, enemyPrefabs.Count)], randomPosition, Quaternion.identity);
-                //GameObject enemy = Instantiate(enemyPrefabs[1], randomPosition, Quaternion.identity);
+                //GameObject enemy = Instantiate(enemyPrefabs[Random.Range(0, enemyPrefabs.Count)], randomPosition, Quaternion.identity);
+                GameObject enemy = Instantiate(enemyPrefabs[0], randomPosition, Quaternion.identity);
 
                 enemyList.Add(enemy);
                 enemy.transform.SetParent(enemyparent.transform);
