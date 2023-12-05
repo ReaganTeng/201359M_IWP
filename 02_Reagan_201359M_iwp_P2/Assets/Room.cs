@@ -29,13 +29,13 @@ public class DirectionInfo
 public class Room : MonoBehaviour
 {
 
-    Dictionary<Direction, Direction> oppositeDirections = new Dictionary<Direction, Direction>
-    {
-        {Direction.UP, Direction.DOWN},
-        {Direction.DOWN, Direction.UP},
-        {Direction.LEFT, Direction.RIGHT},
-        {Direction.RIGHT, Direction.LEFT}
-    };
+    //Dictionary<Direction, Direction> oppositeDirections = new Dictionary<Direction, Direction>
+    //{
+    //    {Direction.UP, Direction.DOWN},
+    //    {Direction.DOWN, Direction.UP},
+    //    {Direction.LEFT, Direction.RIGHT},
+    //    {Direction.RIGHT, Direction.LEFT}
+    //};
 
     public List<DirectionInfo> availableDirections = new List<DirectionInfo>();
 

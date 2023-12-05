@@ -13,12 +13,21 @@ public class GameManager : MonoBehaviour
 
     float goalamount;
 
+
+    public GameObject GameOverPanel;
+    public GameObject WinPanel;
+
+
     // Start is called before the first frame update
     void Start()
     {
         if (!PlayerPrefs.HasKey("GrossMoney"))
         {
             PlayerPrefs.SetFloat("GrossMoney", 100000);
+        }
+        if (!PlayerPrefs.HasKey("MoneyEarned"))
+        {
+            PlayerPrefs.SetFloat("MoneyEarned", 0);
         }
         if (!PlayerPrefs.HasKey("DaysLeft"))
         {
@@ -33,6 +42,9 @@ public class GameManager : MonoBehaviour
             PlayerPrefs.SetInt("RoundsCompleted", 0);
         }
         goalamount = 100000;
+
+
+        
     }
 
 
@@ -49,6 +61,10 @@ public class GameManager : MonoBehaviour
         if (PlayerPrefs.HasKey("MoneyDonated"))
         {
             PlayerPrefs.SetFloat("MoneyDonated", 0);
+        }
+        if (PlayerPrefs.HasKey("MoneyEarned"))
+        {
+            PlayerPrefs.SetFloat("MoneyEarned", 0);
         }
         if (PlayerPrefs.HasKey("RoundsCompleted"))
         {
@@ -67,6 +83,28 @@ public class GameManager : MonoBehaviour
 
 
         daysLeft.text = $"DAYS LEFT\n{PlayerPrefs.GetInt("DaysLeft")}";
+
+
+
+
+        if(PlayerPrefs.GetInt("DaysLeft") > 0)
+        {
+            GameOverPanel.SetActive(false);
+            WinPanel.SetActive(false);
+
+        }
+
+        if (PlayerPrefs.GetFloat("MoneyDonated") < goalamount
+            && PlayerPrefs.GetInt("DaysLeft") <= 0)
+        {
+            GameOverPanel.SetActive(true);
+        }
+
+        if (PlayerPrefs.GetFloat("MoneyDonated") >= goalamount
+            && PlayerPrefs.GetInt("DaysLeft") <= 0)
+        {
+            WinPanel.SetActive(true);
+        }
     }
 
 
@@ -74,7 +112,7 @@ public class GameManager : MonoBehaviour
     {
         if (PlayerPrefs.HasKey("MoneyDonated")
             && ATMInputField.text != ""
-            && float.Parse(ATMInputField.text) <= PlayerPrefs.GetInt("GrossMoney"))
+            && float.Parse(ATMInputField.text) <= PlayerPrefs.GetFloat("GrossMoney"))
         {
             float deposit = float.Parse(ATMInputField.text);
             PlayerPrefs.SetFloat("MoneyDonated"
@@ -82,5 +120,12 @@ public class GameManager : MonoBehaviour
                 );
             Debug.Log("MONEY DONATED");
         }
+    }
+
+
+
+    public void Endday()
+    {
+        PlayerPrefs.SetInt("DaysLeft", 0);
     }
 }

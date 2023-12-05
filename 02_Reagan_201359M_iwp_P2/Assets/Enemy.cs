@@ -26,6 +26,9 @@ public class Enemy : Character
     List<Vector3> listOfPositions;
     //List<List<Vector3>> listOfListofPositions;
 
+
+    protected GameObject[] playerlist;
+
     protected GameObject player;
     Vector3 playerpos;
 
@@ -73,7 +76,21 @@ public class Enemy : Character
 
         //Debug.Log("HEALTH SET " + health);
         attacked = false;
-        player = GameObject.FindGameObjectWithTag("Player");
+
+
+
+        playerlist = GameObject.FindGameObjectsWithTag("Player");
+        
+        for(int i = 0; i< playerlist.Length; i++)
+        {
+            if (!playerlist[i].GetComponent<Player>().AIMode)
+            {
+                player = playerlist[i];
+                break;
+            }
+        }
+
+
         enemymgt = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<EnemyManager>();
         //transform.position = GameObject.Find("MapGenerator").GetComponent<MapGenerator>().startingposition;
         //Debug.Log("TRANSFORM POSITION " + GameObject.Find("MapGenerator").GetComponent<MapGenerator>().startingposition);
@@ -325,9 +342,25 @@ public class Enemy : Character
 
     public EnemyState currentState;
 
-    protected virtual void Update()
+    protected override void Update()
     {
         base.Update();
+
+
+        for (int i = 0; i < playerlist.Length; i++)
+        {
+            if (!playerlist[i].GetComponent<Player>().AIMode)
+            {
+                player = playerlist[i];
+                break;
+            }
+        }
+
+        if (!GameObject.FindGameObjectWithTag("Player").GetComponent<Player>().AIMode)
+        {
+            player = GameObject.FindGameObjectWithTag("Player");
+        }
+
 
         //Debug.Log("REFERENCING FROM");
         if (player != null)
@@ -420,7 +453,7 @@ public class Enemy : Character
             ItemType itemchosen = (ItemType)(Random.Range(0, enumLength));
             
             GameObject item = Instantiate(itemPrefab, transform.position, Quaternion.identity);
-            item.GetComponent<Item>().SetItem(itemchosen, 5);
+            item.GetComponent<Item>().SetItem(itemchosen, 99);
         }
 
         enemymgt.enemyList.Remove(gameObject);

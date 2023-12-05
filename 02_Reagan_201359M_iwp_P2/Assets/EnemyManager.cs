@@ -27,6 +27,8 @@ public class EnemyManager : MonoBehaviour
     List<GameObject> enemiesInChaseMode = new List<GameObject>();
 
 
+    List<Vector2> takenPos = new List<Vector2>();
+
     //FOR ORGANIZATION PURPOSES IN INSPECTOR
     public GameObject enemyparent;
 
@@ -40,7 +42,7 @@ public class EnemyManager : MonoBehaviour
     public void StartItself()
     {
         timer = 0;
-        maxnumberenemies = 40;
+        maxnumberenemies = 15;
 
         if (!generationover)
         {
@@ -54,26 +56,41 @@ public class EnemyManager : MonoBehaviour
         Vector2 randomPosition;
         int enemytype = UnityEngine.Random.Range(0, 3);
         // Find the smallest and largest X and Y values
-        float smallestX = mapGenerator.occupiedPositions.Min(pos => pos.x);
-        float largestX = mapGenerator.occupiedPositions.Max(pos => pos.x);
-        float smallestY = mapGenerator.occupiedPositions.Min(pos => pos.y);
-        float largestY = mapGenerator.occupiedPositions.Max(pos => pos.y);
+        //float smallestX = mapGenerator.occupiedPositions.Min(pos => pos.x);
+        //float largestX = mapGenerator.occupiedPositions.Max(pos => pos.x);
+        //float smallestY = mapGenerator.occupiedPositions.Min(pos => pos.y);
+        //float largestY = mapGenerator.occupiedPositions.Max(pos => pos.y);
+
+        //HARD CODE THE VALUES FIRST
+        float smallestX = -64;
+        float largestX =0;
+        float smallestY = 0;
+        float largestY = 32;
+
+
         for (int i = 0; i < maxnumberenemies; i++)
         {
-            int randomX = UnityEngine.Random.Range((int)smallestX, (int)largestX);
-            int randomY = UnityEngine.Random.Range((int)smallestX, (int)largestX);
+            int randomX = Random.Range((int)smallestX, (int)largestX + 1);
+            int randomY = Random.Range((int)smallestY, (int)largestY + 1);
             randomPosition = new Vector2(
                 randomX,
                randomY
             );
-            if (IsPositionValid(randomPosition))
+            if (randomPosition != Vector2.zero
+                &&
+                !takenPos.Contains( randomPosition )
+                &&
+                IsPositionValid(randomPosition))
             {
-                GameObject enemy = Instantiate(enemyPrefabs[0], randomPosition, Quaternion.identity);
+                GameObject enemy = Instantiate(enemyPrefabs[Random.Range(0, enemyPrefabs.Count)], randomPosition, Quaternion.identity);
                 enemyList.Add(enemy);
                 enemy.transform.SetParent(enemyparent.transform);
+                takenPos.Add(randomPosition);
                 continue; // Successful spawn, move to the next loop iteration
             }
         }
+
+        takenPos.Clear();
         generationover = true;
         //enemiesspawned = true;
     }
@@ -112,24 +129,47 @@ public class EnemyManager : MonoBehaviour
         if (generationover)
         {
             QuantityManager();
-
             FSMManager();
-
         }
-
-        
     }
 
 
      void QuantityManager()
     {
+        Vector2 randomPosition;
+
         if (enemyList.Count < maxnumberenemies)
         {
+            //HARD CODE THE VALUES FIRST
+            float smallestX = -64;
+            float largestX = 0;
+            float smallestY = 0;
+            float largestY = 32;
+
+
+
             for (int i = 0; i < maxnumberenemies - enemyList.Count; i++)
             {
-                GameObject enemy = Instantiate(enemyList[0], Vector2.zero, Quaternion.identity);
-                enemyList.Add(enemy);
+
+                int randomX = Random.Range((int)smallestX, (int)largestX + 1);
+                int randomY = Random.Range((int)smallestY, (int)largestY + 1);
+                randomPosition = new Vector2(
+                    randomX,
+                   randomY
+                );
+                if (randomPosition != Vector2.zero
+                    &&
+                    !takenPos.Contains(randomPosition)
+                    &&
+                    IsPositionValid(randomPosition))
+                {
+                    GameObject enemy = Instantiate(enemyPrefabs[Random.Range(0, enemyPrefabs.Count)], randomPosition, Quaternion.identity);
+                    enemyList.Add(enemy);
+                    continue;
+                }
             }
+
+            takenPos.Clear();
         }
     }
 

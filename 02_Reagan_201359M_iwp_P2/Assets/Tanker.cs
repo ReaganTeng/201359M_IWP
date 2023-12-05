@@ -101,10 +101,11 @@ public class Tanker : Enemy
                     attackcollider.enabled = false;
                     circlecollider.enabled = true;
 
-                    //if (player != null)
-                    //{
+                    if (player != null
+                        && !player.GetComponent<Player>().AIMode)
+                    {
                         LastKnownPosition = player.transform.position;
-                    //}
+                    }
                     //currentState = EnemyState.ABOUT_TO_ATTACK;
                     //timer = 0;
                     break;
@@ -125,11 +126,31 @@ public class Tanker : Enemy
         {
             Debug.Log("BANG Player");
             //DAMAGE PLAYER
-            collision.gameObject.GetComponent<Player>().health -= damage;
+            Player player = collision.gameObject.GetComponent<Player>();
+
+
+            if (player.playerShield != null
+                && player.playerShield.shieldActive)
+            {
+                player.playerShield.shieldtimer = 0;
+            }
+            else
+            {
+                player.health -= damage;
+            }
+
+
             //collision.gameObject.GetComponent<Player>().immunity_timer = .5f;
             attackcooldown = .5f;
             //Destroy(gameObject);
-            collision.gameObject.GetComponent<Player>().healthbar.value = collision.gameObject.GetComponent<Player>().health;
+            //collision.gameObject.GetComponent<Player>().healthbar.value = collision.gameObject.GetComponent<Player>().health;
+            //collision.gameObject.GetComponent<Player>().healthbar.value = collision.gameObject.GetComponent<Player>().health;
+   
+
+            
+
+
+
 
             Debug.Log("PLAYER HEALTH " + collision.gameObject.GetComponent<Player>().health);
         }

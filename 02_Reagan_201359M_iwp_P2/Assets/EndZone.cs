@@ -1,13 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 public class EndZone : MonoBehaviour
 {
 
     GameObject player;
-    public GameObject Panel;
+    public GameObject GameCompletePanel;
+
+    Inventory invmanager;
 
     float countdown;
     bool countdown_started;
@@ -18,6 +21,11 @@ public class EndZone : MonoBehaviour
         countdown = 0;
         countdown_started = false;
         player = GameObject.FindWithTag("Player");
+        GameCompletePanel = GameObject.FindWithTag("GameCompletePanel");
+        GameCompletePanel.SetActive(false);
+
+         invmanager = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<Inventory>();
+
     }
 
 
@@ -37,23 +45,26 @@ public class EndZone : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("Player"))
-        //&& collision.gameObject.GetComponent<Player>().immunity_timer <= 0.0f)
+        if (collision.gameObject.CompareTag("Player")
+        && !collision.gameObject.GetComponent<Player>().AIMode)
         {
-           Panel.SetActive(true);
-            countdown_started = true;
+            GameCompletePanel.SetActive(true);
+            //countdown_started = true;
 
             //COUNT DOWN THE MONEY
-            foreach(var slot in collision.GetComponent<Inventory>().slots)
-            {
-                for(int i = 0; i < slot.Quantity; i++)
-                {
-                    money += (int)slot.CurrentItem.money;
-                    PlayerPrefs.SetInt("GrossMoney", PlayerPrefs.GetInt("GrossMoney") + money);
-                }
-            }
+            //foreach(var slot in invmanager.slots)
+            //{
+            //    for(int i = 0; i < slot.Quantity; i++)
+            //    {
+            //money += (int)slot.CurrentItem.money;
+                    money = PlayerPrefs.GetInt("MoneyEarned");
+                    PlayerPrefs.SetFloat("GrossMoney", PlayerPrefs.GetInt("GrossMoney") + money);
+                    GameCompletePanel.GetComponentInChildren<TextMeshProUGUI>().text = $"GAME OVER, YOU EARNED{money}";
+            PlayerPrefs.SetInt("MoneyEarned", 0);
 
-            
+            //    }
+            //}
+
         }
     }
 }

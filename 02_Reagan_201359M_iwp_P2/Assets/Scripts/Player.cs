@@ -13,6 +13,9 @@ using Quaternion = UnityEngine.Quaternion;
 using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using Vector2 = UnityEngine.Vector2;
 using static Projectile;
+using static Item;
+using static UnityEditor.Progress;
+using TMPro;
 
 public class Player : Character
 {
@@ -23,8 +26,9 @@ public class Player : Character
         HURT
     }
 
+    public TextMeshProUGUI moneyearnerd;
 
-    public Slider healthbar;
+    //public Slider healthbar;
     String[] tilemaptags;
     bool effectactive;
     public Transform playerTransform;
@@ -49,11 +53,18 @@ public class Player : Character
 
     //public float immunity_timer;
 
+    public GameObject itemPrefab;
+
+
+
     bool shotsomething;
 
     protected override void Awake()
     {
         base.Awake();
+
+        PlayerPrefs.SetInt("MoneyEarned", 0);
+
 
         shotsomething = false;
         playerInventory = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<Inventory>();
@@ -61,10 +72,10 @@ public class Player : Character
         effectactive = false;
         health = 100;
 
-        healthbar = GameObject.FindGameObjectWithTag("HPBar").GetComponent<Slider>();
-        healthbar.minValue = 0;
-        healthbar.maxValue = health;
-        healthbar.value = health;
+        //healthbar = GameObject.FindGameObjectWithTag("HPBar").GetComponent<Slider>();
+        //healthbar.minValue = 0;
+        //healthbar.maxValue = health;
+        //healthbar.value = health;
 
         //immunity_timer = 0.0f;
         idx = 0;
@@ -111,7 +122,7 @@ public class Player : Character
         //Instantiate(objectToSpawn, randomPosition, Quaternion.identity);
     }
 
-    
+
     protected override void Update()
     {
         base.Update();
@@ -167,10 +178,30 @@ public class Player : Character
     //HANDLES THE SHOOTING
     void Shooting()
     {
-        if (Input.GetMouseButtonDown(1) && !shotsomething)
+        int currentslot = playerInventory.selectedSlot;
+
+        //switch ()
+
+        if (Input.GetMouseButtonDown(1)
+            && !shotsomething
+            && playerInventory.slots[currentslot].Quantity > 0
+            && playerInventory.slots[currentslot].itemtype != ItemType.NOTHING)
         {
-            ShootProjectile();
-         
+            ItemType itemused = playerInventory.slots[currentslot].itemtype;
+
+            switch (itemused)
+            {
+                case ItemType.RED_GEM:
+                case ItemType.GREEN_GEM:
+                    ShootProjectile();
+                    break;
+                case ItemType.BLUE_GEM:
+                    UseItem();
+                    break;
+                default:
+                    break;
+            }
+
             shotsomething = true;
         }
         if (!Input.GetMouseButtonDown(1))
@@ -406,17 +437,24 @@ public class Player : Character
         //DECIDE ON THE PROJECTILE TYPE DEPENDING ON THE CURRENT INVENTORY SELECTED
         ProjectileType pt = ProjectileType.NORMAL;
         int currentslot = playerInventory.selectedSlot;
-        
+
+        //FOR THE SUBTRACTION OF MONEY
+        ItemType itemchosen = ItemType.NOTHING;
+
+
         switch (playerInventory.slots[currentslot].itemtype)
         {
             case Item.ItemType.RED_GEM: 
             {
                 pt = ProjectileType.RED_GEM;
+                    itemchosen = ItemType.RED_GEM;
                 break;
             }
             case Item.ItemType.GREEN_GEM:
             {
                 pt = ProjectileType.GREEN_GEM;
+                itemchosen = ItemType.GREEN_GEM;
+
                 break;
             }
             default:
@@ -428,16 +466,65 @@ public class Player : Character
         projectilePrefab.GetComponent<Projectile>().projectiletype = pt;
         GameObject projectile = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
 
+
+        //USE FOR SUBTRACTION OF MONEY
+        GameObject item = Instantiate(itemPrefab, transform.position, Quaternion.identity);
+        item.GetComponent<Item>().SetItem(itemchosen, 5);
+        PlayerPrefs.SetInt("MoneyEarned", PlayerPrefs.GetInt("MoneyEarned") - item.GetComponent<Item>().money);
+
+        if (moneyearnerd != null)
+        {
+            moneyearnerd.text = $"{PlayerPrefs.GetInt("MoneyEarned")}";
+        }
+        Destroy(item);
+        //
+
         if (projectile != null)
         {
             Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector3 direction = (mousePosition - transform.position).normalized;
             //(player.transform.position - transform.position).normalized
 
-            projectile.GetComponent<Projectile>().setdata(damage, 3,
+            projectile.GetComponent<Projectile>().setdata(damage, 10,
                 direction, gameObject);
         }
         //spriteRenderer.color = Color.blue;
+    }
+
+
+    void UseItem()
+    {
+        //FOR THE SUBTRACTION OF MONEY
+        ItemType itemchosen = ItemType.NOTHING;
+        int currentslot = playerInventory.selectedSlot;
+
+        switch (playerInventory.slots[currentslot].itemtype)
+        {
+            case ItemType.BLUE_GEM:
+                {
+                    itemchosen = ItemType.BLUE_GEM;
+                    ApplyEffect(EffectType.SHIELD);
+                    break;
+                }
+            default:
+                {
+                    break;
+                }
+        }
+        playerInventory.slots[currentslot].RemoveItem();
+
+        //USE FOR SUBTRACTION OF MONEY
+        GameObject item = Instantiate(itemPrefab, transform.position, Quaternion.identity);
+        item.GetComponent<Item>().SetItem(itemchosen, 5);
+        PlayerPrefs.SetInt("MoneyEarned", PlayerPrefs.GetInt("MoneyEarned") - item.GetComponent<Item>().money);
+        if (moneyearnerd != null)
+        {
+            moneyearnerd.text = $"{PlayerPrefs.GetInt("MoneyEarned")}";
+        }
+        Destroy(item);
+        //
+
+
     }
 
 

@@ -5,14 +5,17 @@ using UnityEngine;
 
 public class Shield : MonoBehaviour
 {
-    public float shieldtimer;
 
     SpriteRenderer sprite;
     //CircleCollider2D circleCollider;
+
+    [HideInInspector]
+    public float shieldtimer;
     public bool shieldActive;
     public void Awake()
     {
         sprite = GetComponent<SpriteRenderer>();
+        shieldtimer = 0;
         //circleCollider = GetComponent<CircleCollider2D>();
         sprite.enabled = false;
         shieldActive = false;

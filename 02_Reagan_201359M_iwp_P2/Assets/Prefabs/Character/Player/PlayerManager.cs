@@ -11,7 +11,6 @@ public class PlayerManager : MonoBehaviour
     public List<GameObject> players; // List of player characters
     int currentPlayerIndex = 0;
     int numberOfPlayers;
-    public float cameraFollowSpeed; // Adjust the camera follow speed as needed
     public Camera mainCamera; // Reference to the main camera
 
     public GameObject characterSwitchpanel;
@@ -19,15 +18,24 @@ public class PlayerManager : MonoBehaviour
     bool stuckmode;
 
 
+    public Slider healthbar;
+
+    [HideInInspector]
+    public bool finishedSpawning;
+    public float cameraFollowSpeed; // Adjust the camera follow speed as needed
+
     //TEMPORARY
     private void Awake()
     {
-        StartItself();
+        finishedSpawning = false;
+        //StartItself();
     }
 
 
     public void StartItself()
     {
+
+
         stuckmode = false;
         numberOfPlayers = players.Count;
         SetPlayerToPlayerMode(currentPlayerIndex);
@@ -46,12 +54,29 @@ public class PlayerManager : MonoBehaviour
             }
         }
 
+
+
+        healthbar = GameObject.FindGameObjectWithTag("HPBar").GetComponent<Slider>();
+        healthbar.minValue = 0;
+        healthbar.maxValue = players[currentPlayerIndex].GetComponent<Player>().health;
+        healthbar.value = players[currentPlayerIndex].GetComponent<Player>().health;
+
+        finishedSpawning = true;
+
+
+        SwitchPlayer();
+
         Debug.Log("START ITSELF FINISH");
     }
 
     private void Update()
     {
-        if(characterSwitchpanel.activeSelf == true)
+        healthbar.value = players[currentPlayerIndex].GetComponent<Player>().health;
+
+
+        
+
+        if (characterSwitchpanel.activeSelf == true)
         {
             //SLOW DOWN TIME
             Time.timeScale = .1f;

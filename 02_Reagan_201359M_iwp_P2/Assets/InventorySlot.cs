@@ -112,10 +112,10 @@ public class InventorySlot : MonoBehaviour
             itemtype = ItemType.NOTHING;
         }
 
-        //if (Quantity > 1)
-        //{
-        //    quantityText.text = Quantity.ToString();
-        //}
+        if (Quantity > 0)
+        {
+            quantityText.text = Quantity.ToString();
+        }
         Debug.Log($"ITEM ADDED");
     }
 }

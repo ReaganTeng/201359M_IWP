@@ -23,6 +23,8 @@ public class Chaser : Enemy
 
     float stage1 = 1;
     float stage2 = 2;
+    float timertochase = 0;
+
 
     protected override void Update()
     {
@@ -34,14 +36,22 @@ public class Chaser : Enemy
         {
             case EnemyState.ABOUT_TO_ATTACK:
                 {
+
+                    timertochase += 1 * Time.deltaTime;
+
+                    if(timertochase >= 3)
+                    {
+                        currentState = EnemyState.IDLE;
+                        timertochase = 0;
+                    }
+
                     if (distance <= 1.0f)
                     {
                         animator.SetFloat("AttackStage", stage1);
                         if (animator.GetCurrentAnimatorStateInfo(0).IsName("attack")
                             && animator.GetFloat("AttackStage") == stage1
                             && animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f)
-                        {
-                            
+                        {       
                             currentState = EnemyState.ATTACK;
                         }
                     }
@@ -70,11 +80,15 @@ public class Chaser : Enemy
                            && animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f
                            && attackcooldown <= 0.0)
                             {
-
-
                                 spriteRenderer.color = Color.white;
                                 animator.SetFloat("AttackStage", 0);
                                 attackcooldown = .5f;
+
+                                if (distance <= 2.0f)
+                                {
+                                    player.GetComponent<Player>().health -= damage;
+                                }
+
                                 currentState = EnemyState.IDLE;
                             }
                             break;

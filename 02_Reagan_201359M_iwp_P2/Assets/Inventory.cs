@@ -4,9 +4,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using static Item;
+using TMPro;
 
 public class Inventory : MonoBehaviour
 {
+    public TextMeshProUGUI moneyearned;
+
+
     public List<InventorySlot> slots;
     public int selectedSlot;
 
@@ -69,6 +73,10 @@ public class Inventory : MonoBehaviour
                 slot.AddItem(item, amountToAdd);
                 // Subtract the added amount from the total
                 amount -= amountToAdd;
+
+                PlayerPrefs.SetInt("MoneyEarned", PlayerPrefs.GetInt("MoneyEarned") + item.money);
+                moneyearned.text = $"{PlayerPrefs.GetInt("MoneyEarned")}";
+
                 Destroy(item.gameObject);
                 // If we've added the required amount, break out of the loop
                 if (amount <= 0)

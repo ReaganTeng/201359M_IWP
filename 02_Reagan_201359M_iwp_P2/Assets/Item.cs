@@ -25,13 +25,13 @@ public class Item : MonoBehaviour
    public int StackSize { get; set; }
 
 
-    List <Player> player = new List<Player>();
+    GameObject[] player;
     GameObject gameManager;
 
     private void Awake()
     {
         itemImage = GetComponent<SpriteRenderer>();
-        player.Add(GameObject.FindGameObjectWithTag("Player").GetComponent<Player>());
+        player = GameObject.FindGameObjectsWithTag("Player");
         gameManager = GameObject.FindGameObjectWithTag("GameMGT");
 
        
@@ -48,11 +48,11 @@ public class Item : MonoBehaviour
         //RESPONSIBLE FOR THE COLLECTION OF ITEMS
         if (StackSize > 0)
         {
-            foreach (Player player in player)
+            foreach (GameObject player in player)
             {
                 float distance = Vector2.Distance(player.gameObject.transform.position, transform.position);
                 if (distance <= 2.0f
-                    && !player.AIMode)
+                    && !player.GetComponent<Player>().AIMode)
                 {
                     //player.GetComponent<Inventory>().AddItem(this, 1);
                     gameManager.GetComponent<Inventory>().AddItem(this, 1);

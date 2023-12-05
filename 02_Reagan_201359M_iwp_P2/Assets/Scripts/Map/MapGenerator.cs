@@ -1,6 +1,8 @@
+using JetBrains.Annotations;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.OleDb;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
@@ -9,21 +11,32 @@ using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.UIElements;
 using static UnityEditor.PlayerSettings;
-
+using static UnityEngine.GridBrushBase;
+using Debug = UnityEngine.Debug;
+using Random = UnityEngine.Random;
 
 public class MapGenerator : MonoBehaviour
 {
+
+    public GameObject manualMap;
+
     public GameObject gameManager;
 
+    public GameObject referenceobject;
+
+
+    public GameObject treasureChestPrefab;
 
     public GameObject EndZone;
     GameObject endZone;
 
 
     public GameObject Player;
+    //List <GameObject> player = new List<GameObject>();
     GameObject player;
-
+    
     PlayerManager playermgt;
     EnemyManager enemymgt;
 
@@ -61,6 +74,9 @@ public class MapGenerator : MonoBehaviour
 
     bool enemiesspawned;
 
+
+    bool poolinitiated;
+
     Vector3 exitroompos;
 
     //bool AllPathsGenerated;
@@ -79,10 +95,20 @@ public class MapGenerator : MonoBehaviour
     public GameObject mapParent;
 
 
+
+
+
+    [HideInInspector]
     public int maxenemynumbers;
+
+
+    bool alltreasuresSpawned;
 
     void Awake()
     {
+        alltreasuresSpawned = false;
+
+        poolinitiated = false;
         //offset = 2;
         //reductionlevel = 0;
         //DivergingPathsGenerated = false;
@@ -97,16 +123,31 @@ public class MapGenerator : MonoBehaviour
         attempts = 0;
 
         allroomsSelected = false;
+
+        //TEMPORARILY TRUE
+        //pathsFinishedDiverging = true;
+        //extraroomsSpawned = true;
+
         pathsFinishedDiverging = false;
         extraroomsSpawned = false;
 
-        
+
         directionValues = (Direction[])Enum.GetValues(typeof(Direction));
-        exitRoomSpawned = false;
-        
-        levelGenerated = false;
+        //exitRoomSpawned = false;
+        exitRoomSpawned = true;
+
+
+        //TEMPORARY
+        //levelGenerated = false;
+        levelGenerated = true;
+
+
         //NumberOfPaths = UnityEngine.Random.Range(50, 81);
-        NumberOfPaths = 100;
+        NumberOfPaths = Random.Range(20, 30);
+
+        //NumberOfPaths = 100;
+        //NumberOfPaths = 1;
+
         //UnityEngine.Debug.Log("PATHS DECIDED " + NumberOfPaths);
         //NumberOfPaths = 10;
         PathsImplemented = 0;
@@ -125,48 +166,85 @@ public class MapGenerator : MonoBehaviour
         }
 
         // Step 1: Implement exit room randomly
-        spawnStartingRoom();
+        //spawnStartingRoom();
     }
 
 
 
-    private void Update()
+    public void SpawnTreasure()
     {
 
-        if (!levelGenerated)
+        //HARD CODE THE VALUES FIRST
+        float smallestX = -64;
+        float largestX = 0;
+        float smallestY = 0;
+        float largestY = 32;
+
+        if (!alltreasuresSpawned)
         {
-            GenerateLevel();
+            for(int i = 0; i< 40; i++)
+            {
+                int randomX = Random.Range((int)smallestX, (int)largestX + 1);
+                int randomY = Random.Range((int)smallestY, (int)largestY + 1);
+                Vector2 randomPosition = new Vector2(
+                    randomX,
+                   randomY
+                );
+                
+           Instantiate(treasureChestPrefab, randomPosition, Quaternion.identity);
+                    
+            }
+            alltreasuresSpawned = true;
         }
-        else
-        {
+    }
+
+
+    void Update()
+    {
+        //if (prevRoomInstantiated != null)
+        //{
+        //    referenceobject.transform.position = prevRoomInstantiated.transform.position;
+        //}
+        //if (!levelGenerated)
+        //{
+        //    //StartCoroutine(
+
+        //    GenerateLevel();
+        //        //);
+        //}
+        //else
+        //{
             gameManager.SetActive(true);
 
-            if(player == null)
+            //if(player == null)
+            if (!gameManager.GetComponent<PlayerManager>().finishedSpawning)
             {
-                player = Instantiate(Player, startingposition, Quaternion.identity);
-                //gameManager.players.Add(player);
-                gameManager.GetComponent<PlayerManager>().players.Add(player);
-                gameManager.GetComponent<PlayerManager>().StartItself();
+                for (int i = 0; i < 2; i++)
+                {
+                    player = Instantiate(Player, startingposition, Quaternion.identity);
+                    //player
+                    //player = Instantiate(Player, Vector3.zero, Quaternion.identity);
+                    //gameManager.players.Add(player);
 
+                    gameManager.GetComponent<PlayerManager>().players.Add(player);
+                    gameManager.GetComponent<PlayerManager>().StartItself();
+                }
             }
 
-            if (endZone == null)
-            {
-                endZone = Instantiate(EndZone, exitroom.transform.position, Quaternion.identity);
-            }
+            //if (endZone == null)
+            //{
+            //    endZone = Instantiate(EndZone, exitroom.transform.position, Quaternion.identity);
+            //}
 
-            if (!enemiesspawned)
+            if (!enemiesspawned
+                && gameManager.GetComponent<PlayerManager>().finishedSpawning)
             {
-                //SpawnEnemy();
-
                 enemymgt.StartItself();
-
-                //EnemyList.Clear();
-
                 enemiesspawned = true;
             }
 
-        }
+            SpawnTreasure();
+        //}
     }
 
     void spawnExitRoom()
@@ -188,11 +266,6 @@ public class MapGenerator : MonoBehaviour
                 directionChosen = directionValues[directionindexChosen];
                 directionselected = true;
             }
-            //else
-            //{
-            //    UnityEngine.Debug.Log("DIRECTION NOT CHOSEN");
-            //    directionselected = false;
-            //}
         }
 
         if (directionselected)
@@ -289,10 +362,12 @@ public class MapGenerator : MonoBehaviour
 
         if (!directionselected)
         {
-            int directionindexChosen = UnityEngine.Random.Range(0, 4);
-           // UnityEngine.Debug.Log("DIRECTION CHOSEN " + directionValues[directionindexChosen]);
-            if (room.GetComponent<Room>().availableDirections.Find(info => info.dir == directionValues[directionindexChosen]) != null
-                && !room.GetComponent<Room>().availableDirections.Find(info => info.dir == directionValues[directionindexChosen]).unExposed)
+            int directionindexChosen = Random.Range(0, 4);
+            // UnityEngine.Debug.Log("DIRECTION CHOSEN " + directionValues[directionindexChosen]);
+            if (room.GetComponent<Room>().availableDirections.Find(info => info.dir 
+            == directionValues[directionindexChosen]) != null
+                && !room.GetComponent<Room>().availableDirections.Find(info => info.dir 
+                == directionValues[directionindexChosen]).unExposed)
             {
                 //UnityEngine.Debug.Log("DIRECTION CHOSEN " + directionValues[directionindexChosen]);
                 directionChosen = directionValues[directionindexChosen];
@@ -340,33 +415,66 @@ public class MapGenerator : MonoBehaviour
                         }
                 }
                 currentRoomPosition = prevroomPosition + positionToGo;
-
-                int roomtemplatechosen = UnityEngine.Random.Range(0, multiDirectionalPaths.Count);
+                int roomtemplatechosen = Random.Range(0, multiDirectionalPaths.Count);
                 GameObject rm = multiDirectionalPaths[roomtemplatechosen];
                 //INSTANTIATE ROOM WHEN ROOM IS CHOSEN
-
-                if (rm.GetComponent<Room>().availableDirections.Find(info => info.dir == oppositeDirection) != null)
+                if (rm.GetComponent<Room>().availableDirections.Find(info => info.dir == oppositeDirection) 
+                    != null)
                 {
+                    //NEW VERSION - FIND WHETHER THE ROOM CHOSEN IS INSIDE THE POOL
+                    //bool allDirectionsInTemplate = roompool.Find(template =>
+                    //template.GetComponent<Room>().availableDirections
+                    //.Select(directionInfo => directionInfo.dir)
+                    //.SequenceEqual(rm.GetComponent<Room>().availableDirections
+                    //.Select(directionInfo => directionInfo.dir)));
+
+                    //currentRoom = roompool.Find(template => 
+                    //allDirectionsInTemplate
+                    //&& template.GetComponent<Room>().availableDirections.Count == rm.GetComponent<Room>().availableDirections.Count
+                    //&& !template.activeSelf);
+                    //if (currentRoom == null)
+                    //{
+                    //    currentRoom = Instantiate(rm, currentRoomPosition, Quaternion.identity);
+                    //    roompool.Add(currentRoom);
+                    //    int roomidx = roompool.IndexOf(currentRoom);
+                    //    roompool[roomidx].name = $"{roompool[roomidx].name} RECLONE";
+                    //    roompool[roomidx].transform.SetParent(roompoolParent.transform);
+                    //    //Debug.Log("PATH UNPOOLED");
+
+                    //}
+                    //else
+                    //{
+                    //    roompool.Remove(currentRoom);
+                    //    currentRoom.SetActive(true);
+                    //    currentRoom.transform.position = currentRoomPosition;
+                    //    //Debug.Log("PATH POOLED");
+
+                    //}
+                    //CheckOccupiedPaths(ref currentRoom);
+                    //occupiedPositions.Add(currentRoomPosition);
+                    //currentRoom.name = $"DIRECT PATH {currentRoom.name}";
+                    //CheckOccupiedPaths(ref room);
+                    //generatedRooms.Add(currentRoom);
+                    ////PREVIOUS ROOM TURNS TO CURRENT ROOM
+                    //room = currentRoom;
+                    ////SET AS CHILD OF MAPPARENT
+                    //currentRoom.transform.SetParent(mapParent.transform);
+                    //pathimplemented += 1;
+                    //attempts = 0;
+                    //roomchosen = true;
+                    ////foreach (var dir in currentRoom.GetComponent<Room>().availableDirections)
+                    ////{
+                    ////    dir.unExposed = false;
+                    ////}
+                    //
+
+
+                    //OLD VERSION
                     currentRoom = Instantiate(rm, currentRoomPosition, Quaternion.identity);
                     CheckOccupiedPaths(ref currentRoom);
                     //UnityEngine.Debug.Log("PATHS IMPLEMENTED " + PathsImplemented);
                     occupiedPositions.Add(currentRoomPosition);
-
-                    //CHECK IF THE ROOM IS SPAWNED NEXT TO ENTRANCE AT A CERTAIN DISTANCE
-                    //Vector2 pos = room.transform.position;
-                    //Vector2 offset = pos - startingposition;
-                    //float distance = offset.magnitude; // Calculate the distance
-                    //// Define the maximum allowed distance from the starting position
-                    //float maxDistance = roomdimension * 1;
-                    //if (distance <= maxDistance)
-                    //{
-                    //    currentRoom.name = "PATHnta";
-                    //    pathsNextToEntrance.Add(currentRoom.transform.position);
-                    //}
-                    //else
-                    //{
-                        currentRoom.name = "DIRECT PATH";
-                    //}
+                    currentRoom.name = "DIRECT PATH";
                     CheckOccupiedPaths(ref room);
                     generatedRooms.Add(currentRoom);
                     room = currentRoom;
@@ -377,62 +485,12 @@ public class MapGenerator : MonoBehaviour
                     roomchosen = true;
                 }
             }
-           
+
         }
     }
 
     void BackTrack(ref GameObject room, ref int path)
     {
-        //UnityEngine.Debug.Log("REDUCTION LEVEL " + reductionlevel);
-        //room.name = "BACKTRACKED";
-        //int loop = 1;
-        //if(PathsImplemented > 1)
-        //{
-        //    loop = 2;
-        //}
-
-        //for (int i = 0; i < 1; i++)
-        //{
-            occupiedPositions.Remove(room.transform.position);
-            generatedRooms.Remove(room);
-
-            Vector2 posi = room.transform.position;
-            if (pathsNextToEntrance.Any(pos => pos == posi))
-            {
-                pathsNextToEntrance.Remove(posi);
-            }
-
-            Destroy(room);
-            //room = generatedRooms[(generatedRooms.Count - 1) - reductionLevel];
-
-            //int idx = 0;
-            //if(generatedRooms.Count - 1 >= 0)
-            //{
-            //    idx = generatedRooms.Count - 1;
-            //}
-            int idx = generatedRooms.Count - 1;
-            room = generatedRooms[(idx)];
-        //CheckUnOccupiedPaths(room);
-        //}
-
-        for (int i = 0; i < generatedRooms.Count; i++)
-        {
-            GameObject generatedRoom = generatedRooms[i];
-            CheckUnOccupiedPaths(ref generatedRoom);
-            generatedRooms[i] = generatedRoom;
-        }
-
-        //UnityEngine.Debug.Log("B-TRACKING " + PathsImplemented);
-        attempts = 0;
-        path -= 1;
-        //UnityEngine.Debug.Log("BACKTRACKING " + path);
-    }
-
-    void BackTrackVer2(ref GameObject room, ref int path)
-    {
-        //UnityEngine.Debug.Log("REDUCTION LEVEL " + reductionlevel);
-        room.name = "BACKTRACKED";
-        
         occupiedPositions.Remove(room.transform.position);
         generatedRooms.Remove(room);
         Vector2 posi = room.transform.position;
@@ -440,21 +498,87 @@ public class MapGenerator : MonoBehaviour
         {
             pathsNextToEntrance.Remove(posi);
         }
+        //OLD METHOD - DESTROY ROOMS
         Destroy(room);
-        
+
+        //NEW METHOD- POOL ROOM
+        //foreach(var dir in room.GetComponent<Room>().availableDirections)
+        //{
+        //    dir.unExposed = false;
+        //}
+        //roompool.Add(room);
+        //int poolidx = roompool.IndexOf(room);
+        //roompool[poolidx].transform.position = Vector3.zero;
+        //roompool[poolidx].name = $"{roompool[poolidx].name} RECLONE";
+        //roompool[poolidx].transform.SetParent(roompoolParent.transform);
+        //roompool[poolidx].SetActive(false);
+        ////Destroy(room);
+        ////if (roompool[poolidx] != null)
+        ////{
+        ////    Debug.Log("NOT NULL");
+        ////}
+        //
+
+        //BACKTRACK TO PREV ROOM
         int idx = generatedRooms.Count - 1;
         room = generatedRooms[(idx)];
-
         for (int i = 0; i < generatedRooms.Count; i++)
         {
             GameObject generatedRoom = generatedRooms[i];
             CheckUnOccupiedPaths(ref generatedRoom);
             generatedRooms[i] = generatedRoom;
         }
-
-        UnityEngine.Debug.Log("B-TRACKING " + PathsImplemented);
+        attempts = 0;
         path -= 1;
+        //UnityEngine.Debug.Log("BACKTRACKING " + path);
+        //levelGenerated = true;
+    }
 
+    void BackTrackVer2(ref GameObject room, ref int path)
+    {
+       
+        room.name = "BACKTRACKED";
+        occupiedPositions.Remove(room.transform.position);
+        generatedRooms.Remove(room);
+        Vector2 posi = room.transform.position;
+        if (pathsNextToEntrance.Any(pos => pos == posi))
+        {
+            pathsNextToEntrance.Remove(posi);
+        }
+
+        //OLD METHOD - DESTROY ROOMS
+        Destroy(room);
+
+        //NEW METHOD- POOL ROOM
+        //foreach (var dir in room.GetComponent<Room>().availableDirections)
+        //{
+        //    dir.unExposed = false;
+        //}
+        //roompool.Add(room);
+        //int poolidx = roompool.IndexOf(room);
+        //roompool[poolidx].transform.position = Vector3.zero;
+        //roompool[poolidx].name = $"{roompool[poolidx].name} RECLONE VER 2";
+        //roompool[poolidx].transform.SetParent(roompoolParent.transform);
+        //roompool[poolidx].SetActive(false);
+        ////Destroy(room);
+        ////if (roompool[poolidx] != null)
+        ////{
+        ////    Debug.Log("NOT NULL");
+        ////}
+        //
+
+        //BACKTRACK TO PREV ROOM
+        int idx = generatedRooms.Count - 1;
+        room = generatedRooms[(idx)];
+        for (int i = 0; i < generatedRooms.Count; i++)
+        {
+            GameObject generatedRoom = generatedRooms[i];
+            CheckUnOccupiedPaths(ref generatedRoom);
+            generatedRooms[i] = generatedRoom;
+        }
+        Debug.Log("B-TRACKING " + PathsImplemented);
+        path -= 1;
+        //levelGenerated = true;
     }
 
     //CHECK WHETHER THE PATHS ARE OCCUPIED BY OTHER NEIGHBOURS, AND THEN CLOSE THE PATHS
@@ -498,7 +622,6 @@ public class MapGenerator : MonoBehaviour
     {
         Vector2 spawnedroomposition = room.transform.position;
         Room spawnedroomRoomScript = room.GetComponent<Room>();
-
         // Iterate through the available directions in the spawned room.
         foreach (DirectionInfo info in spawnedroomRoomScript.availableDirections)
         {
@@ -518,7 +641,7 @@ public class MapGenerator : MonoBehaviour
                 case Direction.DOWN:
                     expectedPosition.y -= roomdimension;
                     break;
-               
+
                 default:
                     break;
             }
@@ -529,6 +652,8 @@ public class MapGenerator : MonoBehaviour
                 info.unExposed = false;
             }
         }
+
+
     }
 
 
@@ -555,8 +680,39 @@ public class MapGenerator : MonoBehaviour
                 if (!occupiedPositions.Contains(new Vector2(x_cor, y_cor)))
                 {
                     //UnityEngine.Debug.Log("SPAWNING EXTRA");
-                    //new Vector2(x_cor, y_cor)
+                    //OLD VERSION, INSTANTIATE ROOM
                     GameObject room = Instantiate(roomchosen, new Vector2(x_cor, y_cor), Quaternion.identity);
+
+                    //NEW VERSION
+                    //bool allDirectionsInTemplate = roompool.Find(template =>
+                    //template.GetComponent<Room>().availableDirections
+                    //.Select(directionInfo => directionInfo.dir)
+                    //.SequenceEqual(roomchosen.GetComponent<Room>().availableDirections
+                    //.Select(directionInfo => directionInfo.dir)));
+                    //GameObject room = roompool.Find(template
+                    //   => allDirectionsInTemplate
+                    //   && template.GetComponent<Room>().availableDirections.Count
+                    //   == roomchosen.GetComponent<Room>().availableDirections.Count
+                    //   && !template.activeSelf);
+                    //if (room == null)
+                    //{
+                    //    currentRoom = Instantiate(roomchosen, new Vector2(x_cor, y_cor), Quaternion.identity);
+                    //    roompool.Add(currentRoom);
+                    //    int roomidx = roompool.IndexOf(currentRoom);
+                    //    roompool[roomidx].name = $"{roompool[roomidx].name} RECLONE";
+                    //    roompool[roomidx].transform.SetParent(roompoolParent.transform);
+                    //}
+                    //else
+                    //{
+                    //    // Reuse the room
+                    //    currentRoom = room;
+                    //    roompool.Remove(currentRoom);
+                    //    currentRoom.transform.position = new Vector2(x_cor, y_cor);
+                    //    currentRoom.SetActive(true);
+                    //    Debug.Log("PATH POOLED");
+                    //}
+                    //
+
                     room.name = "EXTRA ROOM";
                     generatedRooms.Add(room);
                     occupiedPositions.Add(room.transform.position);
@@ -635,7 +791,39 @@ public class MapGenerator : MonoBehaviour
                 //if (!occupiedPositions.Any(pos => pos == new Vector2(x_cor, y_cor)))
                 if (!occupiedPositions.Contains(new Vector2(x_cor, y_cor)))
                 {
+                    //OLD VERSION 
                     GameObject room = Instantiate(roomchosen, new Vector2(x_cor, y_cor), Quaternion.identity);
+
+                    //NEW VERSION
+                    //bool allDirectionsInTemplate = roompool.Find(template =>
+                    //template.GetComponent<Room>().availableDirections
+                    //.Select(directionInfo => directionInfo.dir)
+                    //.SequenceEqual(roomchosen.GetComponent<Room>().availableDirections
+                    //.Select(directionInfo => directionInfo.dir)));
+                    //GameObject room = roompool.Find(template
+                    //   => allDirectionsInTemplate
+                    //   && template.GetComponent<Room>().availableDirections.Count
+                    //   == roomchosen.GetComponent<Room>().availableDirections.Count
+                    //   && !template.activeSelf);
+                    //if (room == null)
+                    //{
+                    //    currentRoom = Instantiate(roomchosen, new Vector2(x_cor, y_cor), Quaternion.identity);
+                    //    roompool.Add(currentRoom);
+                    //    int roomidx = roompool.IndexOf(currentRoom);
+                    //    roompool[roomidx].name = $"{roompool[roomidx].name} RECLONE";
+                    //    roompool[roomidx].transform.SetParent(roompoolParent.transform);
+                    //}
+                    //else
+                    //{
+                    //    // Reuse the room
+                    //    currentRoom = room;
+                    //    roompool.Remove(currentRoom);
+                    //    currentRoom.transform.position = new Vector2(x_cor, y_cor);
+                    //    currentRoom.SetActive(true);
+                    //    Debug.Log("PATH POOLED");
+                    //}
+                    //
+
                     room.transform.SetParent(mapParent.transform);
                     //yield return null;
                 }
@@ -651,94 +839,184 @@ public class MapGenerator : MonoBehaviour
     }
 
 
+    //OLD VERSION
+    //IEnumerator DivergePaths()
+    //{
+    //Vector2 positionToGo = Vector2.zero;
+    //List<GameObject> roomswithopenpaths = new List<GameObject>();
+    //bool allUnExposed;
+    //int chosenmin = 0;
 
-    private IEnumerator DivergePaths()
+    ////UnityEngine.Debug.Log("DIVERGING PATH");
+    //if (!allroomsSelected)
+    //{
+    //    foreach (GameObject room in generatedRooms)
+    //    {
+    //        allUnExposed = room.GetComponent<Room>().availableDirections.All(directionInfo => directionInfo.unExposed);
+    //        if (!allUnExposed
+    //            && room != startingRoom
+    //            && room != exitroom)
+    //        {
+    //            roomswithopenpaths.Add(room);
+    //        }
+    //    }
+    //    allroomsSelected = true;
+    //    yield return null;
+    //}
+
+    ////DIVERGE PATHS
+    //if (allroomsSelected
+    //    && exitRoomSpawned
+    //    && !pathsFinishedDiverging)
+    //{
+    //    //UnityEngine.Debug.Log("DIVERGING");
+    //    for (int i = 0; i < roomswithopenpaths.Count; i++)
+    //    {
+    //        //UnityEngine.Debug.Log("DIVERGING " + i);
+    //        GameObject roomselected = roomswithopenpaths[i];
+    //        //prevRoomInstantiated = roomswithopenpaths[i];
+    //        int pathimp = 0;
+    //        int randomPath = UnityEngine.Random.Range(chosenmin, (NumberOfPaths * 2) + 1);
+    //        for (int x = 0; x < randomPath; x++)
+    //        {
+    //            if (//pathimp == NumberOfPaths - 1 ||
+    //                !IsNextToOccupiedPositions(roomselected)
+    //                && !IsPositionOccupied(roomselected)
+    //                )
+    //            {
+    //                //UnityEngine.Debug.Log("DIVERGING " + x);
+    //                RandomlyGeneratePath(ref roomselected, ref pathimp);
+
+    //                if (roomselected != roomswithopenpaths[i])
+    //                {
+    //                    roomselected.name = "DIVERGED PATH";
+    //                }
+    //                //if (IsPositionOccupied(roomselected)
+    //                //    && roomselected)
+    //                //{
+    //                //    BackTrack(ref roomselected, ref pathimp);
+    //                //}
+    //            }
+
+    //            if (//pathimp == NumberOfPaths - 1 ||
+    //                IsNextToOccupiedPositions(roomselected)
+    //                || IsPositionOccupied(roomselected)
+    //                )
+    //            {
+    //                roomselected = roomswithopenpaths[i];
+    //                allUnExposed = roomselected.GetComponent<Room>().availableDirections.Any(directionInfo => directionInfo.unExposed);
+    //                if (allUnExposed)
+    //                {
+    //                    break;
+    //                }
+    //                else
+    //                {
+    //                    roomselected = roomswithopenpaths[i];
+    //                    x = 0;
+    //                }
+    //            }
+    //            yield return null;
+    //        }
+    //        // Yield to the next frame
+    //        yield return null;
+    //        roomselected = roomswithopenpaths[i];
+    //        allUnExposed = roomselected.GetComponent<Room>().availableDirections.Any(directionInfo => directionInfo.unExposed);
+    //        if (!allUnExposed)
+    //        {
+    //            i++;
+    //        }
+    //    }
+    //    //UnityEngine.Debug.Log("FINISHED DIVERGING");
+    //    pathsFinishedDiverging = true;
+    //    yield return null;
+    //}
+    //}
+
+    public List<GameObject> roompool = new List<GameObject>();
+    public GameObject roompoolParent;
+    private void InitializeBulletPool()
+    {
+        //INITIALIZE 100 SIMILAR ROOM TEMPLATES
+        for (int i = 0; i < roomTemplates.Count; i++)
+        {
+            //for (int x = 0; x < 10; x++)
+            //{
+                GameObject room = Instantiate(roomTemplates[i]);
+                room.SetActive(false);
+                roompool.Add(room);
+                room.transform.SetParent(roompoolParent.transform);
+            //}
+        }
+        poolinitiated = true;
+    }
+
+
+    //NEW VERSION
+    IEnumerator DivergePaths()
+   //void DivergePaths()
     {
         Vector2 positionToGo = Vector2.zero;
         List<GameObject> roomswithopenpaths = new List<GameObject>();
         bool allUnExposed;
         int chosenmin = 0;
 
-        //UnityEngine.Debug.Log("DIVERGING PATH");
         if (!allroomsSelected)
         {
             foreach (GameObject room in generatedRooms)
             {
-                allUnExposed = room.GetComponent<Room>().availableDirections.All(directionInfo => directionInfo.unExposed);
-                if (!allUnExposed
-                    && room != startingRoom
-                    && room != exitroom)
+                allUnExposed
+                    = room.GetComponent<Room>().availableDirections.All(directionInfo
+                    => directionInfo.unExposed);
+                if (!allUnExposed && room != startingRoom && room != exitroom)
                 {
                     roomswithopenpaths.Add(room);
                 }
             }
             allroomsSelected = true;
-            yield return null;
         }
+        yield return null;
 
-        //DIVERGE PATHS
-        if (allroomsSelected
-            && exitRoomSpawned
-            && !pathsFinishedDiverging)
+        if (allroomsSelected && exitRoomSpawned && !pathsFinishedDiverging)
         {
-            //UnityEngine.Debug.Log("DIVERGING");
+            int pathimp;
+            List<int> randomPaths = new List<int>();
             for (int i = 0; i < roomswithopenpaths.Count; i++)
             {
-                //UnityEngine.Debug.Log("DIVERGING " + i);
                 GameObject roomselected = roomswithopenpaths[i];
-                //prevRoomInstantiated = roomswithopenpaths[i];
-                int pathimp = 0;
                 int randomPath = UnityEngine.Random.Range(chosenmin, (NumberOfPaths * 2) + 1);
-                for (int x = 0; x < randomPath; x++)
-                {
-                    if (//pathimp == NumberOfPaths - 1 ||
-                        !IsNextToOccupiedPositions(roomselected)
-                        && !IsPositionOccupied(roomselected)
-                        )
-                    {
-                        //UnityEngine.Debug.Log("DIVERGING " + x);
-                        RandomlyGeneratePath(ref roomselected, ref pathimp);
+                randomPaths.Add(randomPath);
+            }
 
+            for (int i = 0; i < roomswithopenpaths.Count;)
+            {
+                GameObject roomselected = roomswithopenpaths[i];
+                int randomPath = randomPaths[i];
+                pathimp = 0;
+
+                if (!IsNextToOccupiedPositions(roomselected) && !IsPositionOccupied(roomselected))
+                {
+                    for (int x = 0; x < randomPath; x++)
+                    {
+                        RandomlyGeneratePath(ref roomselected, ref pathimp);
                         if (roomselected != roomswithopenpaths[i])
                         {
                             roomselected.name = "DIVERGED PATH";
                         }
-                        //if (IsPositionOccupied(roomselected)
-                        //    && roomselected)
-                        //{
-                        //    BackTrack(ref roomselected, ref pathimp);
-                        //}
-                    }
-
-                    if (//pathimp == NumberOfPaths - 1 ||
-                        IsNextToOccupiedPositions(roomselected)
-                        || IsPositionOccupied(roomselected)
-                        )
-                    {
-                        roomselected = roomswithopenpaths[i];
-                        allUnExposed = roomselected.GetComponent<Room>().availableDirections.Any(directionInfo => directionInfo.unExposed);
-                        if (allUnExposed)
+                        if (IsNextToOccupiedPositions(roomselected) || IsPositionOccupied(roomselected))
                         {
                             break;
                         }
-                        else
-                        {
-                            roomselected = roomswithopenpaths[i];
-                            x = 0;
-                        }
                     }
-                    yield return null;
                 }
-                // Yield to the next frame
-                yield return null;
-                roomselected = roomswithopenpaths[i];
-                allUnExposed = roomselected.GetComponent<Room>().availableDirections.Any(directionInfo => directionInfo.unExposed);
+                allUnExposed 
+                    = roomselected.GetComponent<Room>().availableDirections.Any(directionInfo 
+                    => directionInfo.unExposed);
                 if (!allUnExposed)
                 {
                     i++;
                 }
             }
-            //UnityEngine.Debug.Log("FINISHED DIVERGING");
+
             pathsFinishedDiverging = true;
             yield return null;
         }
@@ -747,31 +1025,29 @@ public class MapGenerator : MonoBehaviour
     private IEnumerator RestGeneration()
     {
         //DIVERGE PATHS
-        if (!pathsFinishedDiverging)
+        if (!pathsFinishedDiverging
+               && exitRoomSpawned)
         {
-            yield return DivergePaths();
+            yield return 
+            DivergePaths();
         }
-        //
-
-        //SPAWN EXTRA ROOMS
         if (pathsFinishedDiverging
-                && !extraroomsSpawned)
+          && !extraroomsSpawned)
         {
-            yield return SpawnExtraRooms();
-
+            yield return 
+            SpawnExtraRooms();
         }
-
-        //SPAWN UNBREAKABLE WALLS
         if (extraroomsSpawned
-           && !paintedtotilemap)
+            && !paintedtotilemap)
         {
-            yield return SpawnUnbreakableWalls();
-
+            yield return 
+            SpawnUnbreakableWalls();
         }
+
+
 
         // Yield to the next frame
         yield return null;
-        //UnityEngine.Debug.Log("DIVERGING PATH");
     }
 
     //CHECK IF ALL SIDES OF THE ROOMS ARE CLOSED
@@ -879,139 +1155,81 @@ public class MapGenerator : MonoBehaviour
         return nextToStartingRoom;
     }
 
+
+
+
+
+    //IEnumerator Pathgenerator()
+    void Pathgenerator()
+    {
+        //OLD VERSION
+        RandomlyGeneratePath(ref prevRoomInstantiated, ref PathsImplemented);
+        attempts += 1;
+        // BACKTRACK WHEN ANY ROOMS HAS ALL THE PATHS CLOSED
+        if (IsPositionOccupied(prevRoomInstantiated) || IsNextToOccupiedPositions(prevRoomInstantiated))
+        {
+            BackTrack(ref prevRoomInstantiated, ref PathsImplemented);
+        }
+        // Yield after processing the current frame
+        //yield return null;
+        if (attempts >= NumberOfPaths)
+        {
+            int no = PathsImplemented;
+            for (int i = 0; i < no - 1; i++)
+            {
+                BackTrackVer2(ref prevRoomInstantiated, ref PathsImplemented);
+                // Yield after each backtrack to spread the load across frames
+                //yield return null;
+            }
+            attempts = 0;
+        }
+    }
+
     void GenerateLevel()
     {
-        //UnityEngine.Debug.Log("PATHS IMPLEMENTED " + PathsImplemented);
-        if (PathsImplemented < NumberOfPaths)
+        if(!poolinitiated)
         {
-            RandomlyGeneratePath(ref prevRoomInstantiated, ref PathsImplemented);
-            attempts += 1;
-            //BACKTRACK WHEN ANY ROOMS HAS ALL THE PATHS CLOSED
-            if (IsPositionOccupied(prevRoomInstantiated)
-             || IsNextToOccupiedPositions(prevRoomInstantiated))
-            {
-                //UnityEngine.Debug.Log("BACKTRACK");
-                BackTrack(ref prevRoomInstantiated, ref PathsImplemented);
-            }
-            if (attempts >= NumberOfPaths)
-            {
-                int no = PathsImplemented;
-                //if (no % 2 != 0)
-                //{
-                //    no -= 1;
-                //}
-                for (int i = 0; i < no - 1; i++)
-                {
-                    //UnityEngine.Debug.Log("BACKTRACK VER 2");
-                    BackTrackVer2(ref prevRoomInstantiated, ref PathsImplemented);
-                }
-                attempts = 0;
-            }
-            //}
+            InitializeBulletPool();
         }
-        else
+        //UnityEngine.Debug.Log("PATHS IMPLEMENTED " + PathsImplemented);
+        if (PathsImplemented < NumberOfPaths
+            && poolinitiated)
+        {
+            //yield return
+            //StartCoroutine(
+            Pathgenerator();
+            //);
+            
+            //yield return null;
+        }
+        if (PathsImplemented >= NumberOfPaths)
         {
             if (!exitRoomSpawned)
             {
                 spawnExitRoom();
             }
-            //if (exitRoomSpawned
-            //    && !pathsFinishedDiverging)
-            //{
-            //    UnityEngine.Debug.Log("SPAWNING DIVERGING PATHS");
-                //StartCoroutine(DivergePaths());
-                //DivergePaths();
-                //DivergePathsCo();
-                //DivergePaths2();
-            StartCoroutine(RestGeneration());
 
+            //StartCoroutine(RestGeneration());
+
+            //if (!pathsFinishedDiverging
+            //    && exitRoomSpawned)
+            //{
+            //    StartCoroutine(DivergePaths());
             //}
             //if (pathsFinishedDiverging
-            //    && !extraroomsSpawned)
+            //  && !extraroomsSpawned)
             //{
-            //    UnityEngine.Debug.Log("SPAWNING EXTRA ROOMS");
-            //    //StartCoroutine(
-            //    //    SpawnExtraRooms()
-            //    //    )
-            //    //    ;
+            //    StartCoroutine(SpawnExtraRooms());
             //}
             //if (extraroomsSpawned
             //    && !paintedtotilemap)
             //{
-            //    UnityEngine.Debug.Log("SPAWNING BOUNDARIES");
-            //    //StartCoroutine(
-            //        //SpawnUnbreakableWalls()
-            //        //)
-            //        ;
-            //    //PaintRoomsToGlobalTilemaps();
+            //    StartCoroutine(SpawnUnbreakableWalls());
             //}
-            //if (extraroomsSpawned
-            //    //&& !paintedtotilemap
-            //    )
-            //{
-            //    UnityEngine.Debug.Log("SPAWNING PAINT");
-            //   // StartCoroutine(PaintRoomsToGlobalTilemaps());
 
-            //    //PaintRoomsToGlobalTilemaps();
-            //}
-            //if (paintedtotilemap)
-            //{
-            //    UnityEngine.Debug.Log("SPAWNING UNBREAKABLE WALLS");
-            //    StartCoroutine(Destroyrooms());
-            //}
+
         }
-        //UnityEngine.Debug.Log("ATTEMPTS " + attempts);
-        //UnityEngine.Debug.Log("PATH " + PathsImplemented);
-        //if(AllPathsGenerated)
-        //{
-        //    DivergePaths();
-        //}
-        //private void DivergePaths()
-        //{
-        //    if (pathsFinishedDiverging) return; // Early exit if paths are already finished diverging
 
-        //    List<GameObject> roomsWithOpenPaths = new List<GameObject>();
-
-        //    foreach (GameObject room in generatedRooms)
-        //    {
-        //        Room roomScript = room.GetComponent<Room>();
-        //        bool allUnExposed = roomScript.availableDirections.All(directionInfo => directionInfo.unExposed);
-
-        //        if (!allUnExposed && room != startingRoom && room != exitroom)
-        //        {
-        //            roomsWithOpenPaths.Add(room);
-        //        }
-        //    }
-
-        //    if (roomsWithOpenPaths.Count == 0)
-        //    {
-        //        pathsFinishedDiverging = true;
-        //        return; // No more rooms with open paths, exit
-        //    }
-
-        //    int chosenMin = 0;
-
-        //    for (int i = 0; i < roomsWithOpenPaths.Count; i++)
-        //    {
-        //        GameObject roomSelected = roomsWithOpenPaths[i];
-        //        int pathImp = 0;
-        //        int randomPath = UnityEngine.Random.Range(chosenMin, (NumberOfPaths * 2) + 1);
-
-        //        for (int x = 0; x < randomPath; x++)
-        //        {
-        //            if (IsNextToOccupiedPositions(roomSelected) || IsPositionOccupied(roomSelected))
-        //            {
-        //                // The room can't generate more paths, skip it
-        //                break;
-        //            }
-
-        //            RandomlyGeneratePath(ref roomSelected, ref pathImp);
-        //            roomSelected.name = "DIVERGED PATH";
-        //        }
-        //    }
-
-        //    pathsFinishedDiverging = true;
-        //}
     }
 
 
@@ -1079,12 +1297,27 @@ public class MapGenerator : MonoBehaviour
 
         return true;
     }
-
     //
+}
+
+
+
+[System.Serializable]
+public class RoomDirections
+{
+    public List<Direction> directions;
+
+    public RoomDirections(List<Direction> dirs)
+    {
+        directions = dirs;
+    }
+}
 
 
 
 
+
+/*
 
     //private IEnumerator DivergePathsCoroutine()
     //{
@@ -1708,92 +1941,150 @@ public class MapGenerator : MonoBehaviour
     //        }
     //    }
     //}
+    //public IEnumerator PaintRoomsToGlobalTilemaps()
+    //{
+    //    for (int i = 0; i < generatedRooms.Count; i++)
+    //    {
+    //        Transform roomTransform = generatedRooms[i].transform;
+    //        Tilemap roomWallTilemap = roomTransform.Find("Walls").GetComponent<Tilemap>();
+    //        Tilemap roomFloorTilemap = roomTransform.Find("Floors").GetComponent<Tilemap>();
+
+    //        Vector3 roomWorldPos = roomTransform.position;
+    //        BoundsInt wallBounds = roomWallTilemap.cellBounds;
+    //        BoundsInt floorBounds = roomFloorTilemap.cellBounds;
+
+    //        // Copy wall tiles from room to mainWallTilemap
+    //        foreach (var position in wallBounds.allPositionsWithin)
+    //        {
+    //            Vector3Int roomPositionInMainTilemap = mainWallTilemap.WorldToCell(roomWorldPos) + position - wallBounds.min;
+    //            Vector3Int roomPosition = position - wallBounds.min;
+
+    //            TileBase wallTile = roomWallTilemap.GetTile(roomPosition);
+    //            if (wallTile != null)
+    //            {
+    //                mainWallTilemap.SetTile(roomPositionInMainTilemap, wallTile);
+    //            }
+    //        }
+
+    //        // Copy floor tiles from room to mainFloorTilemap
+    //        foreach (var position in floorBounds.allPositionsWithin)
+    //        {
+    //            Vector3Int roomPositionInMainTilemap = mainFloorTilemap.WorldToCell(roomWorldPos) + position - floorBounds.min;
+    //            Vector3Int roomPosition = position - floorBounds.min;
+
+    //            TileBase floorTile = roomFloorTilemap.GetTile(roomPosition);
+    //            if (floorTile != null)
+    //            {
+    //                mainFloorTilemap.SetTile(roomPositionInMainTilemap, floorTile);
+    //            }
+    //        }
+
+    //        // Yield after each room has been processed
+    //        yield return null;
+    //    }
+
+    //    //for (int i = 0; i < generatedRooms.Count; i++)
+    //    //        {
+    //    //            Destroy(generatedRooms[i]);
+    //    //        }
+
+    //        paintedtotilemap = true;
+    //    // Notify that all rooms have been painted
+    //    UnityEngine.Debug.Log("All rooms painted");
+    //}
+
+    //IEnumerator AddWalls()
+    //{
+    //    //ADD UNBREAKABLE WALLS
+    //    //Paint walls on empty areas of mainWallTilemap
+    //    BoundsInt bound = mainWallTilemap.cellBounds;
+
+    //    // Define your scaling factor (e.g., 2 for double width)
+    //    int scalingFactor = 2;
+
+    //    // Calculate the new bounds manually
+    //    BoundsInt scaledBounds = new BoundsInt(
+    //        bound.position - new Vector3Int(bound.size.x * (scalingFactor - 1) / 2,
+    //        bound.size.y * (scalingFactor - 1) / 2, 0),
+    //        new Vector3Int(bound.size.x * scalingFactor, bound.size.y * scalingFactor, bound.size.z)
+    //    );
+
+    //    TileBase wallTileAtPosition;
+    //    TileBase floorTileAtPosition;
+
+    //    foreach (Vector3Int position in scaledBounds.allPositionsWithin)
+    //    {
+    //        wallTileAtPosition = mainWallTilemap.GetTile(position);
+    //        floorTileAtPosition = mainFloorTilemap.GetTile(position);
+
+    //        if (wallTileAtPosition == null && floorTileAtPosition == null)
+    //        {
+    //            mainWallTilemap.SetTile(position, wallTile);
+    //        }
+    //        yield return null;
+
+    //        //Debug.Log("WALL ADDED");
+    //    }
+
+    //    levelGenerated = true;
+    //    //
+    //}
+
+
+
+
+    //UnityEngine.Debug.Log("ATTEMPTS " + attempts);
+    //UnityEngine.Debug.Log("PATH " + PathsImplemented);
+    //if(AllPathsGenerated)
+    //{
+    //    DivergePaths();
+    //}
+    //private void DivergePaths()
+    //{
+    //    if (pathsFinishedDiverging) return; // Early exit if paths are already finished diverging
+
+    //    List<GameObject> roomsWithOpenPaths = new List<GameObject>();
+
+    //    foreach (GameObject room in generatedRooms)
+    //    {
+    //        Room roomScript = room.GetComponent<Room>();
+    //        bool allUnExposed = roomScript.availableDirections.All(directionInfo => directionInfo.unExposed);
+
+    //        if (!allUnExposed && room != startingRoom && room != exitroom)
+    //        {
+    //            roomsWithOpenPaths.Add(room);
+    //        }
+    //    }
+
+    //    if (roomsWithOpenPaths.Count == 0)
+    //    {
+    //        pathsFinishedDiverging = true;
+    //        return; // No more rooms with open paths, exit
+    //    }
+
+    //    int chosenMin = 0;
+
+    //    for (int i = 0; i < roomsWithOpenPaths.Count; i++)
+    //    {
+    //        GameObject roomSelected = roomsWithOpenPaths[i];
+    //        int pathImp = 0;
+    //        int randomPath = UnityEngine.Random.Range(chosenMin, (NumberOfPaths * 2) + 1);
+
+    //        for (int x = 0; x < randomPath; x++)
+    //        {
+    //            if (IsNextToOccupiedPositions(roomSelected) || IsPositionOccupied(roomSelected))
+    //            {
+    //                // The room can't generate more paths, skip it
+    //                break;
+    //            }
+
+    //            RandomlyGeneratePath(ref roomSelected, ref pathImp);
+    //            roomSelected.name = "DIVERGED PATH";
+    //        }
+    //    }
+
+    //    pathsFinishedDiverging = true;
+    //}
 }
-//public IEnumerator PaintRoomsToGlobalTilemaps()
-//{
-//    for (int i = 0; i < generatedRooms.Count; i++)
-//    {
-//        Transform roomTransform = generatedRooms[i].transform;
-//        Tilemap roomWallTilemap = roomTransform.Find("Walls").GetComponent<Tilemap>();
-//        Tilemap roomFloorTilemap = roomTransform.Find("Floors").GetComponent<Tilemap>();
 
-//        Vector3 roomWorldPos = roomTransform.position;
-//        BoundsInt wallBounds = roomWallTilemap.cellBounds;
-//        BoundsInt floorBounds = roomFloorTilemap.cellBounds;
-
-//        // Copy wall tiles from room to mainWallTilemap
-//        foreach (var position in wallBounds.allPositionsWithin)
-//        {
-//            Vector3Int roomPositionInMainTilemap = mainWallTilemap.WorldToCell(roomWorldPos) + position - wallBounds.min;
-//            Vector3Int roomPosition = position - wallBounds.min;
-
-//            TileBase wallTile = roomWallTilemap.GetTile(roomPosition);
-//            if (wallTile != null)
-//            {
-//                mainWallTilemap.SetTile(roomPositionInMainTilemap, wallTile);
-//            }
-//        }
-
-//        // Copy floor tiles from room to mainFloorTilemap
-//        foreach (var position in floorBounds.allPositionsWithin)
-//        {
-//            Vector3Int roomPositionInMainTilemap = mainFloorTilemap.WorldToCell(roomWorldPos) + position - floorBounds.min;
-//            Vector3Int roomPosition = position - floorBounds.min;
-
-//            TileBase floorTile = roomFloorTilemap.GetTile(roomPosition);
-//            if (floorTile != null)
-//            {
-//                mainFloorTilemap.SetTile(roomPositionInMainTilemap, floorTile);
-//            }
-//        }
-
-//        // Yield after each room has been processed
-//        yield return null;
-//    }
-
-//    //for (int i = 0; i < generatedRooms.Count; i++)
-//    //        {
-//    //            Destroy(generatedRooms[i]);
-//    //        }
-
-//        paintedtotilemap = true;
-//    // Notify that all rooms have been painted
-//    UnityEngine.Debug.Log("All rooms painted");
-//}
-
-//IEnumerator AddWalls()
-//{
-//    //ADD UNBREAKABLE WALLS
-//    //Paint walls on empty areas of mainWallTilemap
-//    BoundsInt bound = mainWallTilemap.cellBounds;
-
-//    // Define your scaling factor (e.g., 2 for double width)
-//    int scalingFactor = 2;
-
-//    // Calculate the new bounds manually
-//    BoundsInt scaledBounds = new BoundsInt(
-//        bound.position - new Vector3Int(bound.size.x * (scalingFactor - 1) / 2,
-//        bound.size.y * (scalingFactor - 1) / 2, 0),
-//        new Vector3Int(bound.size.x * scalingFactor, bound.size.y * scalingFactor, bound.size.z)
-//    );
-
-//    TileBase wallTileAtPosition;
-//    TileBase floorTileAtPosition;
-
-//    foreach (Vector3Int position in scaledBounds.allPositionsWithin)
-//    {
-//        wallTileAtPosition = mainWallTilemap.GetTile(position);
-//        floorTileAtPosition = mainFloorTilemap.GetTile(position);
-
-//        if (wallTileAtPosition == null && floorTileAtPosition == null)
-//        {
-//            mainWallTilemap.SetTile(position, wallTile);
-//        }
-//        yield return null;
-
-//        //Debug.Log("WALL ADDED");
-//    }
-
-//    levelGenerated = true;
-//    //
-//}
+*/

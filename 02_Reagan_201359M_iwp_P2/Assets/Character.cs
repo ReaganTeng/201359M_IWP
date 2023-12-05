@@ -7,16 +7,19 @@ public class Character : MonoBehaviour
     private List<Effect> activeEffects = new List<Effect>();
 
 
+    [HideInInspector]
     public int health;
     public int damage;
     public SpriteRenderer spriteRenderer;
-
+    public Shield playerShield;
 
 
 
     //bool effectapplied = false;
     protected virtual void Awake()
     {
+        playerShield = GetComponentInChildren<Shield>();
+
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
@@ -90,6 +93,10 @@ public class Character : MonoBehaviour
             case EffectType.POISON:
                 return new PoisonEffect(10f, 2f, 0.75f);
             case EffectType.SHIELD:
+                if(playerShield != null)
+                {
+                    playerShield.shieldtimer = 15.0f;
+                }
                 return new ShieldEffect(15f);
             case EffectType.BURN:
                 return new BurnEffect(20f, 1f);
@@ -152,7 +159,7 @@ public class PoisonEffect : Effect
 
         // Apply poison damage at intervals
         //if (Mathf.Approximately(Duration % interval, 0f))
-            if(intervalTimer >= interval)
+        if(intervalTimer >= interval)
         {
             ApplyDamage();
             intervalTimer = 0;
@@ -177,11 +184,13 @@ public class PoisonEffect : Effect
 
 // Shield effect
 public class ShieldEffect : Effect
-{
+{ 
     public ShieldEffect(float duration)
     {
+        
         Type = EffectType.SHIELD;
-        Duration = duration;
+            Duration = duration;
+        
     }
 
     public override void UpdateEffect(float deltaTime)
