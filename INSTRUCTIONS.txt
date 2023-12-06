@@ -1,0 +1,8 @@
+INSTRUCTIONS:
+Interact with E
+WASD to move
+1,2,3 to switch inventory slots. Selected slot will be red
+Right click use the item in the selected slot
+Red gem and green gem are projectiles, right click to shoot them in the direction of mouse cursor
+Tab to switch players
+Left click to attack enemy
