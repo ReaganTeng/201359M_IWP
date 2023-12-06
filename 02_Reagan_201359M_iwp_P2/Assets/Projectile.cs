@@ -96,10 +96,12 @@ public class Projectile : MonoBehaviour
 
             if (projectiletype == ProjectileType.GREEN_GEM)
             {
+                projectileSprite.color = Color.white;
                 collisionCharacter.ApplyEffect(EffectType.POISON);
             }
             if (projectiletype == ProjectileType.RED_GEM)
             {
+                projectileSprite.color = Color.white;
                 collisionCharacter.ApplyEffect(EffectType.BURN);
             }
             //Debug.Log("HIT Player");
