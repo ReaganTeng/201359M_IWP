@@ -16,7 +16,6 @@ public class PlayerHubWorld : MonoBehaviour
         //ATMPanel = GameObject.FindGameObjectWithTag("ATMPanel");
         //shopPanel = GameObject.FindGameObjectWithTag("ShopPanel");
         //dayPanel = GameObject.FindGameObjectWithTag("DayPanel");
-
     }
 
     // Update is called once per frame
@@ -29,6 +28,9 @@ public class PlayerHubWorld : MonoBehaviour
             Movement();
         }
     }
+
+
+    
 
 
     private void Movement()

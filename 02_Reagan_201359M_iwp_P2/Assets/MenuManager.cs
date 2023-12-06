@@ -5,6 +5,35 @@ using UnityEngine.SceneManagement;
 
 public class MenuManager : MonoBehaviour
 {
+
+    [HideInInspector]
+    public GameObject instructions;
+    public void Awake()
+    {
+        instructions = GameObject.FindGameObjectWithTag("Instructions");
+        Time.timeScale = 0;
+    }
+
+
+    public void Update()
+    {
+        
+    }
+
+    public void toggleInstruction()
+    {
+        instructions.SetActive(!instructions.activeSelf);
+        if(Time.timeScale > 0)
+        {
+            Time.timeScale = 0;
+        }
+        else
+        {
+            Time.timeScale = 1;
+        }
+    }
+
+
     public void ReturnToHubWorld()
     {
 

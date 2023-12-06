@@ -55,6 +55,12 @@ public class DayTracker : MonoBehaviour
     }
 
 
+    public void closePanel()
+    {
+        dayPanel.SetActive(!dayPanel.activeSelf);
+    }
+
+
     void OnTriggerExit2D(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("Player"))

@@ -42,6 +42,12 @@ public class ATM : MonoBehaviour
         }
     }
 
+
+    public void closePanel()
+    {
+        ATMPanel.SetActive(!ATMPanel.activeSelf);
+    }
+
     void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("Player"))

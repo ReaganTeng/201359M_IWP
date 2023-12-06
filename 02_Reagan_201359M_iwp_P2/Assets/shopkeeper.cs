@@ -50,6 +50,12 @@ public class shopkeeper : MonoBehaviour
 
     }
 
+    public void closePanel()
+    {
+        shopPanel.SetActive(!shopPanel.activeSelf);
+    }
+
+
     void OnTriggerEnter2D(Collider2D collision)
     {
         if(collision.gameObject.CompareTag("Player"))

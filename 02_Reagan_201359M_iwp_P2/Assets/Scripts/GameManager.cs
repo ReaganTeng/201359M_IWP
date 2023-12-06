@@ -17,10 +17,20 @@ public class GameManager : MonoBehaviour
     public GameObject GameOverPanel;
     public GameObject WinPanel;
 
+    [HideInInspector]
+    public GameObject HelpPanel;
+    [HideInInspector]
+    public GameObject StoryPanel;
 
     // Start is called before the first frame update
     void Start()
     {
+        HelpPanel = GameObject.FindGameObjectWithTag("HelpPanel");
+        HelpPanel.SetActive(true);
+
+
+        StoryPanel = GameObject.FindGameObjectWithTag("StoryScreen");
+
         if (!PlayerPrefs.HasKey("GrossMoney"))
         {
             PlayerPrefs.SetFloat("GrossMoney", 100000);
@@ -73,11 +83,21 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(HelpPanel.activeSelf == true)
+        {
+            Time.timeScale = 0;
+        }
+        else
+        {
+            Time.timeScale = 1.0f;
+        }
+
+
         grossMoney.text = $"${PlayerPrefs.GetFloat("GrossMoney")}";
         daysLeft.text = $"{daysLeft}";
 
         float moneydonated = PlayerPrefs.GetFloat("MoneyDonated");
-        ATMText.text = $"DONATED: {moneydonated}\nLEFT:{goalamount}";
+        ATMText.text = $"DONATED: {moneydonated}\nGOAL:{goalamount}";
 
         daysLeft.text = $"DAYS LEFT\n{PlayerPrefs.GetInt("DaysLeft")}";
 
@@ -122,6 +142,16 @@ public class GameManager : MonoBehaviour
         }
     }
 
+
+    public void toggleHelpPanel()
+    {
+        HelpPanel.SetActive(!HelpPanel.activeSelf);
+    }
+
+    public void TogglePanel()
+    {
+        StoryPanel.SetActive(!StoryPanel.activeSelf);
+    }
 
 
     public void Endday()

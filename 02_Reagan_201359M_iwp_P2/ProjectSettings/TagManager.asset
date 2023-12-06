@@ -18,6 +18,10 @@ TagManager:
   - EndZone
   - MoneyEarnedText
   - GameOverPanel
+  - HelpPanel
+  - StoryScreen
+  - Instructions
+  - PausePanel
   layers:
   - Default
   - TransparentFX
