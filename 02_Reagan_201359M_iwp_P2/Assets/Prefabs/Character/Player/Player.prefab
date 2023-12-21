@@ -106,7 +106,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   audioclips:
-  - {fileID: 8300000, guid: 13104cd1b33696242a436c5838c0a146, type: 3}
+  - {fileID: 8300000, guid: 39b985af2cfbcd1448c4586214f255a2, type: 3}
   health: 0
   damage: 0
   spriteRenderer: {fileID: 0}

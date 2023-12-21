@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using UnityEngine;
-
 
 public enum Direction
 {
@@ -25,8 +27,43 @@ public class DirectionInfo
 }
 
 
+
+//[CustomEditor(typeof(Room))]
+//public class RoomEditor : Editor
+//{
+//    public override void OnInspectorGUI()
+//    {
+//        DrawDefaultInspector();
+
+//        Room room = (Room)target;
+
+//        if (GUILayout.Button("Assign Prefab ID"))
+//        {
+//            // Get the asset path of the prefab
+//            string assetPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(room);
+
+//            // Extract the name from the asset path
+//            room.prefabId = System.IO.Path.GetFileNameWithoutExtension(assetPath);
+
+//            EditorUtility.SetDirty(room);
+//        }
+//    }
+//}
+
+
+
 public class Room : MonoBehaviour
 {
+    [HideInInspector]
+    public int prefabId;
+
+
+    //public string prefabId;
+
+    void Start()
+    {
+        //Debug.Log($"ID IS {prefabId}");
+    }
 
     //Dictionary<Direction, Direction> oppositeDirections = new Dictionary<Direction, Direction>
     //{

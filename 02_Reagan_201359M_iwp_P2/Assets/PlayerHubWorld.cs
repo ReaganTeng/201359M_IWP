@@ -13,6 +13,13 @@ public class PlayerHubWorld : MonoBehaviour
     {
         Time.timeScale = 1;
 
+        //PlayerPrefs.SetInt("HealthUpgradePercentage", 0);
+
+        if (!PlayerPrefs.HasKey("HealthUpgrade"))
+        {
+            PlayerPrefs.SetInt("HealthUpgradePercentage", 0);
+        }
+        
         //ATMPanel = GameObject.FindGameObjectWithTag("ATMPanel");
         //shopPanel = GameObject.FindGameObjectWithTag("ShopPanel");
         //dayPanel = GameObject.FindGameObjectWithTag("DayPanel");
@@ -48,5 +55,11 @@ public class PlayerHubWorld : MonoBehaviour
         transform.rotation = Quaternion.Euler(0f, 0f, -rotationAngle);
         // Apply movement
         transform.position = newPosition;
+    }
+
+
+    public void IncreaseHealth(int val)
+    {
+        PlayerPrefs.SetInt("HealthUpgradePercentage", PlayerPrefs.GetInt("HealthUpgradePercentage") + val);
     }
 }

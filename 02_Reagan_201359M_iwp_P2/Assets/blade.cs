@@ -6,6 +6,16 @@ public class blade : MonoBehaviour
 {
 
 
+    public AudioClip HitClip;
+    [HideInInspector] AudioSource AS;
+
+
+    void Awake()
+    {
+        AS = GetComponent<AudioSource>();
+
+    }
+
     // Handle collisions with other objects
     void OnTriggerEnter2D(Collider2D collision)
     {
@@ -36,6 +46,9 @@ public class blade : MonoBehaviour
 
             Debug.Log("ENEMY HEALTH " + enemyScript.health);
 
+
+            AS.clip = HitClip;
+            AS.Play();
         }
 
     }

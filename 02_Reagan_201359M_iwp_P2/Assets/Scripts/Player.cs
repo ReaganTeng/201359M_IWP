@@ -75,7 +75,8 @@ public class Player : Character
         playerInventory = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<Inventory>();
         icon = GetComponent<Image>();
         effectactive = false;
-        health = 100;
+        health = 100 + PlayerPrefs.GetInt("HealthUpgradePercentage");
+        Debug.Log($"PLAYER HEALTH {health}");
 
         //healthbar = GameObject.FindGameObjectWithTag("HPBar").GetComponent<Slider>();
         //healthbar.minValue = 0;

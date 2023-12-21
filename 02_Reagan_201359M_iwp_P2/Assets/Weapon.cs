@@ -17,12 +17,17 @@ public class Weapon : MonoBehaviour
    public Player playerscript;
 
 
+   
+
     private void Awake()
     {
         rotationSpeed = 360;
         rotationDuration = 1.0f;
         playerscript = GetComponentInParent<Player>();
         blade.SetActive(false);
+
+
+
         //gameObject.SetActive(true);
         //gameObject.SetActive(false);
     }

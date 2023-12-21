@@ -7119,6 +7119,7 @@ MonoBehaviour:
   maxenemynumbers: 0
   roompool: []
   roompoolParent: {fileID: 2136087909}
+  roomswithopenpaths: []
   enemyPrefab: {fileID: 5479193372864470963, guid: 63f2c5c00e0a1c94291f101fd9df2abb, type: 3}
   spawnInterval: 3
 --- !u!1 &907332443
@@ -7138,7 +7139,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &907332444
 RectTransform:
   m_ObjectHideFlags: 0
@@ -19770,7 +19771,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2006783929
 Transform:
   m_ObjectHideFlags: 0

@@ -11,7 +11,10 @@ public class MenuManager : MonoBehaviour
     public void Awake()
     {
         instructions = GameObject.FindGameObjectWithTag("Instructions");
-        Time.timeScale = 0;
+        if (instructions != null)
+        {
+            Time.timeScale = 0;
+        }
     }
 
 
@@ -22,14 +25,17 @@ public class MenuManager : MonoBehaviour
 
     public void toggleInstruction()
     {
-        instructions.SetActive(!instructions.activeSelf);
-        if(Time.timeScale > 0)
+        if (instructions != null)
         {
-            Time.timeScale = 0;
-        }
-        else
-        {
-            Time.timeScale = 1;
+            instructions.SetActive(!instructions.activeSelf);
+            if (Time.timeScale > 0)
+            {
+                Time.timeScale = 0;
+            }
+            else
+            {
+                Time.timeScale = 1;
+            }
         }
     }
 
