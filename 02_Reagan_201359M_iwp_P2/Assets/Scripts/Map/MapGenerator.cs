@@ -735,11 +735,11 @@ public class MapGenerator : MonoBehaviour
         {
             for (int y_cor = (int)smallestY; y_cor <= (int)largestY; y_cor += roomdimension)
             {
-                int templatechosen = Random.Range(0, roomTemplates.Count);
-                roomchosen = roomTemplates[templatechosen];
-
                 if (!occupiedPositions.Contains(new Vector2(x_cor, y_cor)))
                 {
+                    int templatechosen = Random.Range(0, roomTemplates.Count);
+                    roomchosen = roomTemplates[templatechosen];
+
                     //UnityEngine.Debug.Log("SPAWNING EXTRA");
                     //OLD VERSION, INSTANTIATE ROOM
                     //GameObject room = Instantiate(roomchosen, new Vector2(x_cor, y_cor), Quaternion.identity);
