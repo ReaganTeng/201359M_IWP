@@ -56,6 +56,9 @@ public class MapGenerator : MonoBehaviour
     GameObject startingRoom;
     Vector2 currentRoomPosition;
     public List<Vector2> occupiedPositions;
+
+
+
     public Vector2 startingposition;
     public Tilemap mainWallTilemap;
     public Tilemap mainFloorTilemap;
@@ -711,11 +714,77 @@ public class MapGenerator : MonoBehaviour
 
     float t = 0;
 
-    
 
+    //bool[,] OP = new bool[300, 300];
 
     //SPAWN ROOMS THAT WILL NOT DIRECT TO THE PATH
     //private IEnumerator SpawnExtraRooms()
+    void CA_SpawnExtraRooms()
+
+    {
+        //foreach(Vector2 pos in occupiedPositions)
+        //{
+        //    int xIndex = Mathf.Clamp((int)pos.x, 0, 299); // Clamp to array bounds
+        //    int yIndex = Mathf.Clamp((int)pos.y, 0, 299);
+
+        //    OP[xIndex, yIndex] = true;
+        //}
+
+        GameObject roomchosen = unbreakableWall;
+        Debug.Log("SPAWNING EXTRA ROOMS");
+        float smallestX = occupiedPositions.Min(pos => pos.x);
+        float largestX = occupiedPositions.Max(pos => pos.x);
+        float smallestY = occupiedPositions.Min(pos => pos.y);
+        float largestY = occupiedPositions.Max(pos => pos.y);
+
+        for (int x_cor = (int)smallestX; x_cor <= (int)largestX; x_cor += roomdimension)
+        {
+            for (int y_cor = (int)smallestY; y_cor <= (int)largestY; y_cor += roomdimension)
+            {
+                TrySpawnRoom(x_cor, y_cor);
+            }
+        }
+        extraroomsSpawned = true;
+
+    } //end CA_SpawnExtraRooms
+
+    bool TrySpawnRoom(int x_cor, int y_cor)
+
+    {
+        if (OP[x_cor, y_cor])
+            return false;
+
+        int templatechosen = Random.Range(0, roomTemplates.Count);
+        GameObject roomchosen = roomTemplates[templatechosen];
+        Room rmRoom = roomchosen.GetComponent<Room>();
+        GameObject room = roompool.FirstOrDefault(template
+        => !template.activeSelf
+        && template.GetComponent<Room>().prefabId == rmRoom.prefabId
+        && template.GetComponent<Room>().availableDirections.Count == rmRoom.availableDirections.Count
+        );
+
+        if (room == null)
+        {
+            room = Instantiate(roomchosen, new Vector2(x_cor, y_cor), Quaternion.identity);
+            roompool.Add(room);
+            room.name = $"{room.gameObject.name} RECLONE";
+            room.transform.SetParent(roompoolParent.transform);
+        }
+        else
+        {
+            room.SetActive(true);
+            roompool.Remove(room);
+            room.transform.position = new Vector2(x_cor, y_cor);
+            Debug.Log("PATH POOLED");
+        }
+        room.name = $"{room.name} EXTRA ROOM";
+        generatedRooms.Add(room);
+        OP[x_cor, y_cor] = true;
+        //SET AS CHILD OF MAPPARENT
+        room.transform.SetParent(mapParent.transform);
+        return true;
+
+    } //end TrySpawnRoom
     void SpawnExtraRooms()
     {
         GameObject roomchosen = unbreakableWall;
@@ -1348,7 +1417,8 @@ public class MapGenerator : MonoBehaviour
                 Debug.Log($"TTIME {t}");
 
                 //StartCoroutine(
-                SpawnExtraRooms();
+                //SpawnExtraRooms();
+                CA_SpawnExtraRooms();
                 //) ;
             }
             //if (extraroomsSpawned
