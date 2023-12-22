@@ -13,6 +13,7 @@ public class Enemy : Character
 {
     String[] tilemaptags;
 
+    QuestManager questManager;
 
     TileBase closestTile;
     public TileBase wallTile;
@@ -66,6 +67,9 @@ public class Enemy : Character
     protected override void Awake()
     {
         base.Awake();
+
+
+        questManager = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<QuestManager>();
 
         attackcooldown = 0;
         enemyrb = GetComponent<Rigidbody2D>();
@@ -460,6 +464,8 @@ public class Enemy : Character
         }
 
         enemymgt.enemyList.Remove(gameObject);
+
+        questManager.UpdateQuestProgress("Killing Monster");
         Destroy(gameObject);
 
         //THINGS TO ADD - DYING ANIMATION

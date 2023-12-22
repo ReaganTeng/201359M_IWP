@@ -7,31 +7,23 @@ using static Item;
 using System;
 using Random = UnityEngine.Random;
 
-public class Treasure : MonoBehaviour
+public class Treasure : Interactables
 {
     public List<Sprite> chestSprites;
-
-    SpriteRenderer sr;
-    TextMeshProUGUI textPrompt;
-
     public GameObject itemPrefab;
 
     bool unlocked;
     // Start is called before the first frame update
-    void Awake()
+    public override void Awake()
     {
+        base.Awake();
         unlocked = false;
-        sr = GetComponent<SpriteRenderer>();
-
-        textPrompt = GetComponentInChildren<TextMeshProUGUI>();
-
-        textPrompt.enabled = false;
+        
         sr.sprite = chestSprites[0];
-
     }
 
     // Update is called once per frame
-    void Update()
+    public override void Update()
     {
         if(Input.GetKeyDown(KeyCode.E)
             && textPrompt.enabled
@@ -57,22 +49,25 @@ public class Treasure : MonoBehaviour
         sr.sprite = chestSprites[1];
     }
 
-    void OnTriggerEnter2D(Collider2D collision)
+    public override void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("Player")
-            && !unlocked)
+            && !unlocked
+            )
         {
             textPrompt.enabled = true;
-            //unlocked = true;
+            unlocked = true;
         }
     }
 
-    void OnTriggerExit2D(Collider2D collision)
+    public override void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("Player") && !unlocked)
+        if (collision.gameObject.CompareTag("Player")
+            //&& !unlocked
+            )
         {
             textPrompt.enabled = false;
-            //unlocked = true;
+            unlocked = true;
         }
     }
 

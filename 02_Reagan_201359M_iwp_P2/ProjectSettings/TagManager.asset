@@ -22,6 +22,8 @@ TagManager:
   - StoryScreen
   - Instructions
   - PausePanel
+  - DialoguePanel
+  - QuestPanel
   layers:
   - Default
   - TransparentFX

@@ -56,9 +56,6 @@ public class MapGenerator : MonoBehaviour
     GameObject startingRoom;
     Vector2 currentRoomPosition;
     public List<Vector2> occupiedPositions;
-
-
-
     public Vector2 startingposition;
     public Tilemap mainWallTilemap;
     public Tilemap mainFloorTilemap;
@@ -202,18 +199,18 @@ public class MapGenerator : MonoBehaviour
 
     void Update()
     {
-        if (prevRoomInstantiated != null)
-        {
-            referenceobject.transform.position = prevRoomInstantiated.transform.position;
-        }
-        if (!levelGenerated)
-        {
-            //StartCoroutine(
-            GenerateLevel();
-            //);
-        }
-        else
-        {
+        //if (prevRoomInstantiated != null)
+        //{
+        //    referenceobject.transform.position = prevRoomInstantiated.transform.position;
+        //}
+        //if (!levelGenerated)
+        //{
+        //    //StartCoroutine(
+        //    GenerateLevel();
+        //    //);
+        //}
+        //else
+        //{
             if (!gameManager.activeSelf)
             {
                 gameManager.SetActive(true);
@@ -254,7 +251,7 @@ public class MapGenerator : MonoBehaviour
             }
             SpawnTreasure();
             CompassObject.StartItself();
-        }
+        //}
     }
 
     void spawnExitRoom()
@@ -714,21 +711,31 @@ public class MapGenerator : MonoBehaviour
 
     float t = 0;
 
-
-    //bool[,] OP = new bool[300, 300];
+    List<List<int>> OP = new List<List<int>>();
+    //bool[,] OP = new bool[1000, 1000];
 
     //SPAWN ROOMS THAT WILL NOT DIRECT TO THE PATH
     //private IEnumerator SpawnExtraRooms()
+    // ...
+
     void CA_SpawnExtraRooms()
-
     {
-        //foreach(Vector2 pos in occupiedPositions)
-        //{
-        //    int xIndex = Mathf.Clamp((int)pos.x, 0, 299); // Clamp to array bounds
-        //    int yIndex = Mathf.Clamp((int)pos.y, 0, 299);
+        foreach (Vector2 pos in occupiedPositions)
+        {
+            int xIndex = (int)pos.x; // Clamp to array bounds
+            int yIndex = (int)pos.y;
 
-        //    OP[xIndex, yIndex] = true;
-        //}
+            // Ensure the row exists
+            while (OP.Count <= xIndex)
+                OP.Add(new List<int>());
+
+            // Ensure the column exists
+            while (OP[xIndex].Count <= yIndex)
+                OP[xIndex].Add(0); // Initialize with 0
+
+            // Set the value to 1 (assuming 1 represents true in your case)
+            OP[xIndex][yIndex] = 1;
+        }
 
         GameObject roomchosen = unbreakableWall;
         Debug.Log("SPAWNING EXTRA ROOMS");
@@ -749,18 +756,17 @@ public class MapGenerator : MonoBehaviour
     } //end CA_SpawnExtraRooms
 
     bool TrySpawnRoom(int x_cor, int y_cor)
-
     {
-        if (OP[x_cor, y_cor])
+        if (OP.Count > x_cor && OP[x_cor].Count > y_cor && OP[x_cor][y_cor] == 1)
             return false;
 
         int templatechosen = Random.Range(0, roomTemplates.Count);
         GameObject roomchosen = roomTemplates[templatechosen];
         Room rmRoom = roomchosen.GetComponent<Room>();
         GameObject room = roompool.FirstOrDefault(template
-        => !template.activeSelf
-        && template.GetComponent<Room>().prefabId == rmRoom.prefabId
-        && template.GetComponent<Room>().availableDirections.Count == rmRoom.availableDirections.Count
+            => !template.activeSelf
+            && template.GetComponent<Room>().prefabId == rmRoom.prefabId
+            && template.GetComponent<Room>().availableDirections.Count == rmRoom.availableDirections.Count
         );
 
         if (room == null)
@@ -779,12 +785,11 @@ public class MapGenerator : MonoBehaviour
         }
         room.name = $"{room.name} EXTRA ROOM";
         generatedRooms.Add(room);
-        OP[x_cor, y_cor] = true;
+        OP[x_cor][y_cor] = 1;
         //SET AS CHILD OF MAPPARENT
         room.transform.SetParent(mapParent.transform);
         return true;
-
-    } //end TrySpawnRoom
+    }
     void SpawnExtraRooms()
     {
         GameObject roomchosen = unbreakableWall;
