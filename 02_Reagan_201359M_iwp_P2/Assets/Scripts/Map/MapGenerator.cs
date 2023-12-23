@@ -211,6 +211,7 @@ public class MapGenerator : MonoBehaviour
         //}
         //else
         //{
+        //aaa
             if (!gameManager.activeSelf)
             {
                 gameManager.SetActive(true);

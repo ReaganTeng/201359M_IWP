@@ -8,6 +8,7 @@ public class MenuManager : MonoBehaviour
 
     [HideInInspector]
     public GameObject instructions;
+    [HideInInspector] public GameObject QuestPanel;
     public void Awake()
     {
         instructions = GameObject.FindGameObjectWithTag("Instructions");
@@ -15,6 +16,9 @@ public class MenuManager : MonoBehaviour
         {
             Time.timeScale = 0;
         }
+
+        QuestPanel = GameObject.FindGameObjectWithTag("QuestPanel");
+        QuestPanel.SetActive(false);
     }
 
 
@@ -61,5 +65,11 @@ public class MenuManager : MonoBehaviour
     {
         //LOAD BACK TO HUBWORLD;
         //SceneManager.LoadScene("HubWorld");
+    }
+
+
+    public void ToggleQuestPanel()
+    {
+        QuestPanel.SetActive(!QuestPanel.activeSelf);
     }
 }

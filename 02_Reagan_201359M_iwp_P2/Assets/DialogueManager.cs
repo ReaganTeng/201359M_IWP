@@ -8,9 +8,7 @@ public class DialogueManager : MonoBehaviour
     public TextMeshProUGUI dialogueText;
     public GameObject dialoguePanel;
     public float typingSpeed = 0.05f;
-
-    private Queue<string> sentences;
-
+    Queue<string> sentences;
     public AudioSource AS;
     public AudioClip beepCLip;
 
@@ -26,33 +24,28 @@ public class DialogueManager : MonoBehaviour
     public void StartDialogue(Dialogue dialogue)
     {
         dialoguePanel.SetActive(true);
-
         sentences.Clear();
         foreach (string sentence in dialogue.sentences)
         {
             sentences.Enqueue(sentence);
         }
-
         StartCoroutine(DisplayNextSentence());
     }
 
     IEnumerator DisplayNextSentence()
     {
         dialoguePanel.SetActive(true);
-
         while (sentences.Count > 0)
         {
             string sentence = sentences.Dequeue();
             yield return TypeSentence(sentence);
         }
-
         dialoguePanel.SetActive(false);
     }
 
     IEnumerator TypeSentence(string sentence)
     {
         dialogueText.text = "";
-
         foreach (char letter in sentence.ToCharArray())
         {
             AS.clip = beepCLip;

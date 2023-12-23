@@ -17,7 +17,6 @@ public class PlayerManager : MonoBehaviour
 
     bool stuckmode;
 
-
     public Slider healthbar;
 
     [HideInInspector]
@@ -28,16 +27,10 @@ public class PlayerManager : MonoBehaviour
     [HideInInspector]
     public GameObject gameOverPanel;
 
-
-
-    
-
-
-    private void Awake()
+    void Awake()
     {
         finishedSpawning = false;
         //StartItself();
-
         gameOverPanel = GameObject.FindGameObjectWithTag("GameOverPanel");
 
         if (gameOverPanel != null)
@@ -46,10 +39,8 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-
     public void StartItself()
     {
-
         //stuckmode = false;
         numberOfPlayers = players.Count;
         SetPlayerToPlayerMode(currentPlayerIndex);
@@ -75,13 +66,12 @@ public class PlayerManager : MonoBehaviour
 
         finishedSpawning = true;
 
-
         SwitchPlayer();
 
         Debug.Log("START ITSELF FINISH");
     }
 
-    private void Update()
+    void Update()
     {
         if (finishedSpawning)
         {
