@@ -55,21 +55,13 @@ public class Player : Character
 
     public GameObject itemPrefab;
 
-
-   
-
     bool shotsomething;
-
-
 
     protected override void Awake()
     {
         base.Awake();
 
         PlayerPrefs.SetFloat("MoneyEarned", 0);
-
-
-       
 
         shotsomething = false;
         playerInventory = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<Inventory>();
@@ -133,12 +125,21 @@ public class Player : Character
 
     protected override void Update()
     {
+
         base.Update();
 
         //IF SAME LAYER AS LAYER TILE
         //Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 0.1f, LayerMask.GetMask("WallTilemap"));
         //Debug.Log("COLLIDERS " + colliders.Length);
-        
+
+        if (disabled)
+        {
+            // Put any logic specific to the disabled state here, or simply return
+            return;
+        }
+
+
+
         if (health > 0)
         {
             spriteRenderer.color = Color.white;

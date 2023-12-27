@@ -9,6 +9,10 @@ public class MenuManager : MonoBehaviour
     [HideInInspector]
     public GameObject instructions;
     [HideInInspector] public GameObject QuestPanel;
+
+    public GameObject questCompletedNot;
+    public GameObject newQuestNot;
+
     public void Awake()
     {
         instructions = GameObject.FindGameObjectWithTag("Instructions");
@@ -16,6 +20,10 @@ public class MenuManager : MonoBehaviour
         {
             Time.timeScale = 0;
         }
+
+
+        questCompletedNot.SetActive(false);
+        newQuestNot.SetActive(false);
 
         QuestPanel = GameObject.FindGameObjectWithTag("QuestPanel");
         QuestPanel.SetActive(false);
@@ -71,5 +79,10 @@ public class MenuManager : MonoBehaviour
     public void ToggleQuestPanel()
     {
         QuestPanel.SetActive(!QuestPanel.activeSelf);
+        if(QuestPanel.activeSelf )
+        {
+            newQuestNot.SetActive(false);
+            questCompletedNot.SetActive(false);
+        }
     }
 }

@@ -25,12 +25,14 @@ public class Character : MonoBehaviour
     public AudioSource audioSource;
     float speed;
 
-
-
+    //[HideInInspector]
+    public bool disabled;
 
     //bool effectapplied = false;
     protected virtual void Awake()
     {
+        disabled = false;
+
         audioSource = GetComponent<AudioSource>();
 
         speed = .1f;
@@ -38,7 +40,6 @@ public class Character : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
 
         ps = GetComponent<ParticleSystem>();
-
 
         //ps.emission.enabled = true;
         if (ps != null)
@@ -53,6 +54,12 @@ public class Character : MonoBehaviour
     // Update is called once per frame
     protected virtual void Update()
     {
+        if (disabled)
+        {
+            return;
+        }
+
+
         //if (Input.GetKey(KeyCode.Space))
         //{
         //    if (activeEffects.Count <= 0

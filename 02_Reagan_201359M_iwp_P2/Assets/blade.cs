@@ -37,7 +37,8 @@ public class blade : MonoBehaviour
 
             //DAMAGE ENEMY
             int playerDamage = playerscript.damage;
-            enemyScript.health -= playerDamage;
+            enemyScript.health -= 1000000;
+            //enemyScript.health -= playerDamage;
 
             //SET ENEMY TO HURT STATE
             enemyScript.currentState = Enemy.EnemyState.HURT;

@@ -12,8 +12,10 @@ public class Item : MonoBehaviour
         RED_GEM,
         GREEN_GEM,
         BLUE_GEM,
+        //POTION,
+        //BOMB,
+        //SHIELD,
         NOTHING,
-        
     }
 
     public List<Sprite> itemSprites = new List<Sprite>();

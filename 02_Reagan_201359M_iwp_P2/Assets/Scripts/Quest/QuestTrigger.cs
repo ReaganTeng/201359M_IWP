@@ -57,10 +57,13 @@ public class QuestTrigger : Interactables
                 //CHECK IF QUEST IS ALD COMPLETED
                 Quest quest = QM.quests.Find(template
                     => template.hiddenVariables.questGiverID == questGiverid);
-
+                
                 if (quest.hiddenVariables.isCompleted)
                 {
                     Debug.Log("QUEST COMPLETED");
+                    int idx = QM.quests.IndexOf(quest);
+                    GameObject questUI = QM.questUIContent.transform.GetChild(idx).gameObject;
+                    Destroy(questUI );
                     QM.quests.Remove(quest);
                     Destroy(this.gameObject);
                 }

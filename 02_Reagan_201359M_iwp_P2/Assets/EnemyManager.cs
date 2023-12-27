@@ -41,11 +41,10 @@ public class EnemyManager : MonoBehaviour
 
     public void StartItself()
     {
-        timer = 0;
-        maxnumberenemies = 15;
-
         if (!generationover)
         {
+            timer = 0;
+            maxnumberenemies = 100;
             SpawnEnemy();
         }
     }
@@ -56,16 +55,16 @@ public class EnemyManager : MonoBehaviour
         Vector2 randomPosition;
         int enemytype = UnityEngine.Random.Range(0, 3);
         // Find the smallest and largest X and Y values
-        //float smallestX = mapGenerator.occupiedPositions.Min(pos => pos.x);
-        //float largestX = mapGenerator.occupiedPositions.Max(pos => pos.x);
-        //float smallestY = mapGenerator.occupiedPositions.Min(pos => pos.y);
-        //float largestY = mapGenerator.occupiedPositions.Max(pos => pos.y);
+        float smallestX = mapGenerator.occupiedPositions.Min(pos => pos.x);
+        float largestX = mapGenerator.occupiedPositions.Max(pos => pos.x);
+        float smallestY = mapGenerator.occupiedPositions.Min(pos => pos.y);
+        float largestY = mapGenerator.occupiedPositions.Max(pos => pos.y);
 
         //HARD CODE THE VALUES FIRST
-        float smallestX = -64;
-        float largestX =0;
-        float smallestY = 0;
-        float largestY = 32;
+        //float smallestX = -64;
+        //float largestX =0;
+        //float smallestY = 0;
+        //float largestY = 32;
 
 
         for (int i = 0; i < maxnumberenemies; i++)

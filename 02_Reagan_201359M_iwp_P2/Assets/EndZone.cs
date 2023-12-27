@@ -24,12 +24,12 @@ public class EndZone : MonoBehaviour
         GameCompletePanel = GameObject.FindWithTag("GameCompletePanel");
         GameCompletePanel.SetActive(false);
 
-         invmanager = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<Inventory>();
+        invmanager = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<Inventory>();
 
     }
 
 
-    public void Update()
+    void Update()
     {
         //if (countdown_started)
         //{

@@ -116,7 +116,7 @@ public class MapGenerator : MonoBehaviour
         //DivergingPathsGenerated = false;
         //AllPathsGenerated = false;
         enemymgt = gameManager.GetComponent<EnemyManager>();
-        maxenemynumbers = 50;
+        //maxenemynumbers = 50;
         playermgt = gameManager.GetComponent<PlayerManager>();
 
 
@@ -139,10 +139,10 @@ public class MapGenerator : MonoBehaviour
         levelGenerated = false;
 
 
-        //NumberOfPaths = UnityEngine.Random.Range(50, 81);
+        NumberOfPaths = UnityEngine.Random.Range(50, 81);
         //NumberOfPaths = Random.Range(20, 30);
         //NumberOfPaths = 100;
-        NumberOfPaths = 50;
+        //NumberOfPaths = 50;
         //NumberOfPaths = 1;
 
         //UnityEngine.Debug.Log("PATHS DECIDED " + NumberOfPaths);
@@ -176,11 +176,17 @@ public class MapGenerator : MonoBehaviour
         if (!alltreasuresSpawned)
         {
             //HARD CODE THE VALUES FIRST
-            float smallestX = -64;
-            float largestX = 0;
-            float smallestY = 0;
-            float largestY = 32;
-            for (int i = 0; i< 40; i++)
+            //float smallestX = -64;
+            //float largestX = 0;
+            //float smallestY = 0;
+            //float largestY = 32;
+
+            float smallestX = occupiedPositions.Min(pos => pos.x);
+            float largestX = occupiedPositions.Max(pos => pos.x);
+            float smallestY = occupiedPositions.Min(pos => pos.y);
+            float largestY = occupiedPositions.Max(pos => pos.y);
+
+            for (int i = 0; i< 1000; i++)
             {
                 int randomX = Random.Range((int)smallestX, (int)largestX + 1);
                 int randomY = Random.Range((int)smallestY, (int)largestY + 1);
@@ -199,18 +205,18 @@ public class MapGenerator : MonoBehaviour
 
     void Update()
     {
-        //if (prevRoomInstantiated != null)
-        //{
-        //    referenceobject.transform.position = prevRoomInstantiated.transform.position;
-        //}
-        //if (!levelGenerated)
-        //{
-        //    //StartCoroutine(
-        //    GenerateLevel();
-        //    //);
-        //}
-        //else
-        //{
+        if (prevRoomInstantiated != null)
+        {
+            referenceobject.transform.position = prevRoomInstantiated.transform.position;
+        }
+        if (!levelGenerated)
+        {
+            //StartCoroutine(
+            GenerateLevel();
+            //);
+        }
+        else
+        {
         //aaa
             if (!gameManager.activeSelf)
             {
@@ -223,26 +229,21 @@ public class MapGenerator : MonoBehaviour
                 for (int i = 0; i < 2; i++)
                 {
                     player = Instantiate(Player, startingposition, Quaternion.identity);
-
                     player.GetComponent<SpriteRenderer>().color = 
                     new Color (
                         Random.Range(0, 1),
                         Random.Range(0, 1),
                         Random.Range(0, 1)
                         );
-                    //player
-                    //player = Instantiate(Player, Vector2.zero, Quaternion.identity);
-                    //gameManager.players.Add(player);
-
                     playermgt.players.Add(player);
                     playermgt.StartItself();
                 }
             }
 
-            //if (endZone == null)
-            //{
-            //    endZone = Instantiate(EndZone, exitroom.transform.position, Quaternion.identity);
-            //}
+            if (endZone == null)
+            {
+                endZone = Instantiate(EndZone, exitroom.transform.position, Quaternion.identity);
+            }
 
             if (!enemiesspawned
                 && playermgt.finishedSpawning)
@@ -252,7 +253,7 @@ public class MapGenerator : MonoBehaviour
             }
             SpawnTreasure();
             CompassObject.StartItself();
-        //}
+        }
     }
 
     void spawnExitRoom()
@@ -712,31 +713,47 @@ public class MapGenerator : MonoBehaviour
 
     float t = 0;
 
-    List<List<int>> OP = new List<List<int>>();
-    //bool[,] OP = new bool[1000, 1000];
+    // Helper method to convert List<Vector2> to 2D array
+    private bool[,] ConvertTo2DArray(List<Vector2> positions)
+    {
+        float smallestX = positions.Min(pos => pos.x);
+        float largestX = positions.Max(pos => pos.x);
+        float smallestY = positions.Min(pos => pos.y);
+        float largestY = positions.Max(pos => pos.y);
+
+        int width = Mathf.CeilToInt(largestX - smallestX) + 1; // Add 1 to include the rightmost column
+        int height = Mathf.CeilToInt(largestY - smallestY) + 1; // Add 1 to include the top row
+
+        bool[,] array = new bool[width, height];
+
+        foreach (Vector2 position in positions)
+        {
+            int x = Mathf.FloorToInt(position.x - smallestX);
+            int y = Mathf.FloorToInt(position.y - smallestY);
+
+            // Check bounds before setting the value
+            if (x >= 0 && x < width && y >= 0 && y < height)
+            {
+                array[x, y] = true;
+            }
+            else
+            {
+                Debug.LogError($"Index out of bounds: x={x}, y={y}, width={width}, height={height}");
+            }
+        }
+
+        return array;
+    }
+
 
     //SPAWN ROOMS THAT WILL NOT DIRECT TO THE PATH
     //private IEnumerator SpawnExtraRooms()
     // ...
-
     void CA_SpawnExtraRooms()
     {
-        foreach (Vector2 pos in occupiedPositions)
-        {
-            int xIndex = (int)pos.x; // Clamp to array bounds
-            int yIndex = (int)pos.y;
+        // Convert List<Vector2> to 2D array
+        bool[,] occupiedArray = ConvertTo2DArray(occupiedPositions);
 
-            // Ensure the row exists
-            while (OP.Count <= xIndex)
-                OP.Add(new List<int>());
-
-            // Ensure the column exists
-            while (OP[xIndex].Count <= yIndex)
-                OP[xIndex].Add(0); // Initialize with 0
-
-            // Set the value to 1 (assuming 1 represents true in your case)
-            OP[xIndex][yIndex] = 1;
-        }
 
         GameObject roomchosen = unbreakableWall;
         Debug.Log("SPAWNING EXTRA ROOMS");
@@ -745,29 +762,36 @@ public class MapGenerator : MonoBehaviour
         float smallestY = occupiedPositions.Min(pos => pos.y);
         float largestY = occupiedPositions.Max(pos => pos.y);
 
+
         for (int x_cor = (int)smallestX; x_cor <= (int)largestX; x_cor += roomdimension)
         {
             for (int y_cor = (int)smallestY; y_cor <= (int)largestY; y_cor += roomdimension)
+
             {
-                TrySpawnRoom(x_cor, y_cor);
+                TrySpawnRoom(x_cor, y_cor, occupiedArray);
             }
+
         }
+
         extraroomsSpawned = true;
 
     } //end CA_SpawnExtraRooms
 
-    bool TrySpawnRoom(int x_cor, int y_cor)
+
+
+    bool TrySpawnRoom(int x_cor, int y_cor, bool[,] occupiedArray)
     {
-        if (OP.Count > x_cor && OP[x_cor].Count > y_cor && OP[x_cor][y_cor] == 1)
+        if (occupiedArray[x_cor, y_cor])
             return false;
 
         int templatechosen = Random.Range(0, roomTemplates.Count);
         GameObject roomchosen = roomTemplates[templatechosen];
         Room rmRoom = roomchosen.GetComponent<Room>();
+
         GameObject room = roompool.FirstOrDefault(template
-            => !template.activeSelf
-            && template.GetComponent<Room>().prefabId == rmRoom.prefabId
-            && template.GetComponent<Room>().availableDirections.Count == rmRoom.availableDirections.Count
+        => !template.activeSelf
+        && template.GetComponent<Room>().prefabId == rmRoom.prefabId
+        && template.GetComponent<Room>().availableDirections.Count == rmRoom.availableDirections.Count
         );
 
         if (room == null)
@@ -776,6 +800,7 @@ public class MapGenerator : MonoBehaviour
             roompool.Add(room);
             room.name = $"{room.gameObject.name} RECLONE";
             room.transform.SetParent(roompoolParent.transform);
+
         }
         else
         {
@@ -786,11 +811,16 @@ public class MapGenerator : MonoBehaviour
         }
         room.name = $"{room.name} EXTRA ROOM";
         generatedRooms.Add(room);
-        OP[x_cor][y_cor] = 1;
+        occupiedArray[x_cor, y_cor] = true;
+        //occupiedPositions[x_cor, y_cor] = true;
+
         //SET AS CHILD OF MAPPARENT
         room.transform.SetParent(mapParent.transform);
         return true;
-    }
+    } //end TrySpawnRoom
+
+
+
     void SpawnExtraRooms()
     {
         GameObject roomchosen = unbreakableWall;
@@ -918,8 +948,8 @@ public class MapGenerator : MonoBehaviour
         ////yield return null;
         }
 
-        private IEnumerator SpawnUnbreakableWalls()
-    //void SpawnUnbreakableWalls()
+        //private IEnumerator SpawnUnbreakableWalls()
+   void SpawnUnbreakableWalls()
     {
         float smallestX = occupiedPositions.Min(pos => pos.x);
         float largestX = occupiedPositions.Max(pos => pos.x);
@@ -971,15 +1001,15 @@ public class MapGenerator : MonoBehaviour
                     room.transform.SetParent(mapParent.transform);
                     //yield return null;
                 }
-                yield return null;
+                //yield return null;
             }
-            yield return null;
+            //yield return null;
         }
-        yield return null;
+        //yield return null;
 
         paintedtotilemap = true;
         levelGenerated = true;
-        yield return null;
+        //yield return null;
     }
 
 
@@ -1154,7 +1184,7 @@ public class MapGenerator : MonoBehaviour
             {
                 GameObject roomselected = roomswithopenpaths[i];
                 //int randomNumberPath = randomNumberOfPaths[i];
-                //int randomNumberPath = Random.Range(chosenmin, (NumberOfPaths * 2) + 1);
+                randomNumberPath = Random.Range(chosenmin, (NumberOfPaths * 2) + 1);
                 pathimp = 0;
 
                 if (!IsNextToOccupiedPositions(roomselected)
@@ -1411,8 +1441,8 @@ public class MapGenerator : MonoBehaviour
                 )
             {
                 //StartCoroutine(
-                //DivergePaths();
-                pathsFinishedDiverging = true;
+                DivergePaths();
+                //pathsFinishedDiverging = true;
                 //);
                 //SpawnExtraRooms();
             }
@@ -1423,17 +1453,17 @@ public class MapGenerator : MonoBehaviour
                 Debug.Log($"TTIME {t}");
 
                 //StartCoroutine(
-                //SpawnExtraRooms();
-                CA_SpawnExtraRooms();
+                SpawnExtraRooms();
+                //CA_SpawnExtraRooms();
                 //) ;
             }
-            //if (extraroomsSpawned
-            //    && !paintedtotilemap)
-            //{
-            //    //StartCoroutine(
-            //    SpawnUnbreakableWalls();
+            if (extraroomsSpawned
+                && !paintedtotilemap)
+            {
+                //    //StartCoroutine(
+                SpawnUnbreakableWalls();
             //        //);
-            //}
+            }
         }
 
     }

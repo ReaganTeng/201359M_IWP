@@ -5,9 +5,14 @@ using UnityEngine;
 using TMPro;
 using static ShopItem;
 using System.Linq;
+using static UnityEditor.Progress;
+using UnityEditor.PackageManager.Requests;
 
 public class QuestManager : MonoBehaviour
 {
+
+    [HideInInspector] public MenuManager menuManager;
+
 
     public GameObject questUIContent;
     public GameObject questPrefab;
@@ -15,11 +20,17 @@ public class QuestManager : MonoBehaviour
 
     public TextMeshProUGUI questText;
 
+    [HideInInspector]
+    public AudioSource AS;
+    public AudioClip newQuestClip, questCompletedClip;
+    
+
 
     void Awake()
     {
+        questText.text = "";
         //InitializeQuests();
-
+        AS = GetComponent<AudioSource>();
     }
 
     public void InitializeQuests()
@@ -47,36 +58,22 @@ public class QuestManager : MonoBehaviour
             }
         };
         Debug.Log("QUEST ADDED");
-
         quests.Add(newQuest);
-
-        
-        foreach (Quest item in quests)
+        if(menuManager == null)
         {
-            //for (int i = 0; i < 10; i++)
-            {
-                GameObject itemObject = Instantiate(questPrefab, questUIContent.transform);
-                itemObject.GetComponent<QuestUI>().UpdateUI(item);
-                
-
-                //RectTransform[] children = itemObject.GetComponentsInChildren<RectTransform>();
-
-                //DISPLAY THE CONTENTS
-                //RectTransform itemTransform
-                //    = children.FirstOrDefault(child =>
-                //    child.CompareTag("QuestPanel")).GetComponent<RectTransform>();
-
-                RectTransform shopRectTransform = questUIContent.GetComponent<RectTransform>();
-                //shopRectTransform.sizeDelta = new Vector2(shopRectTransform.sizeDelta.x, itemTransform.sizeDelta.y * shopItems.Count);
-
-
-                //itemObject.GetComponentInChildren<TextMeshProUGUI>().text
-                //    = $"{item.itemName} - {item.price} coins";
-                //Button buyButton = itemObject.GetComponentInChildren<Button>();
-                //buyButton.onClick.AddListener(() => BuyItem(item));
-                //Debug.Log($"FINAL HEIGHT {itemTransform.rect.height}");
-            }
+            menuManager = GetComponent<MenuManager>();
         }
+        menuManager.ToggleQuestPanel();
+        GameObject itemObject = Instantiate(questPrefab, questUIContent.transform);
+        itemObject.GetComponent<QuestUI>().UpdateUI(newQuest);
+        menuManager.newQuestNot.SetActive(true);
+        menuManager.questCompletedNot.SetActive(false);
+
+
+        menuManager.ToggleQuestPanel();
+
+        AS.clip = newQuestClip;
+        AS.Play();
     }
 
 
@@ -90,23 +87,49 @@ public class QuestManager : MonoBehaviour
     public void UpdateQuestProgress(string questName)
     {
         //questText.text = "Completed";
-        Quest quest = quests.Find(q => q.hiddenVariables.questName == questName);
+        List<Quest> matchingQuests = quests.FindAll(q => q.hiddenVariables.questName == questName);
 
-        if (quest != null && !quest.hiddenVariables.isCompleted)
+        foreach (Quest quest in matchingQuests)
         {
-            Debug.Log("QUEST UPDATED");
-            quest.UpdateProgress();
-            CheckQuestCompletion(quest);
+            if (quest != null && !quest.hiddenVariables.isCompleted)
+            {
+                Debug.Log("QUEST UPDATED");
+                quest.UpdateProgress();
+                CheckQuestCompletion(quest);
+            }
+            int idx = quests.IndexOf(quest);
+            QuestUI questUIComponent = questUIContent.transform.GetChild(idx).GetComponent<QuestUI>();
+            if (questUIComponent != null
+                //&& questUIComponent.questStr == quest.hiddenVariables.questName
+                && quest.hiddenVariables.currentCount <= quest.hiddenVariables.requiredCount
+                )
+            {
+                questUIComponent.UpdateUI(quest);
+            }
         }
     }
 
     void CheckQuestCompletion(Quest quest)
     {
+
+        //UPDATE QUEST UI
+        if (menuManager == null)
+        {
+            menuManager = GetComponent<MenuManager>();
+        }
+        menuManager.ToggleQuestPanel();
         if (quest.hiddenVariables.isCompleted)
         {
             Debug.Log($"Quest '{quest.hiddenVariables.questName}' completed!");
-            questText.text = "Completed";
+            //questText.text = "Completed";
+            menuManager.newQuestNot.SetActive(false);
+            menuManager.questCompletedNot.SetActive(true);
+
+            AS.clip = questCompletedClip;
+            AS.Play();
             // Provide rewards or trigger other events
         }
+        menuManager.ToggleQuestPanel();
+        
     }
 }

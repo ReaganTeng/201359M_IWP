@@ -19,11 +19,7 @@ public class compass : MonoBehaviour
     {
 
         compassSet = false;
-
         arrowImage = GetComponent<Image>();
-
-       
-
 
     }
 

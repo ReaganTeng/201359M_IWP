@@ -2,23 +2,26 @@ using System.Diagnostics;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-public class DialogueTrigger : MonoBehaviour
+public class DialogueTrigger : Interactables
 {
+    
+
     public Dialogue dialogue;
 
     [HideInInspector]
     public GameObject DM;
 
-    void Awake()
+    public override void Awake()
     {
-        DM = GameObject.FindGameObjectWithTag("GameMGT"); 
+        base.Awake();
+        DM = GameObject.FindGameObjectWithTag("GameMGT");
+        dialogue.Initialize();
     }
 
-    void OnTriggerEnter2D(Collider2D other)
+    public override void Update()
     {
-        if (other.CompareTag("Player"))
+        if (Input.GetKeyDown(KeyCode.E) && textPrompt.enabled)
         {
-            Debug.Log("TRIGGERING DIALOGUE");
             TriggerDialogue();
         }
     }
@@ -26,5 +29,15 @@ public class DialogueTrigger : MonoBehaviour
     void TriggerDialogue()
     {
         DM.GetComponent<DialogueManager>().StartDialogue(dialogue);
+    }
+
+    public override void OnTriggerEnter2D(Collider2D other)
+    {
+        base.OnTriggerEnter2D(other);
+    }
+
+    public override void OnTriggerExit2D(Collider2D other)
+    {
+        base.OnTriggerExit2D(other);
     }
 }
