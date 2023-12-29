@@ -132,8 +132,6 @@ public class Projectile : MonoBehaviour
                 }
                 collisionCharacter.health -= Damage;
             }
-
-
             hitsomething = true;
 
             Destroy(gameObject);

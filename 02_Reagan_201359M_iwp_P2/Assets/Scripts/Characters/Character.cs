@@ -1,16 +1,38 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEditor.Animations;
+using UnityEditor.U2D;
 using UnityEngine;
+using static CharacterUnlockManager;
+
+
+[System.Serializable]
+public class CharacterAnimationClips
+{
+    public CharacterUnlockManager.CharacterType characterType;
+    public List<AnimationClip> animationClips;
+}
 
 public class Character : MonoBehaviour
 {
+    //[SerializeField]
     public List<AudioClip> audioclips;
 
 
+    //[SerializeField]
+    public List<CharacterAnimationClips> characterAnimations = new List<CharacterAnimationClips>();
+
+    // public Dictionary
+
+    [HideInInspector]
+    public int currentAnimIdx;
+    [HideInInspector]
+    public Animator animatorComponent;
     [HideInInspector]
     public int health;
     [HideInInspector]
-    public int damage;
+    public int meleedamage;
     [HideInInspector]
     public SpriteRenderer spriteRenderer;
     [HideInInspector]
@@ -25,30 +47,95 @@ public class Character : MonoBehaviour
     public AudioSource audioSource;
     float speed;
 
-    //[HideInInspector]
+    [HideInInspector]
     public bool disabled;
+
+    [HideInInspector]
+    public int projectileDamage;
+
+
+    public CharacterUnlockManager.CharacterType characterType;
 
     //bool effectapplied = false;
     protected virtual void Awake()
     {
+        currentAnimIdx = 0;
         disabled = false;
-
+        animatorComponent = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
-
         speed = .1f;
         playerShield = GetComponentInChildren<Shield>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-
         ps = GetComponent<ParticleSystem>();
-
         //ps.emission.enabled = true;
         if (ps != null)
         {
             emissionModule = ps.emission;
             emissionModule.enabled = false;
-
         }
     }
+
+
+    public void PlayAnimation(CharacterUnlockManager.CharacterType characterType, int clipIDX)
+    {
+        AnimatorController animController = animatorComponent.runtimeAnimatorController as AnimatorController;
+        CharacterAnimationClips characterAnimationEntry =
+            characterAnimations.Find(entry => entry.characterType == characterType);
+        AnimationClip animationClipToPlay = characterAnimationEntry.animationClips[clipIDX];
+
+        if (animatorComponent != null)
+        {
+            string stateName = "clip"; // Replace with the actual name of your state
+            int layerIndex = 0; // Assuming the state is on the base layer, change if needed
+
+            // Check if the Animator Controller is not null
+            if (animController != null)
+            {
+                // Loop through the states in the specified layer
+                for (int stateIndex = 0; stateIndex < animController.layers[layerIndex].stateMachine.states.Length; stateIndex++)
+                {
+                    AnimatorState state = animController.layers[layerIndex].stateMachine.states[stateIndex].state;
+
+                    // Check if the state has the specified name
+                    if (state.name == stateName)
+                    {
+                        // Assign a new animation clip
+                        state.motion = animationClipToPlay;
+                        // Play the assigned animation clip
+                        animatorComponent.Play(stateName);
+                        return; // Exit the loop once the state is found and handled
+                    }
+                }
+                Debug.LogError($"Animator state '{stateName}' not found in layer {layerIndex}.");
+            }
+            else
+            {
+                Debug.LogError("Animator Controller not found.");
+            }
+        }
+        else
+        {
+            Debug.LogError("Animator Controller not found.");
+        }
+
+    }
+
+
+    //public AnimationClip GetCurrentAnimationClip()
+    //{
+    //    // Check the current animation clip that is playing
+    //    foreach (AnimationState state in animationComponent)
+    //    {
+    //        if (animationComponent.IsPlaying(state.name))
+    //        {
+    //            // state.name is the name of the currently playing animation clip
+    //            Debug.Log("Current Animation Clip: " + state.name);
+    //            break;
+    //            return state.name;
+    //        }
+    //    }
+    //    return state.name;
+    //}
 
 
     // Update is called once per frame

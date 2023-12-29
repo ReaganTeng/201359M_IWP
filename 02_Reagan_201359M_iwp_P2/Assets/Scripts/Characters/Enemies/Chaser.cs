@@ -20,6 +20,7 @@ public class Chaser : Enemy
     {
         base.Awake();
 
+        //characterAnimations =characterAnimations;
     }
 
     float stage1 = 1;
@@ -32,12 +33,14 @@ public class Chaser : Enemy
         base.Update();
 
 
+        PlayAnimation(characterType, currentAnimIdx);
+      
+
         // Implement state-specific behavior in derived classes
         switch (currentState)
         {
             case EnemyState.ABOUT_TO_ATTACK:
                 {
-
                     timertochase += 1 * Time.deltaTime;
 
                     if(timertochase >= 3)
@@ -46,29 +49,47 @@ public class Chaser : Enemy
                         timertochase = 0;
                     }
 
-                    if (//distance <= 1.0f
-                        //&&
-                        !animator.GetCurrentAnimatorStateInfo(0).IsName("attack")
-                        )
+                    string aboutToAttackName = characterAnimations.Find(
+                       template => template.characterType == characterType
+                       ).animationClips[1].name;
+                        //0 _ IDLE
+                        //1 _ about to atta
+                        //2 _ attack
+                        //3 _ run
+                        //4 _ death
+                        //5 - hurt
+
+
+                    //ANIMATION
+                    if (!animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(aboutToAttackName))
+
                     {
                         if (distance <= 1.0f * 1.5f)
                         {
-                            animator.SetFloat("AttackStage", stage1);
+                            //animatorComponent.SetFloat("AttackStage", stage1);
+                            currentAnimIdx = 1;
                         }
                         else
                         {
+
                             FollowPlayer();
                         }
-
                     }
-                    //else
-                    //{
-                    //    FollowPlayer();
-                    //}
 
-                    if (animator.GetCurrentAnimatorStateInfo(0).IsName("attack")
-                            && animator.GetFloat("AttackStage") == stage1
-                            && animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f)
+
+                    string AttackName = characterAnimations.Find(
+                   template => template.characterType == characterType
+                   ).animationClips[2].name;
+                    //0 _ IDLE
+                    //1 _ about to atta
+                    //2 _ attack
+                    //3 _ run
+                    //4 _ death
+                    //5 - hurt
+
+                    if (animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(AttackName)
+                        //&& animatorComponent.GetFloat("AttackStage") == stage1
+                        && animatorComponent.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f)
                     {
                         currentState = EnemyState.ATTACK;
                     }
@@ -77,31 +98,40 @@ public class Chaser : Enemy
                 }
             case EnemyState.ATTACK:
                 {
-                    if (animator.GetFloat("AttackStage") == stage1)
+
+                    string AttackName = characterAnimations.Find(
+                  template => template.characterType == characterType
+                  ).animationClips[2].name;
+
+                    //if (animatorComponent.GetFloat("AttackStage") == stage1)
+                    if (animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(AttackName))
                     {
-                        animator.SetFloat("AttackStage", stage2);
-                        animator.Play("attack", 0, 0f);
+                            //animatorComponent.SetFloat("AttackStage", stage2);
+                        animatorComponent.Play("clip", 0, 0f);
                     }
 
                     switch (currentAttackPattern)
                     {
                         case ChaserAttackPattern.SWIPE:
                         case ChaserAttackPattern.POUNCE:
-                            animator.SetFloat("AttackStage", stage2);
+                            //animatorComponent.SetFloat("AttackStage", stage2);
 
-                            if (animator.GetCurrentAnimatorStateInfo(0).IsName("attack")
-                             && animator.GetFloat("AttackStage") == stage2
-                           && animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f
+                            if (
+                            animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(AttackName)
+                             // animatorComponent.GetCurrentAnimatorStateInfo(0).IsName("attack")
+                             //&& animatorComponent.GetFloat("AttackStage") == stage2
+                           && animatorComponent.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f
                            && attackcooldown <= 0.0)
                             {
-                                spriteRenderer.color = Color.white;
-                                animator.SetFloat("AttackStage", 0);
+                                //spriteRenderer.color = Color.white;
+                                //animatorComponent.SetFloat("AttackStage", 0);
                                 attackcooldown = .5f;
 
                                 Player playerscript = player.GetComponent<Player>();
                                 Character playercharacterscript = player.GetComponent<Character>();
                                 if (distance <= 2.0f)
                                 {
+                                    //IF PLAYER HAS SHIELD
                                     if (playercharacterscript.playerShield != null
                                     && playercharacterscript.playerShield.shieldActive)
                                     {
@@ -117,6 +147,7 @@ public class Chaser : Enemy
                                         playercharacterscript.playerShield.shieldActive = false;
                                         //collisionCharacter.activeEffects
                                     }
+                                    //IF PLAYER HAS NO SHIELD
                                     else
                                     {
                                         if (playercharacterscript.audioSource != null)
@@ -124,19 +155,20 @@ public class Chaser : Enemy
                                             playercharacterscript.audioSource.clip = playercharacterscript.audioclips[0];
                                             playercharacterscript.audioSource.Play();
                                         }
-                                        playercharacterscript.health -= damage;
+                                        playercharacterscript.health -= meleedamage;
 
                                     }
                                 }
 
+                                currentAnimIdx = 0;
                                 currentState = EnemyState.IDLE;
                             }
                             break;
                     }
                     break;
                 }
-            case EnemyState.HURT:
-                break;
+            //case EnemyState.HURT:
+            //    break;
         }
     }
 }

@@ -23,10 +23,15 @@ public class Shooter : Enemy
 
     float projectilespeed = 10.0f;
 
+    float stage1 = 1;
+    float stage2 = 2;
 
     protected override void Awake()
     {
         base.Awake();
+
+        meleedamage = 10;
+        projectileDamage = 15;
     }
 
 
@@ -50,20 +55,31 @@ public class Shooter : Enemy
                         shootTimer = 0;
                     }
 
+                    //ANIMATION
+                    if (!animatorComponent.GetCurrentAnimatorStateInfo(0).IsName("attack"))
+                    {
+                        animatorComponent.SetFloat("AttackStage", stage1);
+                    }
                     break;
                 }
             case EnemyState.ATTACK:
                 {
+                    //ANIMATION
+                    if (animatorComponent.GetFloat("AttackStage") == stage1)
+                    {
+                        animatorComponent.SetFloat("AttackStage", stage2);
+                        animatorComponent.Play("attack", 0, 0f);
+                    }
+                    //
                     //Debug.Log("SHOOT");
-
                     ShootProjectile();
-
                     break;
                 }
-            case EnemyState.HURT:
-                Debug.Log("OUCH SHOOTER");
-
-                break;
+            //case EnemyState.HURT:
+            //    {
+            //        Debug.Log("OUCH SHOOTER");
+            //        break;
+            //    }
             default:
                 {
                     //Debug.Log("DEFAULT");
@@ -87,10 +103,11 @@ public class Shooter : Enemy
         {
             Projectile projectilescript = projectile.GetComponent<Projectile>();
             projectilescript.projectiletype = ProjectileType.NORMAL;
-            projectilescript.setdata(damage, projectilespeed,
+            projectilescript.setdata(projectileDamage, projectilespeed,
                 (player.transform.position - transform.position).normalized, gameObject);
         }
-        spriteRenderer.color = Color.blue;
+        animatorComponent.SetFloat("AttackStage", 0);
+        //spriteRenderer.color = Color.blue;
         currentState = EnemyState.IDLE;
     }
 

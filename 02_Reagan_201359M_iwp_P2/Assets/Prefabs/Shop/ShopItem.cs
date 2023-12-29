@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Dialogue;
 
 public class ShopItem : MonoBehaviour
 {
@@ -20,18 +21,50 @@ public class ShopItem : MonoBehaviour
 
     public class ShopItemData
     {
+        public enum ShopItem
+        {
+            HEALTH_UPGRADE,
+            PROFESSOR_CHARACTER,
+            VETERAN_CHARACTER,
+        }
+
+
+        public ShopItem shopItem;
+
         public string itemName;
         public int itemID;
         public int price;
 
 
         // New properties for attribute upgrade
-        public string attributeToUpgrade;
+        //public string attributeToUpgrade;
         public int upgradeValue;
 
         //DECIDES WHAT ITEM TO ADD IN THE INVENTORY
         public Item itemtoadd;
 
         // Additional properties or methods can be added here
+
+        //public void Initialize()
+        //{
+        //    //HARD CODE THE POTENTIAL FUNCTIONS HERE BASED ON WHAT DIALOGUEGIVE IT IS
+        //    switch (shopItem)
+        //    {
+                
+        //        default:
+        //            break;
+        //    }
+        //}
+
+        //void UpgradePlayerHealth()
+        //{
+            
+        //}
+
     }
+
+
+
+
+
 }

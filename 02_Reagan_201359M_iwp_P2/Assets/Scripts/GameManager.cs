@@ -21,13 +21,17 @@ public class GameManager : MonoBehaviour
     public GameObject HelpPanel;
     [HideInInspector]
     public GameObject StoryPanel;
+    //[HideInInspector]
+    //public GameObject DialoguePanel;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         HelpPanel = GameObject.FindGameObjectWithTag("HelpPanel");
-        HelpPanel.SetActive(true);
-
+        if (HelpPanel != null)
+        {
+            HelpPanel.SetActive(true);
+        }
 
         StoryPanel = GameObject.FindGameObjectWithTag("StoryScreen");
 
@@ -83,7 +87,8 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(HelpPanel.activeSelf == true)
+        if(HelpPanel != null &&
+            HelpPanel.activeSelf)
         {
             Time.timeScale = 0;
         }

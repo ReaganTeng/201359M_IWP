@@ -24,6 +24,7 @@ TagManager:
   - PausePanel
   - DialoguePanel
   - QuestPanel
+  - Item
   layers:
   - Default
   - TransparentFX

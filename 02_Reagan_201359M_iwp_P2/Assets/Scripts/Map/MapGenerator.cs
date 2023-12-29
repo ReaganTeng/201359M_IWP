@@ -18,30 +18,32 @@ using Random = UnityEngine.Random;
 
 public class MapGenerator : MonoBehaviour
 {
-
     public compass CompassObject;
-
-    public GameObject manualMap;
-
+    //public GameObject manualMap;
     public GameObject gameManager;
-
     public GameObject referenceobject;
-
-
     public GameObject treasureChestPrefab;
-
     public GameObject EndZone;
-    GameObject endZone;
-
-
+    public GameObject unbreakableWall;
     public GameObject Player;
+    public GameObject treasureParent;
+
+
+    [HideInInspector]
+    public List<Vector2> occupiedPositions;
+    [HideInInspector]
+    public Vector2 startingposition;
+    [HideInInspector]
+    public int roomdimension;
+
     //List <GameObject> player = new List<GameObject>();
     GameObject player;
     
     PlayerManager playermgt;
     EnemyManager enemymgt;
+    GameObject endZone;
 
-    public int maxRooms; // Maximum number of rooms.
+
     List<GameObject> generatedRooms = new List<GameObject>();
     int NumberOfPaths;
     int PathsImplemented;
@@ -55,13 +57,12 @@ public class MapGenerator : MonoBehaviour
     GameObject prevRoomInstantiated;
     GameObject startingRoom;
     Vector2 currentRoomPosition;
-    public List<Vector2> occupiedPositions;
-    public Vector2 startingposition;
-    public Tilemap mainWallTilemap;
-    public Tilemap mainFloorTilemap;
-    public Tile wallTile;
+    
+    //public Tilemap mainWallTilemap;
+    //public Tilemap mainFloorTilemap;
+    //public Tile wallTile;
     //THE LENGTH AND WIDTH OF EACH ROOM
-    public int roomdimension;
+    
     bool levelGenerated;
     bool exitRoomSpawned;
     Direction[] directionValues;
@@ -72,15 +73,10 @@ public class MapGenerator : MonoBehaviour
     bool extraroomsSpawned;
     bool allroomsSelected;
     bool paintedtotilemap;
-    public GameObject unbreakableWall;
-
     bool enemiesspawned;
-
-
     bool poolinitiated;
 
-    Vector2 exitroompos;
-
+    //Vector2 exitroompos;
     //bool AllPathsGenerated;
     //Direction startingroomDir;
     //int reductionlevel;
@@ -89,8 +85,8 @@ public class MapGenerator : MonoBehaviour
     //int offset;
 
 
-    public List<GameObject> EnemyList = new List<GameObject>();
-    bool enemypositionchosen = false;
+    //public List<GameObject> EnemyList = new List<GameObject>();
+    //bool enemypositionchosen = false;
 
 
     //SET EACH ROOM AS CHILD OF THIS GAMEOBJECT, FOR ORGANIZATION PURPOSES IN INSPECTOR
@@ -139,8 +135,8 @@ public class MapGenerator : MonoBehaviour
         levelGenerated = false;
 
 
-        NumberOfPaths = UnityEngine.Random.Range(50, 81);
-        //NumberOfPaths = Random.Range(20, 30);
+        //NumberOfPaths = Random.Range(50, 81);
+        NumberOfPaths = Random.Range(20, 30);
         //NumberOfPaths = 100;
         //NumberOfPaths = 50;
         //NumberOfPaths = 1;
@@ -195,8 +191,9 @@ public class MapGenerator : MonoBehaviour
                    randomY
                 );
                 
-           Instantiate(treasureChestPrefab, randomPosition, Quaternion.identity);
-                    
+                GameObject chest = 
+                    Instantiate(treasureChestPrefab, randomPosition, Quaternion.identity);
+                chest.transform.SetParent(treasureParent.transform);
             }
             alltreasuresSpawned = true;
         }
@@ -226,18 +223,18 @@ public class MapGenerator : MonoBehaviour
             //if(player == null)
             if (!playermgt.finishedSpawning)
             {
-                for (int i = 0; i < 2; i++)
-                {
-                    player = Instantiate(Player, startingposition, Quaternion.identity);
-                    player.GetComponent<SpriteRenderer>().color = 
-                    new Color (
-                        Random.Range(0, 1),
-                        Random.Range(0, 1),
-                        Random.Range(0, 1)
-                        );
-                    playermgt.players.Add(player);
+                //for (int i = 0; i < 2; i++)
+                //{
+                //    player = Instantiate(Player, startingposition, Quaternion.identity);
+                //    player.GetComponent<SpriteRenderer>().color = 
+                //    new Color (
+                //        Random.Range(0, 1),
+                //        Random.Range(0, 1),
+                //        Random.Range(0, 1)
+                //        );
+                //    playermgt.players.Add(player);
                     playermgt.StartItself();
-                }
+                //}
             }
 
             if (endZone == null)
@@ -251,6 +248,7 @@ public class MapGenerator : MonoBehaviour
                 enemymgt.StartItself();
                 enemiesspawned = true;
             }
+
             SpawnTreasure();
             CompassObject.StartItself();
         }
@@ -1106,6 +1104,7 @@ public class MapGenerator : MonoBehaviour
     //}
     //}
 
+    [HideInInspector]
     public List<GameObject> roompool = new List<GameObject>();
     public GameObject roompoolParent;
     private void InitializeRoomPool()
@@ -1470,69 +1469,9 @@ public class MapGenerator : MonoBehaviour
 
 
 
-    //ENEMY SPAWN
-    public GameObject enemyPrefab;
-    //public float spawnInterval = 3f;
-    Vector2 prevpos = Vector2.zero;
-    void SpawnEnemy()
-    {
-        Vector2 randomPosition;
+    
 
-        int enemytype = UnityEngine.Random.Range(0, 3);
-        //int positionchosenx = 0;
-        //int positionchoseny = 0;
-
-        // Find the smallest and largest X and Y values
-        float smallestX = occupiedPositions.Min(pos => pos.x);
-        float largestX = occupiedPositions.Max(pos => pos.x);
-        float smallestY = occupiedPositions.Min(pos => pos.y);
-        float largestY = occupiedPositions.Max(pos => pos.y);
-
-        for (int i = 0; i < maxenemynumbers; i++)
-        {
-            int randomX = UnityEngine.Random.Range((int)smallestX, (int)largestX);
-            int randomY = UnityEngine.Random.Range((int)smallestX, (int)largestX);
-
-            randomPosition = new Vector2(
-                randomX,
-               randomY
-            );
-
-            if (IsPositionValid(randomPosition))
-            {
-                Instantiate(enemyPrefab, randomPosition, Quaternion.identity);
-                continue; // Successful spawn, move to the next loop iteration
-            }
-        }
-
-        //enemiesspawned = true;
-    }
-
-    bool IsPositionValid(Vector2 position)
-    {
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(position, 0.1f, LayerMask.GetMask("WallTilemap"));
-
-        if (colliders.Length > 0)
-        {
-            // There is a wall tile at the position
-            return false;
-        }
-
-        foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy"))
-        {
-            float distance = Vector2.Distance(position, prevpos);
-            float distance2 = Vector2.Distance(position, startingposition);
-
-            if (distance <= roomdimension
-                && distance2 <= roomdimension)
-            {
-                // Too close to another enemy
-                return false;
-            }
-        }
-
-        return true;
-    }
+    
     //
 }
 

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Tilemaps;
 using static Item;
 using static UnityEngine.EventSystems.EventTrigger;
@@ -11,19 +12,20 @@ using Random = UnityEngine.Random;
 
 public class Enemy : Character
 {
-    String[] tilemaptags;
+
+    //String[] tilemaptags;
 
     QuestManager questManager;
 
-    TileBase closestTile;
-    public TileBase wallTile;
+    //TileBase closestTile;
+    //public TileBase wallTile;
 
-    bool attacked;
+    //bool attacked;
 
     float time;
 
-    public float attackcooldown;
-    int idx;
+
+    //int idx;
     List<Vector3> listOfPositions;
     //List<List<Vector3>> listOfListofPositions;
 
@@ -38,28 +40,38 @@ public class Enemy : Character
     public float distanceToIdle;
 
 
-    protected Animator animator;
+    //protected Animator animator;
 
 
     GameObject positonGameObject;
     float raycastDistance = 10.0f;
-    int raycastDirections = 100;
+    //int raycastDirections = 100;
     //LayerMask wallLayerMask = LayerMask.GetMask("WallTilemap");  // Define the WallTilemap layer mask
 
+
+    //0 _ IDLE
+    //1 _ about to atta
+    //2 _ attack
+    //3 _ run
+    //4 _ death
 
     public GameObject itemPrefab;
 
     //START TO INTEGRATE ENEMIES INTO THE MAZE
 
-    List<Vector3> potentialDestinations = new List<Vector3>();
+    //List<Vector3> potentialDestinations = new List<Vector3>();
+    //public GameObject positionGO;
 
 
-
-    public GameObject positionGO;
-
+    [HideInInspector]
+    public Slider healthbar;
+    [HideInInspector]
     public float immunity_timer;
+    [HideInInspector]
+    public float attackcooldown;
+    [HideInInspector]
     public float hurt_timer;
-
+    [HideInInspector]
     public Rigidbody2D enemyrb;
 
     EnemyManager enemymgt;
@@ -68,21 +80,25 @@ public class Enemy : Character
     {
         base.Awake();
 
-
         questManager = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<QuestManager>();
 
         attackcooldown = 0;
         enemyrb = GetComponent<Rigidbody2D>();
-        damage = 15;
+        meleedamage = 15;
+        projectileDamage = 15;
+
         hurt_timer = 0;
         immunity_timer = 0;
-        idx = 0;
+        //idx = 0;
         listOfPositions = new List<Vector3>();
         //health = UnityEngine.Random.Range(100, 200);
         health = 100;
-
+        healthbar = GetComponentInChildren<Slider>();
+        healthbar.maxValue = 100;
+        healthbar.minValue = 0;
+        healthbar.value = health;
         //Debug.Log("HEALTH SET " + health);
-        attacked = false;
+        //attacked = false;
 
 
 
@@ -104,7 +120,7 @@ public class Enemy : Character
         //raycastOrigin = transform;
 
         listOfPositions.Add(player.transform.position);
-        animator = GetComponent<Animator>();
+        
         //FOR POSITION TESTING
         //if (positonGameObject == null)
         //{
@@ -115,11 +131,24 @@ public class Enemy : Character
         //}
         //
         //TAGS OF ROOM
-        tilemaptags = new string[] { "WallTilemap", "FloorTilemap" };
+        //tilemaptags = new string[] { "WallTilemap", "FloorTilemap" };
     }
 
     protected void FollowPlayer()
     {
+
+        //string aboutToAttackName = characterAnimations.Find(
+        //           template => template.characterType == characterType
+        //           ).animationClips[1].name;
+        //0 _ IDLE
+        //1 _ about to atta
+        //2 _ attack
+        //3 _ run
+        //4 _ death
+        //5 - hurt
+
+        currentAnimIdx = 3;
+
         //Vector3 targetpos = UpdateTargetingPosition();
         //Vector3 targetpos = CalculatePath();
         Vector3 targetpos = FindPath();
@@ -355,6 +384,10 @@ public class Enemy : Character
     {
         base.Update();
 
+        PlayAnimation(characterType, currentAnimIdx);
+
+
+        healthbar.value = health;
 
         for (int i = 0; i < playerlist.Length; i++)
         {
@@ -369,7 +402,6 @@ public class Enemy : Character
         //{
         //    player = GameObject.FindGameObjectWithTag("Player");
         //}
-
 
         //Debug.Log("REFERENCING FROM");
         if (player != null)
@@ -432,7 +464,7 @@ public class Enemy : Character
                 spriteRenderer.color = Color.white;
                 break;
             case EnemyState.CHASE:
-                spriteRenderer.color = Color.yellow;
+                //spriteRenderer.color = Color.yellow;
                 if (distance >= stoppingdistance)
                 {
                     FollowPlayer();
@@ -440,13 +472,30 @@ public class Enemy : Character
                 break;
             case EnemyState.HURT:
                 {
-                    Debug.Log("OUCH");
-                    spriteRenderer.color = Color.black;
+                   //string dyinganimationName = characterAnimations.Find(
+                   //template => template.characterType == characterType
+                   //).animationClips[4].name;
+                    //0 _ IDLE
+                    //1 _ about to atta
+                    //2 _ attack
+                    //3 _ run
+                    //4 _ death
+                    //5 - hurt
+
+                    //Debug.Log("OUCH");
+                    //spriteRenderer.color = Color.black;
                     hurt_timer += 1 * Time.deltaTime;
                     if (hurt_timer >= 1.0f)
                     {
                         hurt_timer = 0;
+                        //animatorComponent.SetBool("hurt", false);
+                        currentAnimIdx = 5;
                         currentState = EnemyState.IDLE;
+                    }
+                    else
+                    {
+                        currentAnimIdx = 0;
+                        //animatorComponent.SetBool("hurt", true);
                     }
                     break;
                 }
@@ -455,22 +504,37 @@ public class Enemy : Character
 
     void Die()
     {
-        //drop 10 random items
-        for(int i = 0; i < 10; i++)
-        {
-            int enumLength = Enum.GetValues(typeof(ItemType)).Length - 1;
-            ItemType itemchosen = (ItemType)(Random.Range(0, enumLength));
-            
-            GameObject item = Instantiate(itemPrefab, transform.position, Quaternion.identity);
-            item.GetComponent<Item>().SetItem(itemchosen, 99);
+
+        //0 _ IDLE
+        //1 _ about to attack
+        //2 _ attack
+        //3 _ run
+        //4 _ death
+        //5 - hurt
+
+        //animatorComponent.SetBool("hurt", true);
+        //animatorComponent.SetFloat("health", health);
+
+        string dyinganimationName = characterAnimations.Find(
+            template => template.characterType == characterType
+            ).animationClips[4].name;
+        //DYING ANIMATION
+        if (animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(dyinganimationName)
+            && animatorComponent.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f)
+        {//drop 10 random items
+            for (int i = 0; i < 10; i++)
+            {
+                int enumLength = Enum.GetValues(typeof(ItemType)).Length - 1;
+                ItemType itemchosen = (ItemType)(Random.Range(0, enumLength));
+
+                GameObject item = Instantiate(itemPrefab, transform.position, Quaternion.identity);
+                item.GetComponent<Item>().SetItem(itemchosen, 99);
+            }
+            enemymgt.enemyList.Remove(gameObject);
+            questManager.UpdateQuestProgress("Killing Monster");
+            Destroy(gameObject);
         }
 
-        enemymgt.enemyList.Remove(gameObject);
-
-        questManager.UpdateQuestProgress("Killing Monster");
-        Destroy(gameObject);
-
-        //THINGS TO ADD - DYING ANIMATION
     }
     
 

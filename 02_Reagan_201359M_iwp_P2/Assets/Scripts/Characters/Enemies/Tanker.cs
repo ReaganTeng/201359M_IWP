@@ -13,10 +13,8 @@ public class Tanker : Enemy
 
     public TankerAttackPattern currentAttackPattern;
 
-
     float chargetimer = 0;
     float chargingtime = 0;
-
 
     Vector3 LastKnownPosition;
     Vector3 direction;
@@ -24,6 +22,10 @@ public class Tanker : Enemy
 
     BoxCollider2D attackcollider;
     CircleCollider2D circlecollider;
+
+
+    float stage1 = 1;
+    float stage2 = 2;
 
     protected override void Awake()
     {
@@ -35,7 +37,8 @@ public class Tanker : Enemy
         circlecollider.enabled = true;
         attackcollider.enabled = false;
 
-        damage = 10;
+        meleedamage = 10;
+        projectileDamage = 10;
     }
 
     protected override void Update()
@@ -43,19 +46,35 @@ public class Tanker : Enemy
         base.Update();
         // Enemy is too close to the player, move away from the player.
 
+        PlayAnimation(characterType, currentAnimIdx);
 
         switch (currentState)
         {
             case EnemyState.ABOUT_TO_ATTACK:
                 {
                     attackcollider.enabled = false;
-
                     circlecollider.enabled = true;
-
                     //Debug.Log("CHARGING");
                     chargetimer += 1 * Time.deltaTime;
                     //direction = LastKnownPosition - transform.position;
                     direction = LastKnownPosition - transform.position;
+
+                    string aboutToAttackName = characterAnimations.Find(
+                    template => template.characterType == characterType
+                    ).animationClips[1].name;
+                    //0 _ IDLE
+                    //1 _ about to atta
+                    //2 _ attack
+                    //3 _ run
+                    //4 _ death
+                    //5 - hurt
+
+                    //ANIMATION
+                    if (!animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(aboutToAttackName))
+                    {
+                        currentAnimIdx = 1;
+                        //animatorComponent.SetFloat("AttackStage", stage1);
+                    }
 
                     transform.position -= direction * Time.deltaTime;
                     if (chargetimer >= 1.0f)
@@ -68,11 +87,25 @@ public class Tanker : Enemy
             case EnemyState.ATTACK:
                 {
                     attackcollider.enabled = true;
-
                     circlecollider.enabled = false;
 
                     Debug.Log("CHARGE");
                     chargingtime += 1 * Time.deltaTime;
+
+                    string AttackName = characterAnimations.Find(
+                   template => template.characterType == characterType
+                   ).animationClips[1].name;
+
+                    //ANIMATION
+                    //if (animatorComponent.GetFloat("AttackStage") == stage1)
+                    if (!animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(AttackName))
+                    {
+                        currentAnimIdx = 1;
+                        //animatorComponent.SetFloat("AttackStage", stage2);
+                        //animatorComponent.Play("attack", 0, 0f);
+                    }
+                    //
+
                     switch (currentAttackPattern)
                     {
                         case TankerAttackPattern.STRAIGHT_CHARGE:
@@ -87,6 +120,8 @@ public class Tanker : Enemy
 
                     if (chargingtime >= 1.0f)
                     {
+                        currentAnimIdx = 0;
+                        //animatorComponent.SetFloat("AttackStage", 0);
                         currentState = EnemyState.IDLE;
                         chargingtime = 0;
                     }
@@ -94,7 +129,7 @@ public class Tanker : Enemy
                     break;
                 }
             //case EnemyState.HURT:
-               
+
             default:
                 //Debug.Log("DEFAULT");
                 //timer += 1 * Time.deltaTime;
@@ -126,7 +161,7 @@ public class Tanker : Enemy
             //&& collision.gameObject.GetComponent<Player>().immunity_timer <= 0.0f
             )
         {
-            Debug.Log("BANG Player");
+            //Debug.Log("BANG Player");
             //DAMAGE PLAYER
             Player player = collision.gameObject.GetComponent<Player>();
             Character collisionCharacter = collision.gameObject.GetComponent<Character>();
@@ -154,23 +189,14 @@ public class Tanker : Enemy
                     collisionCharacter.audioSource.clip = collisionCharacter.audioclips[0];
                     collisionCharacter.audioSource.Play();
                 }
-                collisionCharacter.health -= damage;
-
+                collisionCharacter.health -= meleedamage;
             }
-
 
             //collision.gameObject.GetComponent<Player>().immunity_timer = .5f;
             attackcooldown = .5f;
             //Destroy(gameObject);
             //collision.gameObject.GetComponent<Player>().healthbar.value = collision.gameObject.GetComponent<Player>().health;
             //collision.gameObject.GetComponent<Player>().healthbar.value = collision.gameObject.GetComponent<Player>().health;
-   
-
-            
-
-
-
-
             Debug.Log("PLAYER HEALTH " + player.health);
         }
     }

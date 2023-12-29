@@ -9,13 +9,12 @@ using Unity.VisualScripting;
 
 public class Shop : MonoBehaviour
 {
+    public CharacterUnlockManager characterUnlockManager;
+
     public List<ShopItemData> shopItems;
     public Transform itemContainer;
     public GameObject itemPrefab;
-
-
     public GameObject shopContent;
-
     public AudioClip chaChingClip;
 
     [HideInInspector] public AudioSource AS;
@@ -28,7 +27,7 @@ public class Shop : MonoBehaviour
 
     // Instantiate a new text element and set its content
     //TextMeshProUGUI newText = Instantiate(contentText, panelContent.transform);
-    //newText.text = text;
+    //newText.text = textDisplayItems()
     //// Ensure the Content object is big enough to contain all the elements
     //RectTransform contentRectTransform = panelContent.GetComponent<RectTransform>();
     //// Adjust the RectTransform of the new text element
@@ -40,40 +39,7 @@ public class Shop : MonoBehaviour
     public void DisplayItems()
     {
         RectTransform parentTransform = GetComponent<RectTransform>();
-        //float itemHeight = itemPrefab.GetComponentInChildren<RectTransform>().rect.height;
-
-
-        //foreach (ShopItemData item in shopItems)
-        //{
-        //    // Instantiate a new text element and set its content
-        //    GameObject itemObject = Instantiate(itemPrefab, parentTransform);
-        //    //newText.GetComponentInChildren<TextMeshProUGUI>().text = text;
-        //    //RectTransform rectTransform = newText.GetComponent<RectTransform>();
-        //    // Ensure the Content object is big enough to contain all the elements
-        //    RectTransform contentRectTransform = item.GetComponent<RectTransform>();
-        //    contentRectTransform.sizeDelta = new Vector2(contentRectTransform.sizeDelta.x,
-        //        rectTransform.sizeDelta.y * itemContent.transform.childCount * 1.0f);
-        //    RectTransform[] children = newText.GetComponentsInChildren<RectTransform>();
-        //    //Debug.Log($"CRT {itemContent.transform.childCount}");
-        //    for (int x = 0; x < children.Length; x++)
-        //    {
-        //        Button childButton = children[x].GetComponentInChildren<Button>();
-        //        if (childButton != null)
-        //        {
-        //            childButton.GetComponentInChildren<TextMeshProUGUI>().text = $"Buy for {price}";
-        //            // Add a listener to the button for a click event
-        //            childButton.onClick.AddListener(
-        //            () =>
-        //            {
-        //                playfablandingmgt.BuyItem(catalogName, itemID, currencyType, int.Parse(price));
-        //                Destroy(newText.gameObject);
-        //            }
-        //            );
-        //        }
-        //    }
-        //}
-
-
+        
         foreach (ShopItemData item in shopItems)
         {
             GameObject itemObject = Instantiate(itemPrefab, shopContent.transform);
@@ -86,7 +52,6 @@ public class Shop : MonoBehaviour
             
             RectTransform shopRectTransform = shopContent.GetComponent<RectTransform>();
             shopRectTransform.sizeDelta = new Vector2(shopRectTransform.sizeDelta.x, itemTransform.sizeDelta.y * shopItems.Count);
-
 
             itemObject.GetComponentInChildren<TextMeshProUGUI>().text
                 = $"{item.itemName} - {item.price} coins";
@@ -122,23 +87,53 @@ public class Shop : MonoBehaviour
         // Assuming you have a Player script on the player GameObject
         PlayerHubWorld player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHubWorld>();
 
-        // Upgrade the player's attribute
-        switch (item.attributeToUpgrade)
+        switch (item.shopItem)
         {
-            case "Health":
+            case ShopItemData.ShopItem.HEALTH_UPGRADE:
                 player.IncreaseHealth(item.upgradeValue);
+                break;
+            case ShopItemData.ShopItem.PROFESSOR_CHARACTER:
+                characterUnlockManager.UnlockCharacter(CharacterUnlockManager.CharacterType.PROFESSOR);
+                shopItems.Remove(item);
+                break;
+            case ShopItemData.ShopItem.VETERAN_CHARACTER:
+                characterUnlockManager.UnlockCharacter(CharacterUnlockManager.CharacterType.VETERAN);
+                shopItems.Remove(item);
                 break;
             //case "Damage":
             //    player.IncreaseDamage(item.upgradeValue);
             //    break;
             // Add more cases for other attributes
             default:
-                Debug.LogWarning($"Unknown attribute to upgrade: {item.attributeToUpgrade}");
+                //Debug.LogWarning($"Unknown attribute to upgrade: {item.attributeToUpgrade}");
                 break;
         }
 
+
+        // Upgrade the player's attribute
+        //switch (item.attributeToUpgrade)
+        //{
+        //    case "Health":
+        //        player.IncreaseHealth(item.upgradeValue);
+        //        break;
+        //    //case "Damage":
+        //    //    player.IncreaseDamage(item.upgradeValue);
+        //    //    break;
+        //    // Add more cases for other attributes
+        //    default:
+        //        Debug.LogWarning($"Unknown attribute to upgrade: {item.attributeToUpgrade}");
+        //        break;
+        //}
+
         //DEDUCT PRICE
         PlayerPrefs.SetFloat("GrossMoney", PlayerPrefs.GetFloat("GrossMoney") - item.price);
+
+        foreach (Transform child in shopContent.transform)
+        {
+            Destroy(child.gameObject);
+        }
+
+        DisplayItems();
 
         //PLAY CHACHING SOUND
         AS.clip = chaChingClip;

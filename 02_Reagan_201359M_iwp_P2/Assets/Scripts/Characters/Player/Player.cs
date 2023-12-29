@@ -17,6 +17,13 @@ using TMPro;
 
 public class Player : Character
 {
+    //public enum CharacterType
+    //{
+    //    JOE,
+    //    PROFESSOR,
+    //    VETERAN,
+    //}
+
     public enum PlayerState
     {
         FOLLOW,
@@ -27,9 +34,13 @@ public class Player : Character
     public TextMeshProUGUI moneyearnerd;
 
 
-
     //public Slider healthbar;
     String[] tilemaptags;
+
+    // Get input from the player
+    [HideInInspector] public float horizontalInput;
+    [HideInInspector] public float verticalInput;
+
     bool effectactive;
     public Transform playerTransform;
     TileBase closestTile;
@@ -40,54 +51,55 @@ public class Player : Character
     int idx;
     List<Vector3> listOfPositions;
     List<List<Vector3>> listOfListofPositions;
-    public bool AIMode;
+    [HideInInspector] public bool AIMode;
     public Image icon;
-
     //THE PLAYER THAT IS NOT IN AI MODE
-    public GameObject leadingPlayer;
-
-
+    [HideInInspector] public GameObject leadingPlayer;
     Inventory playerInventory;
 
     public GameObject projectilePrefab;
-
     //public float immunity_timer;
-
     public GameObject itemPrefab;
 
-    bool shotsomething;
+    bool useditem;
+    bool gotInput;
+
+
+    //[HideInInspector]
+    public CharacterUnlockManager.CharacterType characterType;
+
+    [HideInInspector]
+    public GameObject nearestEnemy;
+    [HideInInspector]
+    public Weapon playerWeapon;
+    [HideInInspector]
+    public GameObject[] listOfEnemies;
 
     protected override void Awake()
     {
         base.Awake();
 
+        playerWeapon = GetComponentInChildren<Weapon>();
+        gotInput = false;
+
         PlayerPrefs.SetFloat("MoneyEarned", 0);
 
-        shotsomething = false;
+        projectileDamage = 15;
+        meleedamage = 15;
+
+        useditem = false;
         playerInventory = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<Inventory>();
         icon = GetComponent<Image>();
         effectactive = false;
         health = 100 + PlayerPrefs.GetInt("HealthUpgradePercentage");
-        Debug.Log($"PLAYER HEALTH {health}");
+        //Debug.Log($"PLAYER HEALTH {health}");
 
-        //healthbar = GameObject.FindGameObjectWithTag("HPBar").GetComponent<Slider>();
-        //healthbar.minValue = 0;
-        //healthbar.maxValue = health;
-        //healthbar.value = health;
-
-        //immunity_timer = 0.0f;
         idx = 0;
         listOfPositions = new List<Vector3>();
         listOfListofPositions = new List<List<Vector3>>();
         playercam = GetComponentInChildren<Camera>();
         attacked = false;
         playerTransform = transform;
-        damage = 15;
-        //transform.position = GameObject.Find("MapGenerator").GetComponent<MapGenerator>().startingposition;
-        //Debug.Log("TRANSFORM POSITION " + GameObject.Find("MapGenerator").GetComponent<MapGenerator>().startingposition);
-        //raycastOrigin = transform;
-        //TAGS OF ROOM
-        tilemaptags = new string[] { "WallTilemap", "FloorTilemap" };
 
         moneyearnerd = GameObject.FindGameObjectWithTag("MoneyEarnedText").GetComponent<TextMeshProUGUI>();
     }
@@ -140,6 +152,11 @@ public class Player : Character
 
 
 
+        horizontalInput = Input.GetAxis("Horizontal");
+        verticalInput = Input.GetAxis("Vertical");
+        listOfEnemies = GameObject.FindGameObjectsWithTag("Enemy");
+
+
         if (health > 0)
         {
             spriteRenderer.color = Color.white;
@@ -147,26 +164,37 @@ public class Player : Character
             
             if (!AIMode)
             {
-                if (Input.GetKeyDown(KeyCode.Space))
+                //if (Input.GetKeyDown(KeyCode.Space))
+                //{
+                //    health -= 10;
+                //}
+
+                if (verticalInput == 0
+                    && horizontalInput == 0
+                    && !playerWeapon.isRotating)
                 {
-                    health -= 10;
+                    currentAnimIdx = 0;
                 }
+
 
                 //emissionModule.enabled = true;
                 //Debug.Log($"CURRENT HEALTH IS {health}");
                 Movement();
                 cameraMovement();
-                Shooting();
+                UseItem();
             }
             else
             {
                 AIMovement();
             }
         }
-        else
-        {
-            spriteRenderer.color = Color.black;
-        }
+        //else
+        //{
+        //    spriteRenderer.color = Color.black;
+        //}
+
+        PlayAnimation(characterType, currentAnimIdx);
+
 
 
         //EFFECT TESTING
@@ -201,38 +229,24 @@ public class Player : Character
     public PlayerState currentstate;
 
 
-    //HANDLES THE SHOOTING
-    void Shooting()
+    //HANDLES THE USAGE OF ITEMS
+    void UseItem()
     {
         int currentslot = playerInventory.selectedSlot;
 
         //switch ()
 
         if (Input.GetMouseButtonDown(1)
-            && !shotsomething
+            && !useditem
             && playerInventory.slots[currentslot].Quantity > 0
             && playerInventory.slots[currentslot].itemtype != ItemType.NOTHING)
         {
-            ItemType itemused = playerInventory.slots[currentslot].itemtype;
-
-            switch (itemused)
-            {
-                case ItemType.RED_GEM:
-                case ItemType.GREEN_GEM:
-                    ShootProjectile();
-                    break;
-                case ItemType.BLUE_GEM:
-                    UseItem();
-                    break;
-                default:
-                    break;
-            }
-
-            shotsomething = true;
+            ItemUsage();
+            useditem = true;
         }
         if (!Input.GetMouseButtonDown(1))
         {
-            shotsomething = false;
+            useditem = false;
         }
     }
 
@@ -371,13 +385,20 @@ public class Player : Character
 
     private void AIMovement()
     {
+
         float distance = Vector3.Distance(transform.position, leadingPlayer.transform.position);
         if(distance >= 10)
         {
             currentstate = PlayerState.FOLLOW;
         }
+        //public enum PlayerState
+        //{
+        //    FOLLOW,
+        //    ATTACK,
+        //    HURT
+        //}
 
-        switch(currentstate)
+        switch (currentstate)
         {
             case PlayerState.FOLLOW:
             {
@@ -385,6 +406,44 @@ public class Player : Character
                 {
                     FollowPlayer();
                 }
+                nearestEnemy = FindNearestEnemy(transform.position);
+                break;
+            }
+            case PlayerState.ATTACK:
+            {
+                //FOLLOW THE NEAREST ENEMY
+                if (nearestEnemy != null)
+                {
+                    float distanceBetweenEnemy = Vector2.Distance(nearestEnemy.transform.position, transform.position);
+                    if (distanceBetweenEnemy < 2.0f)
+                    {
+                        Enemy enemyScript = nearestEnemy.gameObject.GetComponent<Enemy>();
+                        // Calculate the direction from this object to the enemy
+                        Vector2 directionToEnemy =
+                            (nearestEnemy.transform.position - transform.position).normalized;
+                        // Set a force to launch the object in the opposite direction
+                        float launchForce = .1f * Time.deltaTime; // Adjust the force as needed
+                        enemyScript.enemyrb.AddForce(directionToEnemy * launchForce, ForceMode2D.Impulse);
+                        //DAMAGE ENEMY
+                        int playerDamage = meleedamage;
+                        //enemyScript.health -= 1000000;
+                        enemyScript.health -= playerDamage;
+                        //SET ENEMY TO HURT STATE
+                        enemyScript.currentState = Enemy.EnemyState.HURT;
+                        enemyScript.immunity_timer = .5f;
+                        enemyScript.hurt_timer = 0.0f;
+                        currentstate = PlayerState.FOLLOW;
+                    }
+                    else
+                    {
+                        MoveTowardsNearestEnemy();
+                    }
+                }
+
+                break;
+            }
+            case PlayerState.HURT:
+            {
                 break;
             }
             default:
@@ -394,8 +453,34 @@ public class Player : Character
         }
     }
 
+    void MoveTowardsNearestEnemy()
+    {
+        // Calculate the direction towards the nearest enemy
+        Vector3 direction = (nearestEnemy.transform.position - transform.position).normalized;
+        // Move the player in that direction
+        transform.Translate(direction * 10 * Time.deltaTime);
+    }
 
+    GameObject FindNearestEnemy(Vector3 position)
+    {
+        GameObject nearestEnemy = null;
+        float minDistance = float.MaxValue;
 
+        foreach (GameObject enemy in listOfEnemies)
+        {
+            // Calculate the distance between the position and the enemy's position
+            float distance = Vector3.Distance(position, enemy.transform.position);
+
+            // Check if the current enemy is closer than the previous nearest enemy
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+                nearestEnemy = enemy;
+            }
+        }
+
+        return nearestEnemy;
+    }
 
     //public void ApplyPoisonEffectToPlayer(float duration)
     //{
@@ -415,127 +500,49 @@ public class Player : Character
         }
     }
 
-    private void Attack()
+    
+    
+
+    //CHOOSE WHICH ITEM TO USE
+    void ItemUsage()
     {
-        if(Input.GetKey(KeyCode.Space))
-        {
-            if (!attacked)
-            {
-                Debug.Log("Attack ");
-                Explode(transform.position, 1);
-                attacked = true;
-            }
-        }
-        else
-        {
-            //Debug.Log("NOT ATTACK");
-            attacked = false;
-        }
-    }
-
-    private void UpdateTargetingPosition()
-    {
-        time += Time.deltaTime;
-
-        //if(time >= 3)
-        //{
-        //    if (listOfPositions[idx] != null)
-        //    {
-        //        listOfListofPositions[idx] = transform.position;
-        //    }
-        //    else
-        //    {
-        //        listOfListofPositions.Add(transform.position);
-        //    }
-
-        //    if(idx >= 5)
-        //    {
-        //        idx = 0;
-        //    }
-        //    time = 0;
-        //}
-    }
-
-
-
-
-
-    void ShootProjectile()
-    {
-        // Instantiate the projectile
-        //DECIDE ON THE PROJECTILE TYPE DEPENDING ON THE CURRENT INVENTORY SELECTED
+        //FOR THE SUBTRACTION OF MONEY
+        ItemType itemchosen = ItemType.NOTHING;
+        int currentslot = playerInventory.selectedSlot;
         ProjectileType pt = ProjectileType.NORMAL;
-        int currentslot = playerInventory.selectedSlot;
-
-        //FOR THE SUBTRACTION OF MONEY
-        ItemType itemchosen = ItemType.NOTHING;
-
 
         switch (playerInventory.slots[currentslot].itemtype)
         {
-            case Item.ItemType.RED_GEM: 
-            {
-                pt = ProjectileType.RED_GEM;
+            case ItemType.RED_GEM:
+                {
+                    pt = ProjectileType.RED_GEM;
                     itemchosen = ItemType.RED_GEM;
-                break;
-            }
-            case Item.ItemType.GREEN_GEM:
-            {
-                pt = ProjectileType.GREEN_GEM;
-                itemchosen = ItemType.GREEN_GEM;
-
-                break;
-            }
-            default:
-            {
-                break;
-            }
-        }
-        playerInventory.slots[currentslot].RemoveItem();
-        projectilePrefab.GetComponent<Projectile>().projectiletype = pt;
-        GameObject projectile = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
-
-
-        //USE FOR SUBTRACTION OF MONEY
-        GameObject item = Instantiate(itemPrefab, transform.position, Quaternion.identity);
-        item.GetComponent<Item>().SetItem(itemchosen, 5);
-        PlayerPrefs.SetFloat("MoneyEarned", PlayerPrefs.GetFloat("MoneyEarned") - item.GetComponent<Item>().money);
-        if (PlayerPrefs.GetFloat("MoneyEarned") < 0)
-        {
-            PlayerPrefs.SetFloat("MoneyEarned", 0);
-        }
-
-        if (moneyearnerd != null)
-        {
-            moneyearnerd.text = $"{PlayerPrefs.GetFloat("MoneyEarned")}";
-        }
-
-
-
-        Destroy(item);
-        //
-
-        if (projectile != null)
-        {
-            Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector3 direction = (mousePosition - transform.position).normalized;
-            //(player.transform.position - transform.position).normalized
-
-            projectile.GetComponent<Projectile>().setdata(damage, 10,
-                direction, gameObject);
-        }
-        //spriteRenderer.color = Color.blue;
-    }
-
-
-    void UseItem()
-    {
-        //FOR THE SUBTRACTION OF MONEY
-        ItemType itemchosen = ItemType.NOTHING;
-        int currentslot = playerInventory.selectedSlot;
-
-        switch (playerInventory.slots[currentslot].itemtype)
-        {
+                    projectilePrefab.GetComponent<Projectile>().projectiletype = pt;
+                    GameObject projectile = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
+                    if (projectile != null)
+                    {
+                        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                        Vector3 direction = (mousePosition - transform.position).normalized;
+                        projectile.GetComponent<Projectile>().setdata(projectileDamage, 10,
+                            direction, gameObject);
+                    }
+                    break;
+                }
+            case ItemType.GREEN_GEM:
+                {
+                    pt = ProjectileType.GREEN_GEM;
+                    itemchosen = ItemType.GREEN_GEM;
+                    projectilePrefab.GetComponent<Projectile>().projectiletype = pt;
+                    GameObject projectile = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
+                    if (projectile != null)
+                    {
+                        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                        Vector3 direction = (mousePosition - transform.position).normalized;
+                        projectile.GetComponent<Projectile>().setdata(projectileDamage, 10,
+                            direction, gameObject);
+                    }
+                    break;
+                }
             case ItemType.BLUE_GEM:
                 {
                     itemchosen = ItemType.BLUE_GEM;
@@ -572,9 +579,31 @@ public class Player : Character
 
     private void Movement()
     {
-        // Get input from the player
-        float horizontalInput = Input.GetAxis("Horizontal");
-        float verticalInput = Input.GetAxis("Vertical");
+        
+
+        //if (currentAnimIdx <= 0)
+        //{
+        if (verticalInput < 0)
+        {
+            currentAnimIdx = 1;
+        }
+        else if (verticalInput > 0)
+        {
+            currentAnimIdx = 2;
+        }
+
+        if (horizontalInput < 0)
+        {
+            currentAnimIdx = 3;
+        }
+        else if (horizontalInput > 0)
+        {
+            currentAnimIdx = 4;
+        }
+        //}
+
+        
+
         // Calculate the movement vector
         Vector3 movement = new Vector3(horizontalInput, verticalInput, 0f).normalized * 5.0f * Time.deltaTime;
         // Calculate the player's potential new position
@@ -587,44 +616,97 @@ public class Player : Character
         transform.position = newPosition;
     }
 
-    public void Explode(Vector3 explosionPosition, float explosionRadius)
-    {
-        // Find the GameObject with the "WallTilemap" tag.
-        GameObject wallTilemapObject = GameObject.FindWithTag("WallTilemap");
 
-        // Check if the GameObject with the tag was found.
-        if (wallTilemapObject != null)
-        {
-            // Get the Tilemap component from the found GameObject.
-            Tilemap wallTilemap = wallTilemapObject.GetComponent<Tilemap>();
 
-            if (wallTilemap != null)
-            {
-                // Convert world position to tilemap cell position.
-                Vector3Int cellPosition = wallTilemap.WorldToCell(explosionPosition);
 
-                // Loop through tiles within the explosion radius.
-                for (int x = -Mathf.FloorToInt(explosionRadius); x <= Mathf.FloorToInt(explosionRadius); x++)
-                {
-                    for (int y = -Mathf.FloorToInt(explosionRadius); y <= Mathf.FloorToInt(explosionRadius); y++)
-                    {
-                        // Calculate the position of the current cell.
-                        Vector3Int currentCell = cellPosition + new Vector3Int(x, y, 0);
 
-                        // Check if the cell contains a wall tile.
-                        TileBase tile = wallTilemap.GetTile(currentCell);
 
-                        // If it does, remove the wall tile.
-                        if (tile != null)
-                        {
-                            wallTilemap.SetTile(currentCell, null);
-                        }
-                    }
-                }
-            }
-        }
-       
-    }
+
+    //private void Attack()
+    //{
+    //    if (Input.GetKey(KeyCode.Space))
+    //    {
+    //        if (!attacked)
+    //        {
+    //            Debug.Log("Attack ");
+    //            //Explode(transform.position, 1);
+    //            attacked = true;
+    //        }
+    //    }
+    //    else
+    //    {
+    //        //Debug.Log("NOT ATTACK");
+    //        attacked = false;
+    //    }
+    //}
+
+    //private void UpdateTargetingPosition()
+    //{
+    //    time += Time.deltaTime;
+
+    //    //if(time >= 3)
+    //    //{
+    //    //    if (listOfPositions[idx] != null)
+    //    //    {
+    //    //        listOfListofPositions[idx] = transform.position;
+    //    //    }
+    //    //    else
+    //    //    {
+    //    //        listOfListofPositions.Add(transform.position);
+    //    //    }
+
+    //    //    if(idx >= 5)
+    //    //    {
+    //    //        idx = 0;
+    //    //    }
+    //    //    time = 0;
+    //    //}
+    //}
+
+
+
+
+
+
+
+    //public void Explode(Vector3 explosionPosition, float explosionRadius)
+    //{
+    //    // Find the GameObject with the "WallTilemap" tag.
+    //    GameObject wallTilemapObject = GameObject.FindWithTag("WallTilemap");
+
+    //    // Check if the GameObject with the tag was found.
+    //    if (wallTilemapObject != null)
+    //    {
+    //        // Get the Tilemap component from the found GameObject.
+    //        Tilemap wallTilemap = wallTilemapObject.GetComponent<Tilemap>();
+
+    //        if (wallTilemap != null)
+    //        {
+    //            // Convert world position to tilemap cell position.
+    //            Vector3Int cellPosition = wallTilemap.WorldToCell(explosionPosition);
+
+    //            // Loop through tiles within the explosion radius.
+    //            for (int x = -Mathf.FloorToInt(explosionRadius); x <= Mathf.FloorToInt(explosionRadius); x++)
+    //            {
+    //                for (int y = -Mathf.FloorToInt(explosionRadius); y <= Mathf.FloorToInt(explosionRadius); y++)
+    //                {
+    //                    // Calculate the position of the current cell.
+    //                    Vector3Int currentCell = cellPosition + new Vector3Int(x, y, 0);
+
+    //                    // Check if the cell contains a wall tile.
+    //                    TileBase tile = wallTilemap.GetTile(currentCell);
+
+    //                    // If it does, remove the wall tile.
+    //                    if (tile != null)
+    //                    {
+    //                        wallTilemap.SetTile(currentCell, null);
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
+
+    //}
 
     /*private void FindClosestTile(string[] tags)
     {
@@ -673,7 +755,7 @@ public class Player : Character
 
 
 
-    
+
 
 
     private void FindClosestTile(string[] tags)

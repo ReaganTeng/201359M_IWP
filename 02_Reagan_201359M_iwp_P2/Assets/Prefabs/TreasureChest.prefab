@@ -285,6 +285,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82cbca13d6d81c947bd1fac5aebda7fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sr: {fileID: 0}
+  textPrompt: {fileID: 0}
   chestSprites:
   - {fileID: 21300000, guid: 33a6f66e1d500a443921a6d884d0d8cb, type: 3}
   - {fileID: 21300000, guid: f7b6429c0545dbd48be292b362aaabfe, type: 3}
