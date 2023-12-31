@@ -52,6 +52,9 @@ MonoBehaviour:
   - {fileID: 21300000, guid: a6dd7a81acc656d43b6f5085220a82a0, type: 3}
   - {fileID: 21300000, guid: aede5fc3a369f134993eca1faa2d09b5, type: 3}
   - {fileID: 21300000, guid: fdae880631cfd834d8281f411c1b58fd, type: 3}
+  - {fileID: 21300000, guid: 418c93285dff7114490b7a76237086d1, type: 3}
+  - {fileID: 21300000, guid: 404dc5629c1187a46942f27b87b53d48, type: 2}
+  - {fileID: 21300000, guid: 415ba910aea682349bb699ec03fb7bb0, type: 3}
   itemImage: {fileID: 506502593322550195}
   money: 0
 --- !u!222 &7882805440595935496
@@ -103,7 +106,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: a6dd7a81acc656d43b6f5085220a82a0, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 418c93285dff7114490b7a76237086d1, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

@@ -9,21 +9,84 @@ using TMPro;
 public class Inventory : MonoBehaviour
 {
     public TextMeshProUGUI moneyearned;
-
-
+    public Upgrades upgrades;
     public List<InventorySlot> slots;
     public int selectedSlot;
+
+    public GameObject slotPrefab;
+    public GameObject inventoryPanel;
+
 
     Inventory playerInventory;
     public void Awake()
     {
         //itempicked.SetItem(ItemType.RED_GEM, 5);
         //AddItem(itempicked, 18);
+
+        //foreach (InventorySlot slot in upgrades.slotsToTransfer)
+        //{
+        //    upgrades.emptySlot(slot);
+        //}
+
+        ////foreach(InventorySlot slots in upgrades.slots)
+        ////{
+
+        ////}
+        //InstantiateInventorySlots();
+
+        //SelectSlot(0);
     }
+
+
+    void InstantiateInventorySlots()
+    {
+        //public Item CurrentItem;
+        //public ItemType itemtype;
+        //public int Quantity;
+        //// Assuming slot has an Image component
+        //public Image slotImage;
+        //public TextMeshProUGUI quantityText;
+        float totalWidth = 0;
+
+        for (int i = 0; i < upgrades.slotsToTransfer.Count; i++)
+        {
+            GameObject slot = Instantiate(slotPrefab, inventoryPanel.GetComponent<RectTransform>());
+            InventorySlot inventorySlotComponent = slot.GetComponent<InventorySlot>();
+
+            //TRANSFER WHATEVER INVENTORY IN UPGRADE SCRIPTABLEOBJECT INTO INVENTORY IN SCENE  
+            InventorySlot slot2Transfer = upgrades.slotsToTransfer[i];
+            inventorySlotComponent.CurrentItem = slot2Transfer.CurrentItem;
+            inventorySlotComponent.Quantity = slot2Transfer.Quantity;
+            inventorySlotComponent.itemtype = slot2Transfer.itemtype;
+            inventorySlotComponent.quantityText = slot2Transfer.quantityText;
+            inventorySlotComponent.slotImage = slot2Transfer.slotImage;
+            slots.Add(inventorySlotComponent);
+
+            // Adjust the position based on the index to arrange them in a column
+            RectTransform slotRect = slot.GetComponent<RectTransform>();
+            slotRect.anchoredPosition = new Vector2(totalWidth, 0);
+            totalWidth += slotRect.rect.width + 10;
+            // Adjust the spacing (10 in this case)
+            foreach (InventorySlot s in slots)
+            {
+                RectTransform stRect = s.GetComponent<RectTransform>();
+                stRect.anchoredPosition =
+                    new Vector2(
+                    stRect.anchoredPosition.x - (slotRect.rect.width),
+                    stRect.anchoredPosition.y
+                );
+            }
+            //
+
+            // Customize or initialize your slot here if needed
+        }
+    }
+
+
 
     public void Update()
     {
-        for (int i = 1; i <= 3; i++)
+        for (int i = 1; i < slots.Count; i++)
         {
             if (Input.GetKeyDown(i.ToString()))
             {
@@ -71,11 +134,19 @@ public class Inventory : MonoBehaviour
 
                 // Add the item to the slot
                 slot.AddItem(item, amountToAdd);
+
+         
                 // Subtract the added amount from the total
                 amount -= amountToAdd;
 
                 PlayerPrefs.SetFloat("MoneyEarned", PlayerPrefs.GetFloat("MoneyEarned") + item.money);
                 moneyearned.text = $"{PlayerPrefs.GetFloat("MoneyEarned")}";
+
+                //put in upgrade scriptableobject also
+                List<InventorySlot> slotsinupgrade = upgrades.slotsToTransfer;
+                int upgradeidx = slots.IndexOf(slot);
+                slotsinupgrade[upgradeidx] = slot;
+                //
 
                 Destroy(item.gameObject);
                 // If we've added the required amount, break out of the loop

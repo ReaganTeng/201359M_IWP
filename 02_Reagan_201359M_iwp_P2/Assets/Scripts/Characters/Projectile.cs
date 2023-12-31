@@ -11,9 +11,11 @@ public class Projectile : MonoBehaviour
     {
         GREEN_GEM,
         RED_GEM,
+        BOMB,
         NORMAL
     }
 
+    [HideInInspector]
     public ProjectileType projectiletype;
 
     SpriteRenderer projectileSprite;
@@ -47,40 +49,19 @@ public class Projectile : MonoBehaviour
 
     }
 
-    //DIRECTION WHEN ENEMY SHOOTS
-    //(player.transform.position - transform.position).normalized
-
-
-    //DIRECTION WHEN PLAYER SHOOTS
-    //Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-    //Vector3 direction = (mousePosition - transform.position).normalized;
-    //(player.transform.position - transform.position).normalized
-
     private void Update()
     {
-        transform.position += direction * projectilespeed * Time.deltaTime;
+        transform.position += direction * projectilespeed * Time.deltaTime ;
+
+        //transform.position += transform.right * projectilespeed * Time.deltaTime;
+        //transform.rotation = Quaternion.Euler(0, 0, 90);
+
         timer += 1 * Time.deltaTime;
-        //if (timer >= 2)
-        //{
-        //    Destroy(gameObject);
-        //}
+        if (timer >= 2)
+        {
+            Destroy(gameObject);
+        }
     }
-
-
-    //SHOOT PROJECTILE BASED ON MOUSE'S DIRECTION
-    //void ShootProjectile()
-    //{
-    //    Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-    //    Vector3 direction = (mousePosition - transform.position).normalized;
-
-    //    // Instantiate the projectile at the player's position.
-    //    GameObject projectile = Instantiate(gameObject, transform.position, Quaternion.identity);
-
-    //    // Set the projectile's direction.
-    //    projectile.GetComponent<Rigidbody2D>().velocity = direction * projectileSpeed;
-    //}
-
-
 
     // Handle collisions with other objects
     void OnTriggerEnter2D(Collider2D collision)
@@ -99,7 +80,8 @@ public class Projectile : MonoBehaviour
                 projectileSprite.color = Color.white;
                 collisionCharacter.ApplyEffect(EffectType.POISON);
             }
-            if (projectiletype == ProjectileType.RED_GEM)
+            if (projectiletype == ProjectileType.RED_GEM
+                || projectiletype == ProjectileType.BOMB)
             {
                 projectileSprite.color = Color.white;
                 collisionCharacter.ApplyEffect(EffectType.BURN);
@@ -135,14 +117,19 @@ public class Projectile : MonoBehaviour
             hitsomething = true;
 
             Destroy(gameObject);
-            Debug.Log($"{collision.gameObject.name} HEALTH " + collision.gameObject.GetComponent<Character>().health);
+            Debug.Log($"{collision.gameObject.name} HEALTH {collision.gameObject.GetComponent<Character>().health}");
         }
 
         //FOR THE EXPLOSION OF RED PROJECTILE
-        if ((collision.CompareTag("WallTilemap") || collision.CompareTag("UnbreakableWall"))
-            && projectiletype == ProjectileType.RED_GEM)
+        if (collision.CompareTag("WallTilemap") 
+            || collision.CompareTag("UnbreakableWall")
+            )
         {
-            Explode(transform.position, 3, collision.gameObject);
+            if (projectiletype == ProjectileType.RED_GEM
+                || projectiletype == ProjectileType.BOMB)
+            {
+                Explode(transform.position, 3, collision.gameObject);
+            }
             //direction = new Vector3(0, 0, 0);
             Destroy(gameObject);
         }

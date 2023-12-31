@@ -16,7 +16,7 @@ public class shopkeeper : MonoBehaviour
         buttonpressed = false;
         textprompt = GetComponentInChildren<TextMeshProUGUI>();
         shopPanel = GameObject.FindGameObjectWithTag("ShopPanel");
-        shopPanel.GetComponent<Shop>().DisplayItems();
+        //shopPanel.GetComponent<Shop>().DisplayItems();
 
         //shopPanel.GetComponent<Shop>().itemContainer = shopPanel.gameObject.GetComponent<Transform>();
 
@@ -52,19 +52,7 @@ public class shopkeeper : MonoBehaviour
 
     }
 
-    public void closePanel()
-    {
-        //shopPanel.SetActive(!shopPanel.activeSelf);
-        shopPanel.GetComponent<CanvasGroup>().interactable = !shopPanel.GetComponent<CanvasGroup>().interactable;
-        if(shopPanel.GetComponent<CanvasGroup>().interactable)
-        {
-            shopPanel.GetComponent<CanvasGroup>().alpha = 1;
-        }
-        else
-        {
-            shopPanel.GetComponent<CanvasGroup>().alpha = 0;
-        }
-    }
+   
 
 
     void OnTriggerEnter2D(Collider2D collision)

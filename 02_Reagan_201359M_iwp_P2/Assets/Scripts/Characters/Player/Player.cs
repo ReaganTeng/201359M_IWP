@@ -14,6 +14,7 @@ using Vector2 = UnityEngine.Vector2;
 using static Projectile;
 using static Item;
 using TMPro;
+using UnityEngine.Playables;
 
 public class Player : Character
 {
@@ -47,22 +48,22 @@ public class Player : Character
     public TileBase wallTile;
     bool attacked;
     Camera playercam;
-    float time;
-    int idx;
-    List<Vector3> listOfPositions;
-    List<List<Vector3>> listOfListofPositions;
+    //float time;
+    //int idx;
+    //List<Vector3> listOfPositions;
+    //List<List<Vector3>> listOfListofPositions;
     [HideInInspector] public bool AIMode;
     public Image icon;
     //THE PLAYER THAT IS NOT IN AI MODE
     [HideInInspector] public GameObject leadingPlayer;
-    Inventory playerInventory;
+    [HideInInspector] public Inventory playerInventory;
 
-    public GameObject projectilePrefab;
+    //public GameObject projectilePrefab;
     //public float immunity_timer;
     public GameObject itemPrefab;
 
     bool useditem;
-    bool gotInput;
+    //bool gotInput;
 
 
     //[HideInInspector]
@@ -74,13 +75,67 @@ public class Player : Character
     public Weapon playerWeapon;
     [HideInInspector]
     public GameObject[] listOfEnemies;
+    [HideInInspector]
+    public Dictionary<ItemType, Action> itemActions = new Dictionary<ItemType, Action>();
+
 
     protected override void Awake()
     {
         base.Awake();
 
+
+
+        // INITIALISE THE EFFECTS AND FUNCTIONS FOR EACH ITEM
+        itemActions = new Dictionary<ItemType, Action>
+        {
+            { ItemType.RED_GEM, () =>
+            ShootProjectiles(ProjectileType.RED_GEM,
+            Camera.main.ScreenToWorldPoint(Input.mousePosition),
+            transform.position) },
+            { ItemType.GREEN_GEM, () =>
+            ShootProjectiles(ProjectileType.GREEN_GEM,
+            Camera.main.ScreenToWorldPoint(Input.mousePosition),
+            transform.position) },
+            { ItemType.BLUE_GEM, ()
+            => ApplyEffect(EffectType.SHIELD) },
+            //POWERUPS
+            { ItemType.ONE_HIT, ()
+            => 
+                
+                ApplyEffect(EffectType.ONE_HIT)
+
+                 },
+            { ItemType.MINER_SENSE,
+            () => ApplyEffect(EffectType.MINER_SENSE) },
+            { ItemType.GHOST, ()
+            => ApplyEffect(EffectType.GHOST) },
+            { ItemType.SPIRIT_FIRE, ()
+            => ApplyEffect(EffectType.SPIRIT_FIRE) },
+            { ItemType.GEM_WISDOM, ()
+            => ApplyEffect(EffectType.GEM_WISDOM) },
+            //
+            //EQUIPMENT
+             { ItemType.BOMB, () =>
+            ShootProjectiles(ProjectileType.BOMB,
+            Camera.main.ScreenToWorldPoint(Input.mousePosition),
+            transform.position) },
+              { ItemType.POTION, () =>
+               health += 99
+              },
+            { ItemType.BULLET, () =>
+            ShootProjectiles(ProjectileType.NORMAL,
+            Camera.main.ScreenToWorldPoint(Input.mousePosition),
+            transform.position) },
+             //
+        };
+
+
+
+
+
+
         playerWeapon = GetComponentInChildren<Weapon>();
-        gotInput = false;
+        //gotInput = false;
 
         PlayerPrefs.SetFloat("MoneyEarned", 0);
 
@@ -94,9 +149,9 @@ public class Player : Character
         health = 100 + PlayerPrefs.GetInt("HealthUpgradePercentage");
         //Debug.Log($"PLAYER HEALTH {health}");
 
-        idx = 0;
-        listOfPositions = new List<Vector3>();
-        listOfListofPositions = new List<List<Vector3>>();
+        //idx = 0;
+        //listOfPositions = new List<Vector3>();
+        //listOfListofPositions = new List<List<Vector3>>();
         playercam = GetComponentInChildren<Camera>();
         attacked = false;
         playerTransform = transform;
@@ -104,13 +159,9 @@ public class Player : Character
         moneyearnerd = GameObject.FindGameObjectWithTag("MoneyEarnedText").GetComponent<TextMeshProUGUI>();
     }
 
-
-
     public GameObject objectToSpawn;
     public float spawnRadius = 5f;
     public LayerMask occupiedLayer;
-
-
 
     void SpawnRandomObject()
     {
@@ -150,8 +201,6 @@ public class Player : Character
             return;
         }
 
-
-
         horizontalInput = Input.GetAxis("Horizontal");
         verticalInput = Input.GetAxis("Vertical");
         listOfEnemies = GameObject.FindGameObjectsWithTag("Enemy");
@@ -160,8 +209,6 @@ public class Player : Character
         if (health > 0)
         {
             spriteRenderer.color = Color.white;
-
-            
             if (!AIMode)
             {
                 //if (Input.GetKeyDown(KeyCode.Space))
@@ -176,7 +223,6 @@ public class Player : Character
                     currentAnimIdx = 0;
                 }
 
-
                 //emissionModule.enabled = true;
                 //Debug.Log($"CURRENT HEALTH IS {health}");
                 Movement();
@@ -185,7 +231,7 @@ public class Player : Character
             }
             else
             {
-                AIMovement();
+                FSManager();
             }
         }
         //else
@@ -250,11 +296,14 @@ public class Player : Character
         }
     }
 
-    protected void FollowPlayer()
+    void FollowPlayer()
     {
         //Vector3 targetpos = UpdateTargetingPosition();
         //Vector3 targetpos = CalculatePath();
-        Vector3 targetpos = FindPath();
+        Vector2 playerPosition = leadingPlayer.transform.position;
+        Vector2 Position = transform.position;
+        Vector3 targetpos = FindPath(playerPosition, Position);
+
         //positonGameObject.transform.position = targetpos;
 
         float speed = 2.0f;
@@ -264,128 +313,12 @@ public class Player : Character
         direction.Normalize();
         // Update the position of the follower toward the target
         transform.position += direction * speed * Time.deltaTime;
-
-        //float distance = Vector2.Distance(transform.position, targetpos);
-
-        //if (distance <= 0.5f)
-        //{
-        //    listOfPositions.Remove(targetpos);
-        //}
-
     }
-    Vector3 FindPath()
+   
+    
+
+    void FSManager()
     {
-        Vector2 playerPosition = leadingPlayer.transform.position;
-        Vector2 enemyPosition = transform.position;
-        Vector2 directionToPlayer = playerPosition - enemyPosition;
-        directionToPlayer.Normalize();
-        float raycastDistance = 10.0f;
-
-        //DRAW RAYS
-        for (float angle = 0; angle < 360; angle += 1)
-        {
-            float x = 1.0f;
-            Vector3 direction = Quaternion.Euler(0, 0, angle) * Vector3.right;
-            direction.Normalize();
-            //Debug.DrawRay(enemyPosition, direction * raycastDistance * x, Color.red);
-            //Debug.DrawRay(playerPosition, direction * raycastDistance * x, Color.magenta);
-        }
-        //Debug.DrawRay(enemyPosition, directionToPlayer * raycastDistance, Color.blue);
-        //
-
-        RaycastHit2D hitwall = Physics2D.Raycast(enemyPosition, directionToPlayer, raycastDistance, LayerMask.GetMask("WallTilemap"));
-
-        if (hitwall.collider != null)
-        {
-            // Scenario 1: There is an obstacle between the enemy and the player
-            // Initialize variables for finding the closest intersection
-            List<Vector3> lineOfSightPoints = new List<Vector3>();
-            float minDistance = float.MaxValue;
-            Vector3 closestIntersection = Vector3.zero;
-
-            for (float angle = 0; angle < 360; angle += 1)
-            {
-                Vector2 direction = Quaternion.Euler(0, 0, angle) * Vector3.right;
-                Vector2 endPoint = enemyPosition + direction * raycastDistance;
-
-                List<Vector3> pointsInDirection = BresenhamLine(enemyPosition, endPoint);
-                lineOfSightPoints.AddRange(pointsInDirection);
-            }
-
-            foreach (var point in lineOfSightPoints)
-            {
-                bool enemyLinecastClear = !Physics2D.Linecast(enemyPosition, point, LayerMask.GetMask("WallTilemap"));
-                bool playerLinecastClear = !Physics2D.Linecast(playerPosition, point, LayerMask.GetMask("WallTilemap"));
-
-                // Filter out points that are too close to the enemy or player
-                float minDistanceFromEntities = 0.1f; // Adjust this value as needed
-                if (enemyLinecastClear && playerLinecastClear &&
-                    Vector3.Distance(point, enemyPosition) > minDistanceFromEntities &&
-                    Vector3.Distance(point, playerPosition) > minDistanceFromEntities)
-                {
-                    float distance = Vector3.Distance(playerPosition, point);
-                    if (distance < minDistance)
-                    {
-                        closestIntersection = point;
-                        minDistance = distance;
-                    }
-                }
-            }
-            lineOfSightPoints.Clear();
-            return closestIntersection;
-        }
-        else
-        {
-            //Debug.Log("THERE'S NO OBSTACLE");
-            //Debug.Log("PLAYER'S POSITION " + playerPosition);
-            // Scenario 2: There is no obstacle between the enemy and the player
-            return playerPosition;
-        }
-    }
-    public List<Vector3> BresenhamLine(Vector2 start, Vector2 end)
-    {
-        List<Vector3> linePoints = new List<Vector3>();
-
-        int x0 = Mathf.RoundToInt(start.x);
-        int y0 = Mathf.RoundToInt(start.y);
-        int x1 = Mathf.RoundToInt(end.x);
-        int y1 = Mathf.RoundToInt(end.y);
-
-        int dx = Mathf.Abs(x1 - x0);
-        int dy = Mathf.Abs(y1 - y0);
-
-        int sx = (x0 < x1) ? 1 : -1;
-        int sy = (y0 < y1) ? 1 : -1;
-        int err = dx - dy;
-
-        while (true)
-        {
-            linePoints.Add(new Vector3(x0, y0));
-
-            if (x0 == x1 && y0 == y1)
-                break;
-
-            int e2 = 2 * err;
-            if (e2 > -dy)
-            {
-                err = err - dy;
-                x0 = x0 + sx;
-            }
-            if (e2 < dx)
-            {
-                err = err + dx;
-                y0 = y0 + sy;
-            }
-        }
-        return linePoints;
-    }
-
-
-
-
-    private void AIMovement()
-    {
-
         float distance = Vector3.Distance(transform.position, leadingPlayer.transform.position);
         if(distance >= 10)
         {
@@ -401,8 +334,9 @@ public class Player : Character
         switch (currentstate)
         {
             case PlayerState.FOLLOW:
+            //case PlayerState.ATTACK:
             {
-                if (distance >= 5)
+                    if (distance >= 5)
                 {
                     FollowPlayer();
                 }
@@ -410,42 +344,42 @@ public class Player : Character
                 break;
             }
             case PlayerState.ATTACK:
-            {
-                //FOLLOW THE NEAREST ENEMY
-                if (nearestEnemy != null)
                 {
-                    float distanceBetweenEnemy = Vector2.Distance(nearestEnemy.transform.position, transform.position);
-                    if (distanceBetweenEnemy < 2.0f)
+                    //FOLLOW THE NEAREST ENEMY
+                    if (nearestEnemy != null)
                     {
-                        Enemy enemyScript = nearestEnemy.gameObject.GetComponent<Enemy>();
-                        // Calculate the direction from this object to the enemy
-                        Vector2 directionToEnemy =
-                            (nearestEnemy.transform.position - transform.position).normalized;
-                        // Set a force to launch the object in the opposite direction
-                        float launchForce = .1f * Time.deltaTime; // Adjust the force as needed
-                        enemyScript.enemyrb.AddForce(directionToEnemy * launchForce, ForceMode2D.Impulse);
-                        //DAMAGE ENEMY
-                        int playerDamage = meleedamage;
-                        //enemyScript.health -= 1000000;
-                        enemyScript.health -= playerDamage;
-                        //SET ENEMY TO HURT STATE
-                        enemyScript.currentState = Enemy.EnemyState.HURT;
-                        enemyScript.immunity_timer = .5f;
-                        enemyScript.hurt_timer = 0.0f;
-                        currentstate = PlayerState.FOLLOW;
+                        float distanceBetweenEnemy = Vector2.Distance(nearestEnemy.transform.position, transform.position);
+                        if (distanceBetweenEnemy < 2.0f)
+                        {
+                            Enemy enemyScript = nearestEnemy.gameObject.GetComponent<Enemy>();
+                            // Calculate the direction from this object to the enemy
+                            Vector2 directionToEnemy =
+                                (nearestEnemy.transform.position - transform.position).normalized;
+                            // Set a force to launch the object in the opposite direction
+                            float launchForce = .1f * Time.deltaTime; // Adjust the force as needed
+                            enemyScript.enemyrb.AddForce(directionToEnemy * launchForce, ForceMode2D.Impulse);
+                            //DAMAGE ENEMY
+                            int playerDamage = meleedamage;
+                            //enemyScript.health -= 1000000;
+                            enemyScript.health -= playerDamage;
+                            //SET ENEMY TO HURT STATE
+                            enemyScript.currentState = Enemy.EnemyState.HURT;
+                            enemyScript.immunity_timer = .5f;
+                            enemyScript.hurt_timer = 0.0f;
+                            currentstate = PlayerState.FOLLOW;
+                        }
+                        else
+                        {
+                            MoveTowardsNearestEnemy();
+                        }
                     }
-                    else
-                    {
-                        MoveTowardsNearestEnemy();
-                    }
-                }
 
-                break;
-            }
+                    break;
+                }
             case PlayerState.HURT:
-            {
-                break;
-            }
+                {
+                    break;
+                }
             default:
             {
                 break;
@@ -463,14 +397,15 @@ public class Player : Character
 
     GameObject FindNearestEnemy(Vector3 position)
     {
-        GameObject nearestEnemy = null;
-        float minDistance = float.MaxValue;
+       
 
+
+        GameObject nearestEnemy = null;
+        float minDistance = 10;
         foreach (GameObject enemy in listOfEnemies)
         {
             // Calculate the distance between the position and the enemy's position
             float distance = Vector3.Distance(position, enemy.transform.position);
-
             // Check if the current enemy is closer than the previous nearest enemy
             if (distance < minDistance)
             {
@@ -478,6 +413,11 @@ public class Player : Character
                 nearestEnemy = enemy;
             }
         }
+
+       
+
+
+
 
         return nearestEnemy;
     }
@@ -506,55 +446,20 @@ public class Player : Character
     //CHOOSE WHICH ITEM TO USE
     void ItemUsage()
     {
-        //FOR THE SUBTRACTION OF MONEY
         ItemType itemchosen = ItemType.NOTHING;
         int currentslot = playerInventory.selectedSlot;
-        ProjectileType pt = ProjectileType.NORMAL;
 
-        switch (playerInventory.slots[currentslot].itemtype)
+        
+
+        // Check if the item type is in the dictionary, then perform the associated action
+        if (itemActions.ContainsKey(playerInventory.slots[currentslot].itemtype))
         {
-            case ItemType.RED_GEM:
-                {
-                    pt = ProjectileType.RED_GEM;
-                    itemchosen = ItemType.RED_GEM;
-                    projectilePrefab.GetComponent<Projectile>().projectiletype = pt;
-                    GameObject projectile = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
-                    if (projectile != null)
-                    {
-                        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                        Vector3 direction = (mousePosition - transform.position).normalized;
-                        projectile.GetComponent<Projectile>().setdata(projectileDamage, 10,
-                            direction, gameObject);
-                    }
-                    break;
-                }
-            case ItemType.GREEN_GEM:
-                {
-                    pt = ProjectileType.GREEN_GEM;
-                    itemchosen = ItemType.GREEN_GEM;
-                    projectilePrefab.GetComponent<Projectile>().projectiletype = pt;
-                    GameObject projectile = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
-                    if (projectile != null)
-                    {
-                        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                        Vector3 direction = (mousePosition - transform.position).normalized;
-                        projectile.GetComponent<Projectile>().setdata(projectileDamage, 10,
-                            direction, gameObject);
-                    }
-                    break;
-                }
-            case ItemType.BLUE_GEM:
-                {
-                    itemchosen = ItemType.BLUE_GEM;
-                    ApplyEffect(EffectType.SHIELD);
-                    break;
-                }
-            default:
-                {
-                    break;
-                }
+            itemchosen = playerInventory.slots[currentslot].itemtype;
+            itemActions[playerInventory.slots[currentslot].itemtype].Invoke();
         }
+        //REMOVE THE ITEM FROM THE SLOT
         playerInventory.slots[currentslot].RemoveItem();
+        //
 
         //USE FOR SUBTRACTION OF MONEY
         GameObject item = Instantiate(itemPrefab, transform.position, Quaternion.identity);

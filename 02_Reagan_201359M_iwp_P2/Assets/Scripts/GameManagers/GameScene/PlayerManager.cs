@@ -78,8 +78,10 @@ public class PlayerManager : MonoBehaviour
         {
             // Instantiate characters in the game scene based on unlocked characters
             GameObject p = Instantiate(playerPrefab, Vector2.zero, Quaternion.identity);
+            Character charScript = p.GetComponent<Character>();
             Player playerScript = p.GetComponent<Player>();
 
+            charScript.characterType = character;
             playerScript.characterType = character;
 
             //Professor - weak in basic attacks but can deal higher damage with Gems
@@ -153,11 +155,16 @@ public class PlayerManager : MonoBehaviour
 
     void Update()
     {
-        if (!finishedSpawning)
+        if (!finishedSpawning
+             ||
+             players == null
+             || 
+             (players != null &&
+             players[0].GetComponent<Character>().disabled)
+             )
         {
             return;
         }
-
 
         aiTimer += 1 * Time.deltaTime;
 

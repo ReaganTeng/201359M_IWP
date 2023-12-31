@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Item;
 
-public class PowerUp : MonoBehaviour
+public class PowerUp : Item
 {
 
     public enum PowerUps
@@ -15,60 +16,126 @@ public class PowerUp : MonoBehaviour
         GHOST, //PASS THROUGH WALLS
         //
 
-
         //
-        ODOR_OF_BEASTS,
-        
+        //ODOR_OF_BEASTS,
     }
 
-    public enum EffectType
-    {
-        ONE_HIT,
-        SPIRIT_FIRE,
-        MINER_SENSE,
-        GEM_WISDOM,
-        GHOST,
-    }
-
+    //[HideInInspector]
+    //public PowerUps powerup;
 
     [HideInInspector]
-    public PowerUps powerup;
-
     public EffectType powerUpEffectType; // The type of effect the power-up applies
-    public Dictionary<EffectType, float> powerUpDurations = new Dictionary<EffectType, float>();
 
-    private void Start()
+    [HideInInspector]
+    public Dictionary<PowerUps, Dictionary<ItemType, EffectType>> powerUpitemType 
+        = new Dictionary<PowerUps, Dictionary<ItemType, EffectType>>();
+
+   
+    public SpriteRenderer powerUpIconRenderer;
+    public List<Sprite> powerupIconsList = new List<Sprite>();
+    public Sprite backgroundImage;
+
+
+    protected override void Awake()
     {
+        base.Awake();
         // Initialize power-up durations
-        powerUpDurations.Add(EffectType.ONE_HIT, 10f);
-        powerUpDurations.Add(EffectType.SPIRIT_FIRE, 15f);
-        powerUpDurations.Add(EffectType.MINER_SENSE, 20f);
-        powerUpDurations.Add(EffectType.GEM_WISDOM, 12f);
-        powerUpDurations.Add(EffectType.GHOST, 8f);
+        InitialiseItemType();
+
+       
+        
         // Add more power-up durations as needed
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
+
+    void InitialiseItemType()
     {
-        if (other.CompareTag("Player"))
+        powerUpitemType.Add(PowerUps.ONE_HIT, new Dictionary<ItemType, EffectType>
         {
-            ApplyPowerUpEffect(other.gameObject);
-            Destroy(gameObject);
-        }
+            { ItemType.ONE_HIT, EffectType.ONE_HIT },
+            // Add more item types and their corresponding effect types as needed
+        });
+        powerUpitemType.Add(PowerUps.SPIRIT_FIRE, new Dictionary<ItemType, EffectType>
+        {
+            { ItemType.SPIRIT_FIRE, EffectType.SPIRIT_FIRE },
+            // Add more item types and their corresponding effect types as needed
+        });
+
+        powerUpitemType.Add(PowerUps.MINER_SENSE, new Dictionary<ItemType, EffectType>
+        {
+            { ItemType.MINER_SENSE, EffectType.MINER_SENSE },
+            // Add more item types and their corresponding effect types as needed
+        });
+
+        powerUpitemType.Add(PowerUps.GEM_WISDOM, new Dictionary<ItemType, EffectType>
+        {
+            { ItemType.GEM_WISDOM, EffectType.GEM_WISDOM },
+            // Add more item types and their corresponding effect types as needed
+        });
+
+        powerUpitemType.Add(PowerUps.GHOST, new Dictionary<ItemType, EffectType>
+        {
+            { ItemType.GHOST, EffectType.GHOST },
+            // Add more item types and their corresponding effect types as needed
+        });
     }
 
-    private void ApplyPowerUpEffect(GameObject player)
-    {
-        Character characterScript = player.GetComponent<Character>();
-        if (characterScript != null && powerUpDurations.ContainsKey(powerUpEffectType))
-        {
-            float duration = powerUpDurations[powerUpEffectType];
 
-            // Apply the power-up effect to the player with the determined duration
-            //characterScript.ApplyEffect(powerUpEffectType, duration);
-            Debug.Log($"Power-up applied: {powerUpEffectType}, Duration: {duration} seconds");
+    public void SetPowerUpItem(PowerUps powerupType, int stacksize)
+    {
+        Dictionary<ItemType, EffectType> itemEffects = powerUpitemType[powerupType];
+
+        ItemType itemType = ItemType.NOTHING;
+        // Now you can access ItemType and EffectType
+        foreach (var kvp in itemEffects)
+        {
+            itemType = kvp.Key;
+            powerUpEffectType = kvp.Value;
+            // Do something with itemType and effectType
         }
+        //powerUpEffectType = powerUpitemType[powerupType];
+
+        base.SetItem(itemType, stacksize);
+
+
+        //SetItemSprite(itemType);
+
+        //SET THE SPRITE OF THE POWER UP
+        //SET BACKGROUND IMAGE
+        itemImage.sprite = backgroundImage;
+        powerUpIconRenderer.sprite = powerupIconsList[(int)powerUpEffectType];
     }
+
+   
+
+
+    public override void Update()
+    {
+        base.Update();
+    }
+
+    void OnTriggerEnter2D (Collider2D other)
+    {
+        //if (other.CompareTag("Player"))
+        //{
+        //    ApplyPowerUpEffect(other.gameObject);
+        //    Destroy(gameObject);
+        //}
+    }
+
+    //private void ApplyPowerUpEffect(GameObject player)
+    //{
+    //    Character characterScript = player.GetComponent<Character>();
+    //    if (characterScript != null //&& 
+    //        //powerUpDurations.ContainsKey(powerUpEffectType)
+    //        )
+    //    {
+    //        //float duration = powerUpDurations[powerUpEffectType];
+    //        // Apply the power-up effect to the player with the determined duration
+    //        characterScript.ApplyEffect(powerUpEffectType);
+    //        //Debug.Log($"Power-up applied: {powerUpEffectType}, Duration: {duration} seconds");
+    //    }
+    //}
 
 
     //public GameObject powerUpPrefab;

@@ -5,6 +5,7 @@ using System.Security.Policy;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class EnemyManager : MonoBehaviour
 {
@@ -24,21 +25,16 @@ public class EnemyManager : MonoBehaviour
 
     public MapGenerator mapGenerator;
 
-
     List<GameObject> enemiesInChaseMode = new List<GameObject>();
-
-
     List<Vector2> takenPos = new List<Vector2>();
 
     //FOR ORGANIZATION PURPOSES IN INSPECTOR
     public GameObject enemyparent;
 
-
     //public GameObject enemyPrefab;
     [HideInInspector]
     public float spawnInterval = 3f;
     Vector3 prevpos = Vector3.zero;
-
     bool generationover = false;
 
     public void StartItself()
@@ -50,8 +46,6 @@ public class EnemyManager : MonoBehaviour
             SpawnEnemy();
         }
     }
-
-
     void SpawnEnemy()
     {
         Vector2 randomPosition;
@@ -68,7 +62,6 @@ public class EnemyManager : MonoBehaviour
         //float smallestY = 0;
         //float largestY = 32;
 
-
         for (int i = 0; i < maxnumberenemies; i++)
         {
             int randomX = Random.Range((int)smallestX, (int)largestX + 1);
@@ -81,10 +74,12 @@ public class EnemyManager : MonoBehaviour
                 &&
                 !takenPos.Contains( randomPosition )
                 &&
+                //IF ENEMY IS NOT STUCK
                 IsPositionValid(randomPosition))
             {
                 GameObject enemy = Instantiate(enemyPrefabs[Random.Range(0, enemyPrefabs.Count)], randomPosition, Quaternion.identity);
                 //GameObject enemy = Instantiate(enemyPrefabs[0], randomPosition, Quaternion.identity);
+
 
                 enemyList.Add(enemy);
                 enemy.transform.SetParent(enemyparent.transform);
@@ -98,7 +93,8 @@ public class EnemyManager : MonoBehaviour
         //enemiesspawned = true;
     }
 
-    bool IsPositionValid(Vector2 position)
+    //if the enemy is stuck in wall
+    public bool IsPositionValid(Vector2 position)
     {
         Collider2D[] colliders = Physics2D.OverlapCircleAll(position, 0.1f, LayerMask.GetMask("WallTilemap"));
 
@@ -110,13 +106,13 @@ public class EnemyManager : MonoBehaviour
 
         foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy"))
         {
-            float distance = Vector2.Distance(position, prevpos);
+            float distance = Vector2.Distance(position, enemy.transform.position);
             float distance2 = Vector2.Distance(position, mapGenerator.startingposition);
 
             if (distance <= mapGenerator.roomdimension
-                && distance2 <= mapGenerator.roomdimension)
+                || distance2 <= mapGenerator.roomdimension)
             {
-                // Too close to another enemy
+                // Too close to another enemy or player
                 return false;
             }
         }
@@ -124,16 +120,23 @@ public class EnemyManager : MonoBehaviour
         return true;
     }
 
-
-
     // Update is called once per frame
     void Update()
     {
-        if (generationover)
+        if (!generationover
+            ||
+             enemyList == null
+             ||
+             (enemyList != null &&
+             enemyList[0].GetComponent<Character>().disabled)
+             )
         {
-            QuantityManager();
-            FSMManager();
+            return;
         }
+
+        QuantityManager();
+        FSMManager();
+        
     }
 
 
@@ -144,16 +147,19 @@ public class EnemyManager : MonoBehaviour
         if (enemyList.Count < maxnumberenemies)
         {
             //HARD CODE THE VALUES FIRST
-            float smallestX = -64;
-            float largestX = 0;
-            float smallestY = 0;
-            float largestY = 32;
+            //float smallestX = -64;
+            //float largestX = 0;
+            //float smallestY = 0;
+            //float largestY = 32;
 
+            float smallestX = mapGenerator.occupiedPositions.Min(pos => pos.x);
+            float largestX = mapGenerator.occupiedPositions.Max(pos => pos.x);
+            float smallestY = mapGenerator.occupiedPositions.Min(pos => pos.y);
+            float largestY = mapGenerator.occupiedPositions.Max(pos => pos.y);
 
 
             for (int i = 0; i < maxnumberenemies - enemyList.Count; i++)
             {
-
                 int randomX = Random.Range((int)smallestX, (int)largestX + 1);
                 int randomY = Random.Range((int)smallestY, (int)largestY + 1);
                 randomPosition = new Vector2(
@@ -168,6 +174,7 @@ public class EnemyManager : MonoBehaviour
                 {
                     GameObject enemy = Instantiate(enemyPrefabs[Random.Range(0, enemyPrefabs.Count)], randomPosition, Quaternion.identity);
                     enemyList.Add(enemy);
+                    enemy.transform.SetParent(enemyparent.transform);
                     continue;
                 }
             }
@@ -202,7 +209,7 @@ public class EnemyManager : MonoBehaviour
             {
                 if (enemies.GetComponent<Enemy>().currentState == Enemy.EnemyState.CHASE)
                 {
-                    Debug.Log("ADDED");
+                    //Debug.Log("ADDED");
                     enemiesInChaseMode.Add(enemies);
                 }
             }
@@ -218,8 +225,7 @@ public class EnemyManager : MonoBehaviour
 
                     enemyScript.currentState = Enemy.EnemyState.ABOUT_TO_ATTACK;
                     enemyScript.spriteRenderer.color = Color.red;
-                    Debug.Log("ABOUT TO ATTACK");
-
+                    //Debug.Log("ABOUT TO ATTACK");
                 }
             }
             enemiesInChaseMode.Clear();

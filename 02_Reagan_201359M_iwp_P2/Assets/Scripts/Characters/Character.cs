@@ -1,10 +1,18 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using Unity.VisualScripting;
 using UnityEditor.Animations;
+using UnityEditor.EditorTools;
 using UnityEditor.U2D;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 using static CharacterUnlockManager;
+using static Item;
+using static Projectile;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 
 [System.Serializable]
@@ -16,14 +24,13 @@ public class CharacterAnimationClips
 
 public class Character : MonoBehaviour
 {
-    //[SerializeField]
     public List<AudioClip> audioclips;
-
-
-    //[SerializeField]
     public List<CharacterAnimationClips> characterAnimations = new List<CharacterAnimationClips>();
+    public AnimatorController animController;
 
-    // public Dictionary
+
+    public GameObject projectilePrefab;
+
 
     [HideInInspector]
     public int currentAnimIdx;
@@ -45,23 +52,42 @@ public class Character : MonoBehaviour
     ParticleSystem.EmissionModule emissionModule;
     [HideInInspector]
     public AudioSource audioSource;
-    float speed;
-
     [HideInInspector]
     public bool disabled;
-
     [HideInInspector]
     public int projectileDamage;
 
+    float speed;
 
     public CharacterUnlockManager.CharacterType characterType;
 
+    [HideInInspector]
+   public  GameObject powerupNotificationPanel;
+    CanvasGroup powerUpCanvasGroup
+           ;
     //bool effectapplied = false;
     protected virtual void Awake()
     {
         currentAnimIdx = 0;
         disabled = false;
+        //animatorComponent = GetComponent<Animator>();
+        powerupNotificationPanel = GameObject.FindGameObjectWithTag("PowerUpNotification");
+        powerUpCanvasGroup = powerupNotificationPanel.GetComponent<CanvasGroup>();
+        powerUpCanvasGroup.alpha = 0;
+        powerUpCanvasGroup.interactable = false;
+
+
         animatorComponent = GetComponent<Animator>();
+        //animatorComponent.runtimeAnimatorController = animController;
+        // Instantiate a new instance of the AnimatorController (RuntimeAnimatorController)
+        AnimatorController newController = Instantiate(animController);
+        if (newController != null)
+        {
+            // Assign the new controller to the animatorComponent
+            animatorComponent.runtimeAnimatorController = newController;
+        }
+        
+
         audioSource = GetComponent<AudioSource>();
         speed = .1f;
         playerShield = GetComponentInChildren<Shield>();
@@ -75,67 +101,190 @@ public class Character : MonoBehaviour
         }
     }
 
-
+    //[ContextMenu("Change State Motion")]
     public void PlayAnimation(CharacterUnlockManager.CharacterType characterType, int clipIDX)
     {
-        AnimatorController animController = animatorComponent.runtimeAnimatorController as AnimatorController;
+        //GET THE CLIP YOU WANT TO PLAY
         CharacterAnimationClips characterAnimationEntry =
-            characterAnimations.Find(entry => entry.characterType == characterType);
-        AnimationClip animationClipToPlay = characterAnimationEntry.animationClips[clipIDX];
+        characterAnimations.Find(entry => entry.characterType == characterType);
+        AnimationClip clipToPlay = characterAnimationEntry.animationClips[clipIDX];
+        //
 
-        if (animatorComponent != null)
+        if (characterAnimationEntry != null && animatorComponent != null)
         {
-            string stateName = "clip"; // Replace with the actual name of your state
-            int layerIndex = 0; // Assuming the state is on the base layer, change if needed
+            // Check if animatorComponent has a valid runtimeAnimatorController
+            //if (animatorComponent.runtimeAnimatorController == null)
+            //{
+            //    Debug.LogError("AnimatorController is missing.");
+            //    return;
+            //}
 
-            // Check if the Animator Controller is not null
-            if (animController != null)
+            // Get the Animator Controller
+            AnimatorController animatorCon = animatorComponent.runtimeAnimatorController as AnimatorController;
+            if (animatorCon != null)
             {
-                // Loop through the states in the specified layer
-                for (int stateIndex = 0; stateIndex < animController.layers[layerIndex].stateMachine.states.Length; stateIndex++)
-                {
-                    AnimatorState state = animController.layers[layerIndex].stateMachine.states[stateIndex].state;
+                // Get the existing state by name
+                AnimatorStateMachine stateMachine = animatorCon.layers[0].stateMachine;
+                AnimatorState state = null;
 
-                    // Check if the state has the specified name
-                    if (state.name == stateName)
+                foreach (ChildAnimatorState childState in stateMachine.states)
+                {
+                    if (childState.state.name == "clip") // Replace with your actual state name
                     {
-                        // Assign a new animation clip
-                        state.motion = animationClipToPlay;
-                        // Play the assigned animation clip
-                        animatorComponent.Play(stateName);
-                        return; // Exit the loop once the state is found and handled
+                        state = childState.state;
+                        // Assign the animation clip to the state's motion
+                        state.motion = clipToPlay;
+                        // Play the animation by setting the state
+                        Debug.Log($"STATE {state.name}");
+                        animatorComponent.Play(state.name); // Replace with your actual state name
+                        break;
                     }
                 }
-                Debug.LogError($"Animator state '{stateName}' not found in layer {layerIndex}.");
             }
-            else
-            {
-                Debug.LogError("Animator Controller not found.");
-            }
-        }
-        else
-        {
-            Debug.LogError("Animator Controller not found.");
-        }
 
+        }
     }
 
 
-    //public AnimationClip GetCurrentAnimationClip()
-    //{
-    //    // Check the current animation clip that is playing
-    //    foreach (AnimationState state in animationComponent)
-    //    {
-    //        if (animationComponent.IsPlaying(state.name))
-    //        {
-    //            // state.name is the name of the currently playing animation clip
-    //            Debug.Log("Current Animation Clip: " + state.name);
-    //            break;
-    //            return state.name;
-    //        }
-    //    }
-    //    return state.name;
-    //}
+    protected virtual Vector3 FindPath(
+        Vector2 targetPos, //THE TARGET THE OBJECT WILL FOLLOW 
+        Vector2 followerPos //THE OBJECT WHO WILL FOLLOW THE TARGET
+        )
+    {
+       //RAYCAST ALL DIRECTIONS TO DETECT ANY WALLS
+        Vector2 directionToPlayer = targetPos - followerPos;
+        directionToPlayer.Normalize();
+        float raycastDistance = 10.0f;
+        //DRAW RAYS
+        for (float angle = 0; angle < 360; angle += 1)
+        {
+            //float x = 1.0f;
+            Vector3 direction = Quaternion.Euler(0, 0, angle) * Vector3.right;
+            direction.Normalize();
+            //Debug.DrawRay(enemyPosition, direction * raycastDistance * x, Color.red);
+            //Debug.DrawRay(playerPosition, direction * raycastDistance * x, Color.magenta);
+        }
+        //Debug.DrawRay(enemyPosition, directionToPlayer * raycastDistance, Color.blue);
+        //
+        RaycastHit2D hitwall = Physics2D.Raycast(followerPos, directionToPlayer, raycastDistance, LayerMask.GetMask("WallTilemap"));
+        //
+
+        if (hitwall.collider != null)
+        {
+            // Scenario 1: There is an obstacle between the enemy and the player
+            // Initialize variables for finding the closest intersection
+            List<Vector3> lineOfSightPoints = new List<Vector3>();
+            float minDistance = float.MaxValue;
+            Vector3 closestIntersection = Vector3.zero;
+
+            for (float angle = 0; angle < 360; angle += 1)
+            {
+                Vector2 direction = Quaternion.Euler(0, 0, angle) * Vector3.right;
+                Vector2 endPoint = followerPos + direction * raycastDistance;
+
+                List<Vector3> pointsInDirection = BresenhamLine(followerPos, endPoint);
+                lineOfSightPoints.AddRange(pointsInDirection);
+            }
+
+            foreach (var point in lineOfSightPoints)
+            {
+                bool enemyLinecastClear = !Physics2D.Linecast(followerPos, point, LayerMask.GetMask("WallTilemap"));
+                bool playerLinecastClear = !Physics2D.Linecast(targetPos, point, LayerMask.GetMask("WallTilemap"));
+
+                // Filter out points that are too close to the enemy or player
+                float minDistanceFromEntities = 0.1f; // Adjust this value as needed
+                if (enemyLinecastClear && playerLinecastClear &&
+                    Vector3.Distance(point, followerPos) > minDistanceFromEntities &&
+                    Vector3.Distance(point, targetPos) > minDistanceFromEntities)
+                {
+                    float distance = Vector3.Distance(targetPos, point);
+                    if (distance < minDistance)
+                    {
+                        closestIntersection = point;
+                        minDistance = distance;
+                    }
+                }
+            }
+            lineOfSightPoints.Clear();
+            return closestIntersection;
+        }
+        else
+        {
+            //Debug.Log("THERE'S NO OBSTACLE");
+            //Debug.Log("PLAYER'S POSITION " + playerPosition);
+            // Scenario 2: There is no obstacle between the enemy and the player
+            return targetPos;
+        }
+    }
+
+
+    protected virtual List<Vector3> BresenhamLine(Vector2 start, Vector2 end)
+    {
+        List<Vector3> linePoints = new List<Vector3>();
+
+        int x0 = Mathf.RoundToInt(start.x);
+        int y0 = Mathf.RoundToInt(start.y);
+        int x1 = Mathf.RoundToInt(end.x);
+        int y1 = Mathf.RoundToInt(end.y);
+
+        int dx = Mathf.Abs(x1 - x0);
+        int dy = Mathf.Abs(y1 - y0);
+
+        int sx = (x0 < x1) ? 1 : -1;
+        int sy = (y0 < y1) ? 1 : -1;
+        int err = dx - dy;
+
+        while (true)
+        {
+            linePoints.Add(new Vector3(x0, y0));
+
+            if (x0 == x1 && y0 == y1)
+                break;
+
+            int e2 = 2 * err;
+            if (e2 > -dy)
+            {
+                err = err - dy;
+                x0 = x0 + sx;
+            }
+            if (e2 < dx)
+            {
+                err = err + dx;
+                y0 = y0 + sy;
+            }
+        }
+
+        return linePoints;
+    }
+
+
+    public virtual void ShootProjectiles(
+        ProjectileType pt, //projectileTYPE
+        Vector3 targetposition,
+        Vector3 sourceposition//,
+        //Quaternion projectile_Rotation
+        )
+    {
+        if (projectilePrefab != null)
+        {
+            projectilePrefab.GetComponent<Projectile>().projectiletype = pt;
+            //Vector3 direction = transform.right;
+            //if (projectile_Rotation == Quaternion.Euler(0, 0, 0))
+            //{
+                Vector3 direction = (targetposition - sourceposition).normalized;
+            //}
+            GameObject projectile 
+                = Instantiate(projectilePrefab, sourceposition, Quaternion.identity);
+
+            if (projectile != null)
+            {
+                //projectile.transform.rotation = projectile_Rotation;
+                projectile.GetComponent<Projectile>().setdata(projectileDamage, 
+                    10, direction, gameObject);
+                //Debug.Log($"ROTATION IS {projectile.transform.rotation.eulerAngles}");
+            }
+        }
+    }
 
 
     // Update is called once per frame
@@ -146,31 +295,21 @@ public class Character : MonoBehaviour
             return;
         }
 
+        if (Input.GetKey(KeyCode.Space))
+        {
+            if (activeEffects.Count <= 0)
+            {
+                //Debug.Log("EFFECT APPLIED");
+                ApplyEffect(EffectType.GHOST);
+            }
+        }
 
-        //if (Input.GetKey(KeyCode.Space))
-        //{
-        //    if (activeEffects.Count <= 0
-        //        //&& !effectapplied
-        //        )
-        //    {
-        //        Debug.Log("EFFECT APPLIED");
-        //        ApplyEffect(EffectType.POISON);
-        //        //effectapplied = true;
-        //        //for(int i = 0; i < activeEffects.Count; i++)
-        //        //{
-        //        //    if (activeEffects[i].)
-        //        //    {
-
-        //        //    }
-        //        //}
-        //    }
-        //}
-
+        PlayAnimation(characterType, currentAnimIdx);
         // Update and check duration for each active effect
         for (int i = activeEffects.Count - 1; i >= 0; i--)
         {
             Effect effect = activeEffects[i];
-            effect.UpdateEffect(ref health, Time.deltaTime);
+            effect.UpdateEffect(Time.deltaTime);
 
             //ENABLE SHIELD
             if (effect.Type == EffectType.SHIELD)
@@ -181,7 +320,6 @@ public class Character : MonoBehaviour
                     playerShield.shieldActive = true;
                 }
             }
-
 
             if (effect.IsExpired)
             {
@@ -204,12 +342,14 @@ public class Character : MonoBehaviour
             activeEffects.Add(newEffect);
             Debug.Log($"{type} effect applied.");
         }
-        else
-        {
-            Debug.Log($"Player already has {type} effect.");
-        }
+        //else
+        //{
+        //    Debug.Log($"Player already has {type} effect.");
+        //}
     }
 
+
+    
     // Check if the player has a specific effect
     public bool HasEffect(EffectType type)
     {
@@ -229,12 +369,13 @@ public class Character : MonoBehaviour
                         mainModule.startColor = Color.green;
                         emissionModule.enabled = true;
                     }
-                    return new PoisonEffect(10f, 2f, 0.75f);
+
+                    return new PoisonEffect(10f, 2f, 0.75f, this);
                 }
             case EffectType.SHIELD:
                 {
                     
-                    return new ShieldEffect(15f);
+                    return new ShieldEffect(15f, this);
                 }
             case EffectType.BURN:
                 {
@@ -245,7 +386,82 @@ public class Character : MonoBehaviour
                         emissionModule.enabled = true;
                         //Debug.Log("BEGIN BURN");
                     }
-                    return new BurnEffect(20f, 1f);
+                    return new BurnEffect(20f, 1f, this);
+                }
+            case EffectType.ONE_HIT:
+                {
+                    if (ps != null)
+                    {
+                        ParticleSystem.MainModule mainModule = ps.main;
+                        mainModule.startColor = Color.white;
+                        emissionModule.enabled = true;
+                        //Debug.Log("BEGIN BURN");
+                    }
+                    powerupNotificationPanel.GetComponent<PowerUpNotificationUI>().powerupName.text 
+                        = "ONE HIT";
+                    powerUpCanvasGroup.alpha = 1;
+                    powerUpCanvasGroup.interactable = true;
+                    return new OneHitEffect(10f, 3, this);
+                }
+            case EffectType.SPIRIT_FIRE:
+                {
+                    //if (ps != null)
+                    //{
+                    //    ParticleSystem.MainModule mainModule = ps.main;
+                    //    mainModule.startColor = Color.white;
+                    //    emissionModule.enabled = true;
+                    //    //Debug.Log("BEGIN BURN");
+                    //}
+                    powerupNotificationPanel.GetComponent<PowerUpNotificationUI>().powerupName.text
+                        = "SPIRIT FIRE";
+                    powerUpCanvasGroup.alpha = 1;
+                    powerUpCanvasGroup.interactable = true;
+                    return new SpiritFireEffect(10f, this);
+                }
+            case EffectType.GEM_WISDOM:
+                {
+                    //if (ps != null)
+                    //{
+                    //    ParticleSystem.MainModule mainModule = ps.main;
+                    //    mainModule.startColor = Color.white;
+                    //    emissionModule.enabled = true;
+                    //    //Debug.Log("BEGIN BURN");
+                    //}
+                    powerupNotificationPanel.GetComponent<PowerUpNotificationUI>().powerupName.text
+                        = "GEM_WISDON";
+                    powerUpCanvasGroup.alpha = 1;
+                    powerUpCanvasGroup.interactable = true;
+                    return new GemWisdomEffect(10f, this);
+                }
+            case EffectType.MINER_SENSE:
+                {
+                    //if (ps != null)
+                    //{
+                    //    ParticleSystem.MainModule mainModule = ps.main;
+                    //    mainModule.startColor = Color.white;
+                    //    emissionModule.enabled = true;
+                    //    //Debug.Log("BEGIN BURN");
+                    //}
+                    powerupNotificationPanel.GetComponent<PowerUpNotificationUI>().powerupName.text
+                        = "MINER SENSE";
+                    powerUpCanvasGroup.alpha = 1;
+                    powerUpCanvasGroup.interactable = true;
+                    return new MinerSenseEffect(10f);
+                }
+            case EffectType.GHOST:
+                {
+                    //if (ps != null)
+                    //{
+                    //    ParticleSystem.MainModule mainModule = ps.main;
+                    //    mainModule.startColor = Color.white;
+                    //    emissionModule.enabled = true;
+                    //    //Debug.Log("BEGIN BURN");
+                    //}
+                    powerupNotificationPanel.GetComponent<PowerUpNotificationUI>().powerupName.text
+                        = "GHOST";
+                    powerUpCanvasGroup.alpha = 1;
+                    powerUpCanvasGroup.interactable = true;
+                    return new GhostEffect(10f);
                 }
             // Add more cases for additional effects
             default:
@@ -262,158 +478,99 @@ public enum EffectType
     SHIELD,
     BURN,
     // Add more effect types as needed
+
+    ONE_HIT,
+    SPIRIT_FIRE,
+    MINER_SENSE,
+    GEM_WISDOM,
+    GHOST,
 }
 
 // Base class for player effects
-public abstract class Effect
-{
-    public EffectType Type { get; protected set; }
-    public float Duration { get; protected set; }
-    public bool IsExpired { get; protected set; }
 
 
-    public Color particleColor { get; protected set; }
+
+//ONE_HIT - character class' meleedamage increases, then reverts back to old value when duration is up
+//SPIRIT_FIRE - SHOOT PROJECTILES AT FOUR DIFFERENT DIRECTIONS
+//MINER_SENSE - DETECT TREASURE CHESTS by manipulation the chest's spriterender sort order
+//GEM_WISDOM - INCREASE character class' projectiledamage, then reverts back to old value when duration is up
+//GHOST - off the colliders of gameobjects which have "WallTileMap" tag
 
 
-    //public int health { get; protected set; }
-
-    // Constructor that takes a reference to player's health
-    //public Effect(ref int health)
-    //{
-    //    this.health = health;
-    //}
-
-    public virtual void UpdateEffect(ref int health, float deltaTime)
-    {
-        Duration -= deltaTime;
-        if (Duration <= 0)
-        {
-            IsExpired = true;
-            return;
-        }
-
-        Debug.Log("UPDATING EFFECT");
-       
-    }
-}
-
-// Poison effect
-public class PoisonEffect : Effect
-{
-    private float interval;
-    private float intervalTimer;
-    private int damage;
-    private float slowFactor;
-    //private float intervalTimer;
-    public PoisonEffect(float duration, float interval, float slowFactor)
-    {
-        intervalTimer = 0;
-        Type = EffectType.POISON;
-        Duration = duration;
-        this.interval = interval;
-        this.slowFactor = slowFactor;
-        damage = 10; // Adjust the damage amount as needed
-    }
-
-    public override void UpdateEffect(ref int health, float deltaTime)
-    {
-        base.UpdateEffect(ref health, deltaTime);
-
-        Debug.Log("EFFECT POISON " + interval);
-        intervalTimer += Time.deltaTime;
-        
-        // Apply poison damage at intervals
-        //if (Mathf.Approximately(Duration % interval, 0f))
-        if(intervalTimer >= interval)
-        {
-            ApplyDamage(ref health);
-            intervalTimer = 0;
-        }
-
-        // Apply speed reduction
-        ApplySpeedReduction();
-    }
-
-    private void ApplyDamage(ref int health)
-    {
-        health -= damage;
-        //Debug.Log($"HEALTH REDUCED TO {health}");
-        // Implement logic to damage the player
-        Debug.Log($"Poison: Player takes {damage} damage.");
-    }
-
-    private void ApplySpeedReduction()
-    {
-        // Implement logic to slow down the player
-        Debug.Log("Poison: Player is slowed down.");
-    }
-}
-
-// Shield effect
-public class ShieldEffect : Effect
-{ 
-    public ShieldEffect(float duration)
-        //: base(ref health)
-    {
-        Type = EffectType.SHIELD;
-            Duration = duration;
-    }
-
-    public override void UpdateEffect(ref int health, float deltaTime)
-    {
-        
-        base.UpdateEffect(ref health, deltaTime);
 
 
-        // Implement logic for the shield effect
-        Debug.Log("Shield: Player is protected.");
-    }
-}
-
-// Burn effect
-public class BurnEffect : Effect
-{
-    private float interval;
-    private int damage;
-
-    private float intervalTimer;
-
-    public BurnEffect(float duration, float interval)
-        //base(ref health)
-    {
-        intervalTimer = 0;
-        Type = EffectType.BURN;
-        Duration = duration;
-        this.interval = interval;
-        damage = 15; // Adjust the damage amount as needed
-    }
-
-    public override void UpdateEffect(ref int health, float deltaTime)
-    {
-        base.UpdateEffect(ref health, deltaTime);
 
 
-        Debug.Log("UPDATING BURN EFFECT");
+//POWERUPS
+//public class OneHitEffect : Effect
+//{
+//    private int originalMeleeDamage;
 
-        // Apply burn damage at intervals
-        intervalTimer += Time.deltaTime;
+//    public OneHitEffect(float duration, int meleeDamageIncrease) : base()
+//    {
+//        Type = EffectType.ONE_HIT;
+//        Duration = duration;
+//        originalMeleeDamage = meleeDamageIncrease;
+//    }
 
-        // Apply poison damage at intervals
-        //if (Mathf.Approximately(Duration % interval, 0f))
-        if (intervalTimer >= interval)
-        {
-            ApplyDamage(ref health);
-            intervalTimer = 0;
-        }
-    }
+//    public override void UpdateEffect(ref int health, float deltaTime)
+//    {
+//        base.UpdateEffect(ref health, deltaTime);
+//    }
 
-    private void ApplyDamage(ref int health)
-    {
-        health -=damage;
-        // Implement logic to damage the player
-        Debug.Log($"Burn: Player takes {damage} damage.");
-    }
-}
+//    public override void ApplyEffect(Character character)
+//    {
+//        character.meleedamage = int.MaxValue; // Set to a very high value for a one-hit effect
+//    }
+
+//    public override void RevertEffect(Character character)
+//    {
+//        character.meleedamage = originalMeleeDamage;
+//    }
+//}
+
+//public class SpiritFireEffect : Effect
+//{
+//    // Implement SpiritFireEffect logic
+//}
+
+//public class MinerSenseEffect : Effect
+//{
+//    // Implement MinerSenseEffect logic
+//}
+
+//public class GemWisdomEffect : Effect
+//{
+//    private int originalProjectileDamage;
+
+//    public GemWisdomEffect(float duration, int projectileDamageIncrease) : base()
+//    {
+//        Type = EffectType.GEM_WISDOM;
+//        Duration = duration;
+//        originalProjectileDamage = projectileDamageIncrease;
+//    }
+
+//    public override void UpdateEffect(ref int health, float deltaTime)
+//    {
+//        base.UpdateEffect(ref health, deltaTime);
+//    }
+
+//    public override void ApplyEffect(Character character)
+//    {
+//        character.projectileDamage = int.MaxValue; // Set to a very high value for increased projectile damage
+//    }
+
+//    public override void RevertEffect(Character character)
+//    {
+//        character.projectileDamage = originalProjectileDamage;
+//    }
+//}
+
+//public class GhostEffect : Effect
+//{
+//    // Implement GhostEffect logic
+//}
+
 
 
 //private bool hasTakenDamage = false;

@@ -20,21 +20,21 @@ public class Chaser : Enemy
     {
         base.Awake();
 
+        //characterType = CharacterUnlockManager.CharacterType.CHASER;
         //characterAnimations =characterAnimations;
     }
 
-    float stage1 = 1;
-    float stage2 = 2;
+   
     float timertochase = 0;
 
 
     protected override void Update()
     {
         base.Update();
-
-
-        PlayAnimation(characterType, currentAnimIdx);
-      
+        if (disabled)
+        {
+            return;
+        }
 
         // Implement state-specific behavior in derived classes
         switch (currentState)
@@ -48,7 +48,6 @@ public class Chaser : Enemy
                         currentState = EnemyState.IDLE;
                         timertochase = 0;
                     }
-
                     string aboutToAttackName = characterAnimations.Find(
                        template => template.characterType == characterType
                        ).animationClips[1].name;
@@ -58,8 +57,6 @@ public class Chaser : Enemy
                         //3 _ run
                         //4 _ death
                         //5 - hurt
-
-
                     //ANIMATION
                     if (!animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(aboutToAttackName))
 
@@ -108,6 +105,10 @@ public class Chaser : Enemy
                     {
                             //animatorComponent.SetFloat("AttackStage", stage2);
                         animatorComponent.Play("clip", 0, 0f);
+                    }
+                    else
+                    {
+                        currentAnimIdx = 2;
                     }
 
                     switch (currentAttackPattern)

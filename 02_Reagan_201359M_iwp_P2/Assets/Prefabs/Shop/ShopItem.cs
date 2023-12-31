@@ -26,14 +26,18 @@ public class ShopItem : MonoBehaviour
             HEALTH_UPGRADE,
             PROFESSOR_CHARACTER,
             VETERAN_CHARACTER,
+            BOMB,
+            POTION,
+            BULLET
         }
 
 
         public ShopItem shopItem;
 
         public string itemName;
-        public int itemID;
+        //public int itemID;
         public int price;
+        public string itemDescription;
 
 
         // New properties for attribute upgrade
@@ -41,7 +45,9 @@ public class ShopItem : MonoBehaviour
         public int upgradeValue;
 
         //DECIDES WHAT ITEM TO ADD IN THE INVENTORY
-        public Item itemtoadd;
+        //public Item itemtoadd;
+
+        public Sprite itemSprite;
 
         // Additional properties or methods can be added here
 

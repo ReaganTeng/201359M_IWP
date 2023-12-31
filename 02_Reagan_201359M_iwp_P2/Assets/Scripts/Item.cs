@@ -12,17 +12,33 @@ public class Item : MonoBehaviour
         RED_GEM,
         GREEN_GEM,
         BLUE_GEM,
-        //POTION,
-        //BOMB,
-        //SHIELD,
-        //POWERUP,
-        NOTHING,
+
+
+        //INVENTORY
+        BOMB, //EXPLODE SURROUNDINGS, LIKE RED GEM
+        BULLET, //SHOOTS ENEMY
+        POTION, //INCREASES HEALTH
+
+
+        //POWERUP
+        //ADD THESE FIRST
+        ONE_HIT, //ONE HIT KILL
+        SPIRIT_FIRE,// SHOOT PROJECTILES AT FOUR DIFFERENT CORNERS
+        MINER_SENSE, //DETECT TREASURE CHESTS
+        GEM_WISDOM,  //INCREASE GEM DAMAGE/DURATION
+        GHOST, //PASS THROUGH WALLS
+        //
+
+        
+        NOTHING
     }
 
     public List<Sprite> itemSprites = new List<Sprite>();
+
+    [HideInInspector]
     public SpriteRenderer itemImage;
 
-
+    [HideInInspector]
     public int money;
     public ItemType type { get; set; }
    public int StackSize { get; set; }
@@ -31,7 +47,7 @@ public class Item : MonoBehaviour
     GameObject[] player;
     GameObject gameManager;
 
-    private void Awake()
+    protected virtual void Awake()
     {
         itemImage = GetComponent<SpriteRenderer>();
         player = GameObject.FindGameObjectsWithTag("Player");
@@ -43,9 +59,7 @@ public class Item : MonoBehaviour
         // Example of how to set the sprite based on the item type
         //SetItemSprite(type);
     }
-
-
-    public void Update()
+    public virtual void Update()
     {
 
         //RESPONSIBLE FOR THE COLLECTION OF ITEMS
@@ -64,9 +78,7 @@ public class Item : MonoBehaviour
             }
         }
     }
-
-
-    public void SetItem(ItemType itemType, int stacksize)
+    public virtual void SetItem(ItemType itemType, int stacksize)
     {
         type = itemType;
         StackSize = stacksize;
@@ -81,14 +93,17 @@ public class Item : MonoBehaviour
             case ItemType.GREEN_GEM:
                 money = 200;
                 break;
+            default:
+                money = 0;
+                break;
         }
         SetItemSprite(type);
     }
 
 
-    public void SetItemSprite(ItemType itemType)
+    public virtual void SetItemSprite(ItemType itemType)
     {
-        itemImage = GetComponent<SpriteRenderer>();
+        //itemImage = GetComponent<SpriteRenderer>();
         // Assuming your itemSprites list is populated with sprites
         if (itemSprites.Count > (int)itemType)
         {

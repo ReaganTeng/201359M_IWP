@@ -99,9 +99,6 @@ public class Enemy : Character
         healthbar.value = health;
         //Debug.Log("HEALTH SET " + health);
         //attacked = false;
-
-
-
         playerlist = GameObject.FindGameObjectsWithTag("Player");
         
         for(int i = 0; i< playerlist.Length; i++)
@@ -151,7 +148,10 @@ public class Enemy : Character
 
         //Vector3 targetpos = UpdateTargetingPosition();
         //Vector3 targetpos = CalculatePath();
-        Vector3 targetpos = FindPath();
+        Vector2 playerPosition = playerpos;
+        Vector2 enemyPosition = transform.position;
+        Vector3 targetpos = FindPath(playerPosition, enemyPosition);
+
         if (positonGameObject != null)
         {
             positonGameObject.transform.position = targetpos;
@@ -174,146 +174,8 @@ public class Enemy : Character
         //}
 
     }
-    Vector3 FindPath()
-    {
-        Vector2 playerPosition = playerpos;
-        Vector2 enemyPosition = transform.position;
-        Vector2 directionToPlayer = playerPosition - enemyPosition;
-        directionToPlayer.Normalize();
-
-        //DRAW RAYS
-        for (float angle = 0; angle < 360; angle += 1)
-        {
-            float x = 1.0f;
-            Vector3 direction = Quaternion.Euler(0, 0, angle) * Vector3.right;
-            direction.Normalize();
-            Debug.DrawRay(enemyPosition, direction * raycastDistance * x, Color.red);
-            Debug.DrawRay(playerPosition, direction * raycastDistance * x, Color.magenta);
-        }
-        Debug.DrawRay(enemyPosition, directionToPlayer * raycastDistance, Color.blue);
-        //
-
-        RaycastHit2D hitwall = Physics2D.Raycast(enemyPosition, directionToPlayer, raycastDistance, LayerMask.GetMask("WallTilemap"));
-
-        if (hitwall.collider != null)
-        {
-            // Scenario 1: There is an obstacle between the enemy and the player
-            // Initialize variables for finding the closest intersection
-            List<Vector3> lineOfSightPoints = new List<Vector3>();
-            float minDistance = float.MaxValue;
-            Vector3 closestIntersection = Vector3.zero;
-
-            for (float angle = 0; angle < 360; angle+= 1)
-            {
-                Vector2 direction = Quaternion.Euler(0, 0, angle) * Vector3.right;
-                Vector2 endPoint = enemyPosition + direction * raycastDistance;
-
-                List<Vector3> pointsInDirection = BresenhamLine(enemyPosition, endPoint);
-                lineOfSightPoints.AddRange(pointsInDirection);
-            }
-
-            
-    //        foreach (var point in lineOfSightPoints)
-    //        {
-    ////if(!Physics2D.Linecast(enemyPosition, point, LayerMask.GetMask("WallTilemap")) &&
-    ////!Physics2D.Linecast(playerPosition, point, LayerMask.GetMask("WallTilemap"))
-
-    //            // Check if this path is less obstructed by the "WallTilemap" layer
-    //            bool enemyLinecastClear = !Physics2D.Linecast(enemyPosition, point, LayerMask.GetMask("WallTilemap"));
-    //            bool playerLinecastClear = !Physics2D.Linecast(playerPosition, point, LayerMask.GetMask("WallTilemap"));
-
-    //            if (enemyLinecastClear 
-    //                && playerLinecastClear)
-    //            {
-    //                float distance = Vector3.Distance(playerPosition, point);
-    //                if (distance < minDistance)
-    //                {
-    //                    closestIntersection = point;
-    //                    minDistance = distance;
-    //                }
-    //            }
-    //        }
-
-
-            foreach (var point in lineOfSightPoints)
-            {
-                bool enemyLinecastClear = !Physics2D.Linecast(enemyPosition, point, LayerMask.GetMask("WallTilemap"));
-                bool playerLinecastClear = !Physics2D.Linecast(playerPosition, point, LayerMask.GetMask("WallTilemap"));
-
-                // Filter out points that are too close to the enemy or player
-                float minDistanceFromEntities = 0.1f; // Adjust this value as needed
-                if (enemyLinecastClear && playerLinecastClear &&
-                    Vector3.Distance(point, enemyPosition) > minDistanceFromEntities &&
-                    Vector3.Distance(point, playerPosition) > minDistanceFromEntities)
-                {
-                    float distance = Vector3.Distance(playerPosition, point);
-                    if (distance < minDistance)
-                    {
-                        closestIntersection = point;
-                        minDistance = distance;
-                    }
-                }
-            }
-
-
-            lineOfSightPoints.Clear();
-
-            //if (minDistance != float.MaxValue)
-            //{
-            //    Debug.Log("MINDIST GOT SOMETHING");
-            //}
-
-            //if (minDistance != float.MaxValue)
-            //{
-            return closestIntersection;
-            //}
-        }
-        else
-        {
-            //Debug.Log("THERE'S NO OBSTACLE");
-            //Debug.Log("PLAYER'S POSITION " + playerPosition);
-            // Scenario 2: There is no obstacle between the enemy and the player
-            return playerPosition;
-        }
-    }
-    public List<Vector3> BresenhamLine(Vector2 start, Vector2 end)
-    {
-        List<Vector3> linePoints = new List<Vector3>();
-
-        int x0 = Mathf.RoundToInt(start.x);
-        int y0 = Mathf.RoundToInt(start.y);
-        int x1 = Mathf.RoundToInt(end.x);
-        int y1 = Mathf.RoundToInt(end.y);
-
-        int dx = Mathf.Abs(x1 - x0);
-        int dy = Mathf.Abs(y1 - y0);
-
-        int sx = (x0 < x1) ? 1 : -1;
-        int sy = (y0 < y1) ? 1 : -1;
-        int err = dx - dy;
-
-        while (true)
-        {
-            linePoints.Add(new Vector3(x0, y0));
-
-            if (x0 == x1 && y0 == y1)
-                break;
-
-            int e2 = 2 * err;
-            if (e2 > -dy)
-            {
-                err = err - dy;
-                x0 = x0 + sx;
-            }
-            if (e2 < dx)
-            {
-                err = err + dx;
-                y0 = y0 + sy;
-            }
-        }
-
-        return linePoints;
-    }
+    
+    
 
     //int CountWallHits(Vector3 start, Vector3 end)
     //{
@@ -364,11 +226,6 @@ public class Enemy : Character
     }
 
 
-
-
-
-
-
     public enum EnemyState
     {
         IDLE,
@@ -384,8 +241,11 @@ public class Enemy : Character
     {
         base.Update();
 
-        PlayAnimation(characterType, currentAnimIdx);
-
+        //PlayAnimation(characterType, currentAnimIdx);
+        if (disabled)
+        {
+            return;
+        }
 
         healthbar.value = health;
 
@@ -504,7 +364,6 @@ public class Enemy : Character
 
     void Die()
     {
-
         //0 _ IDLE
         //1 _ about to attack
         //2 _ attack
@@ -518,14 +377,18 @@ public class Enemy : Character
         string dyinganimationName = characterAnimations.Find(
             template => template.characterType == characterType
             ).animationClips[4].name;
+
+        currentAnimIdx = 4;
+
         //DYING ANIMATION
         if (animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(dyinganimationName)
             && animatorComponent.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f)
-        {//drop 10 random items
+        {//drop 10 random gems
             for (int i = 0; i < 10; i++)
             {
                 int enumLength = Enum.GetValues(typeof(ItemType)).Length - 1;
-                ItemType itemchosen = (ItemType)(Random.Range(0, enumLength));
+                //ItemType itemchosen = (ItemType)(Random.Range(0, enumLength));
+                ItemType itemchosen = (ItemType)(Random.Range(0, 3));
 
                 GameObject item = Instantiate(itemPrefab, transform.position, Quaternion.identity);
                 item.GetComponent<Item>().SetItem(itemchosen, 99);

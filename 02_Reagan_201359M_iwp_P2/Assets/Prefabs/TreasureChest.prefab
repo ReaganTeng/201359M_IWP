@@ -291,6 +291,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 33a6f66e1d500a443921a6d884d0d8cb, type: 3}
   - {fileID: 21300000, guid: f7b6429c0545dbd48be292b362aaabfe, type: 3}
   itemPrefab: {fileID: 72955845208125536, guid: 5b0e3c7ba455c46408341d69e4f40f44, type: 3}
+  powerUpPrefab: {fileID: 72955845208125536, guid: 7f4e33fddb3a3a54db06aa12bc2e5da9, type: 3}
 --- !u!212 &2258851939839519502
 SpriteRenderer:
   m_ObjectHideFlags: 0

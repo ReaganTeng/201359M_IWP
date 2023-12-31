@@ -6,14 +6,23 @@ using static ShopItem;
 using static System.Net.Mime.MediaTypeNames;
 using System.Linq;
 using Unity.VisualScripting;
+using static Item;
+using Image = UnityEngine.UI.Image;
+using UnityEngine.SceneManagement;
+
 
 public class Shop : MonoBehaviour
 {
     public CharacterUnlockManager characterUnlockManager;
+    public InventoryHubWorldManager inventoryHubWorldManager;
+    public Inventory inventoryManager;
 
     public List<ShopItemData> shopItems;
-    public Transform itemContainer;
+    //public Transform itemContainer;
+    public GameObject shopitemPrefab;
     public GameObject itemPrefab;
+    [HideInInspector]
+    public CanvasGroup canvasGroup;
     public GameObject shopContent;
     public AudioClip chaChingClip;
 
@@ -21,7 +30,8 @@ public class Shop : MonoBehaviour
 
     void Awake()
     {
-        //DisplayItems();
+        canvasGroup = GetComponent<CanvasGroup>();
+        DisplayItems();
         AS = GetComponent<AudioSource>();
     }
 
@@ -38,23 +48,26 @@ public class Shop : MonoBehaviour
 
     public void DisplayItems()
     {
-        RectTransform parentTransform = GetComponent<RectTransform>();
-        
+        RectTransform shopRectTransform = shopContent.GetComponent<RectTransform>();
+
         foreach (ShopItemData item in shopItems)
         {
-            GameObject itemObject = Instantiate(itemPrefab, shopContent.transform);
+            GameObject itemObject = Instantiate(shopitemPrefab, shopContent.transform);
             RectTransform[] children = itemObject.GetComponentsInChildren<RectTransform>();
 
-            //DISPLAY THE CONTENTS
-            RectTransform itemTransform
-                = children.FirstOrDefault(child =>
-                child.CompareTag("ShopItemPanel")).GetComponent<RectTransform>();
-            
-            RectTransform shopRectTransform = shopContent.GetComponent<RectTransform>();
-            shopRectTransform.sizeDelta = new Vector2(shopRectTransform.sizeDelta.x, itemTransform.sizeDelta.y * shopItems.Count);
+            // DISPLAY THE CONTENTS
+            RectTransform itemTransform =
+                children.FirstOrDefault(child => child.CompareTag("ShopItemPanel")).GetComponent<RectTransform>();
 
-            itemObject.GetComponentInChildren<TextMeshProUGUI>().text
+            // Update the shopRectTransform size based on the total height of items
+            shopRectTransform.sizeDelta = new Vector2(shopRectTransform.sizeDelta.x,
+                shopRectTransform.sizeDelta.y + itemTransform.sizeDelta.y);
+
+            //SET THE UI IMAGE AND TEXT
+            itemObject.GetComponent<ShopItemUI>().ItemName.text 
                 = $"{item.itemName} - {item.price} coins";
+            Image sourceImg = itemObject.GetComponent<ShopItemUI>().ItemImage;
+            sourceImg.sprite = item.itemSprite;
             Button buyButton = itemObject.GetComponentInChildren<Button>();
             buyButton.onClick.AddListener(() => BuyItem(item));
             Debug.Log($"FINAL HEIGHT {itemTransform.rect.height}");
@@ -64,10 +77,24 @@ public class Shop : MonoBehaviour
 
     //void BuyItem(ShopItemData item)
     //{
-        
+
     //}
 
 
+
+    public void closePanel()
+    {
+        //shopPanel.SetActive(!shopPanel.activeSelf);
+        canvasGroup.interactable = !canvasGroup.interactable;
+        if (canvasGroup.interactable)
+        {
+            canvasGroup.alpha = 1;
+        }
+        else
+        {
+            canvasGroup.alpha = 0;
+        }
+    }
 
     //SIZE IT IN CANVAS
     //RectTransform rectTransform = itemObject.GetComponent<RectTransform>();
@@ -92,6 +119,9 @@ public class Shop : MonoBehaviour
             case ShopItemData.ShopItem.HEALTH_UPGRADE:
                 player.IncreaseHealth(item.upgradeValue);
                 break;
+            //case ShopItemData.ShopItem.HEALTH_UPGRADE:
+            //    player.IncreaseHealth(item.upgradeValue);
+            //    break;
             case ShopItemData.ShopItem.PROFESSOR_CHARACTER:
                 characterUnlockManager.UnlockCharacter(CharacterUnlockManager.CharacterType.PROFESSOR);
                 shopItems.Remove(item);
@@ -100,10 +130,53 @@ public class Shop : MonoBehaviour
                 characterUnlockManager.UnlockCharacter(CharacterUnlockManager.CharacterType.VETERAN);
                 shopItems.Remove(item);
                 break;
-            //case "Damage":
-            //    player.IncreaseDamage(item.upgradeValue);
-            //    break;
-            // Add more cases for other attributes
+            //EQUIPMENT
+            case ShopItemData.ShopItem.POTION:
+                {
+                    ItemType itemchosen = ItemType.POTION;
+                    Item it = new Item();
+                    it.SetItem(itemchosen, 10);
+                    if (inventoryHubWorldManager != null)
+                    {
+                        inventoryHubWorldManager.AddItem(it.GetComponent<Item>(), 1);
+                    }
+
+                    if (inventoryManager != null)
+                    {
+                        inventoryManager.AddItem(it.GetComponent<Item>(), 1);
+                    }
+                    Destroy(it);
+                    break;
+                }
+            case ShopItemData.ShopItem.BULLET:
+                {
+                    ItemType itemchosen = ItemType.BULLET;
+                    GameObject it = Instantiate(itemPrefab, transform.position, Quaternion.identity);
+                    it.GetComponent<Item>().SetItem(itemchosen, 10);
+                    if (inventoryHubWorldManager != null)
+                    {
+                        inventoryHubWorldManager.AddItem(it.GetComponent<Item>(), 1);
+                        inventoryHubWorldManager.InstantiateInventorySlots();
+                    }
+                    if (inventoryManager != null)
+                    {
+                        inventoryManager.AddItem(it.GetComponent<Item>(), 1);
+                    }
+                    Destroy(it);
+                    break;
+                }
+            case ShopItemData.ShopItem.BOMB:
+                {
+                    ItemType itemchosen = ItemType.BOMB;
+                    GameObject it = Instantiate(itemPrefab,
+                        transform.position,
+                        Quaternion.identity);
+                    it.GetComponent<Item>().SetItem(itemchosen, 10);
+                    inventoryHubWorldManager.AddItem(it.GetComponent<Item>(), 1);
+                    inventoryHubWorldManager.InstantiateInventorySlots();
+                    Destroy(it);
+                    break;
+                }
             default:
                 //Debug.LogWarning($"Unknown attribute to upgrade: {item.attributeToUpgrade}");
                 break;
@@ -126,7 +199,26 @@ public class Shop : MonoBehaviour
         //}
 
         //DEDUCT PRICE
-        PlayerPrefs.SetFloat("GrossMoney", PlayerPrefs.GetFloat("GrossMoney") - item.price);
+        // Get the currently active scene
+        Scene currentScene = SceneManager.GetActiveScene();
+        switch (currentScene.name)
+        {
+            case "HubWorld":
+            {
+                PlayerPrefs.SetFloat("GrossMoney", PlayerPrefs.GetFloat("GrossMoney") 
+                    - item.price);
+                break;                
+            }
+            case "GameScene":
+            {
+                PlayerPrefs.SetFloat("MoneyEarned", PlayerPrefs.GetFloat("MoneyEarned") 
+                    - item.price);
+                break;
+            }
+            default:
+                break;
+        }
+
 
         foreach (Transform child in shopContent.transform)
         {

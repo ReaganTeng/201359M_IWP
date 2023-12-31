@@ -6,11 +6,13 @@ using TMPro;
 using static Item;
 using System;
 using Random = UnityEngine.Random;
+using static PowerUp;
 
 public class Treasure : Interactables
 {
     public List<Sprite> chestSprites;
     public GameObject itemPrefab;
+    public GameObject powerUpPrefab;
 
     bool unlocked;
     // Start is called before the first frame update
@@ -37,15 +39,26 @@ public class Treasure : Interactables
 
     void UnlockChest()
     {
-        //drop 10 random items
+        //drop 10 random gems
         for (int i = 0; i < 10; i++)
         {
-            int enumLength = Enum.GetValues(typeof(ItemType)).Length - 1;
-            ItemType itemchosen = (ItemType)(Random.Range(0, enumLength));
-
+            //int enumLength = Enum.GetValues(typeof(ItemType)).Length - 1;
+            ItemType itemchosen = (ItemType)(Random.Range(0, 3));
             GameObject item = Instantiate(itemPrefab, transform.position, Quaternion.identity);
             item.GetComponent<Item>().SetItem(itemchosen, 99);
         }
+
+        //drop powerups
+        int powerupdropper = (Random.Range(1, 3));
+        if(powerupdropper % 2 == 0)
+        {
+            PowerUps powerupchosen = (PowerUps)(Random.Range(0, 
+                Enum.GetValues(typeof(PowerUps)).Length - 1));
+            GameObject item = Instantiate(powerUpPrefab, transform.position, Quaternion.identity);
+            item.GetComponent<PowerUp>().SetPowerUpItem(powerupchosen, 1);
+        }
+        //
+
         textPrompt.enabled = false;
         sr.sprite = chestSprites[1];
         unlocked = true;

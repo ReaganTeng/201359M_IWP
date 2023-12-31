@@ -2,11 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using TMPro;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 public class EndZone : MonoBehaviour
 {
-
+    public Upgrades upgrade;
     GameObject player;
     public GameObject GameCompletePanel;
 
@@ -50,7 +51,7 @@ public class EndZone : MonoBehaviour
         && !GameCompletePanel.activeSelf)
         {
             PlayerPrefs.SetInt("RoundsCompleted",
-           PlayerPrefs.GetInt("RoundsCompleted") + 1);
+            PlayerPrefs.GetInt("RoundsCompleted") + 1);
             int roundsCompleted = PlayerPrefs.GetInt("RoundsCompleted");
 
             //REDUCE DAYS IF CERTAIN AMOUNT OF ROUNDS COMPLETED
@@ -74,6 +75,16 @@ public class EndZone : MonoBehaviour
 
             //    }
             //}
+
+            //EMPTY EVERYTHING IN INVENTORY
+            //put in upgrade scriptableobject also
+            List<InventorySlot> slotsinupgrade = upgrade.slotsToTransfer;
+            foreach (InventorySlot slots in slotsinupgrade)
+            {
+                upgrade.emptySlot(slots);
+            }
+            //
+
 
             GameCompletePanel.SetActive(true);
             //countdown_started = true;

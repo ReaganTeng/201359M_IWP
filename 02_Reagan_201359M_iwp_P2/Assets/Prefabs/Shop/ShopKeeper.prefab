@@ -251,6 +251,7 @@ GameObject:
   - component: {fileID: 2258830165517921369}
   - component: {fileID: 1544178339435056070}
   - component: {fileID: 4323680955881984916}
+  - component: {fileID: 3315186757393746127}
   m_Layer: 0
   m_Name: ShopKeeper
   m_TagString: Untagged
@@ -380,9 +381,25 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &3315186757393746127
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7858503774673311384}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6000bc09ee8404c46ac32410dbd8234e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sr: {fileID: 0}
+  textPrompt: {fileID: 0}
+  dialogue: {fileID: 11400000, guid: e4da2a14a49f22e4cbca6c8f6a143871, type: 2}
+  DM: {fileID: 0}
 --- !u!1 &8109491757747385351
 GameObject:
   m_ObjectHideFlags: 0

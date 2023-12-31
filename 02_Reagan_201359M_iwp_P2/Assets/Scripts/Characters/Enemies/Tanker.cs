@@ -24,9 +24,6 @@ public class Tanker : Enemy
     CircleCollider2D circlecollider;
 
 
-    float stage1 = 1;
-    float stage2 = 2;
-
     protected override void Awake()
     {
         base.Awake();
@@ -39,6 +36,8 @@ public class Tanker : Enemy
 
         meleedamage = 10;
         projectileDamage = 10;
+
+        //characterType = CharacterUnlockManager.CharacterType.tan;
     }
 
     protected override void Update()
@@ -46,8 +45,11 @@ public class Tanker : Enemy
         base.Update();
         // Enemy is too close to the player, move away from the player.
 
-        PlayAnimation(characterType, currentAnimIdx);
-
+        //PlayAnimation(characterType, currentAnimIdx);
+        if (disabled)
+        {
+            return;
+        }
         switch (currentState)
         {
             case EnemyState.ABOUT_TO_ATTACK:
@@ -128,8 +130,6 @@ public class Tanker : Enemy
 
                     break;
                 }
-            //case EnemyState.HURT:
-
             default:
                 //Debug.Log("DEFAULT");
                 //timer += 1 * Time.deltaTime;

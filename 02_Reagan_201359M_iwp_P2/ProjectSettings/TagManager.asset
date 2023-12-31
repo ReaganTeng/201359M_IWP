@@ -25,6 +25,8 @@ TagManager:
   - DialoguePanel
   - QuestPanel
   - Item
+  - LoadingScreen
+  - PowerUpNotification
   layers:
   - Default
   - TransparentFX

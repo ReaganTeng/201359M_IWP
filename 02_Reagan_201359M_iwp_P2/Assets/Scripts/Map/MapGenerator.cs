@@ -27,7 +27,8 @@ public class MapGenerator : MonoBehaviour
     public GameObject unbreakableWall;
     public GameObject Player;
     public GameObject treasureParent;
-
+    public GameObject shopkeeperPrefab;
+    public GameObject questTriggers;
 
     [HideInInspector]
     public List<Vector2> occupiedPositions;
@@ -35,6 +36,8 @@ public class MapGenerator : MonoBehaviour
     public Vector2 startingposition;
     [HideInInspector]
     public int roomdimension;
+    [HideInInspector]
+    public List<GameObject> listofShopkeepers = new List<GameObject>();
 
     //List <GameObject> player = new List<GameObject>();
     GameObject player;
@@ -48,6 +51,7 @@ public class MapGenerator : MonoBehaviour
     int NumberOfPaths;
     int PathsImplemented;
     int PathsImplementedChecker;
+    int NumberOfShopKeepers;
     public List<GameObject> startingRoomtemplates;
     public List<GameObject> exitRoomtemplates;
     List<GameObject> roomTemplates = new List<GameObject>(); // Array of room templates.
@@ -57,6 +61,7 @@ public class MapGenerator : MonoBehaviour
     GameObject prevRoomInstantiated;
     GameObject startingRoom;
     Vector2 currentRoomPosition;
+    //Vector2 shopKeeperPrevPos;
     
     //public Tilemap mainWallTilemap;
     //public Tilemap mainFloorTilemap;
@@ -75,6 +80,7 @@ public class MapGenerator : MonoBehaviour
     bool paintedtotilemap;
     bool enemiesspawned;
     bool poolinitiated;
+    bool objectsGenerated;
 
     //Vector2 exitroompos;
     //bool AllPathsGenerated;
@@ -104,6 +110,8 @@ public class MapGenerator : MonoBehaviour
 
     void Awake()
     {
+        //shopKeeperPrevPos = Vector2.zero;
+        objectsGenerated = false;
         alltreasuresSpawned = false;
 
         poolinitiated = false;
@@ -121,6 +129,9 @@ public class MapGenerator : MonoBehaviour
         attemptTimer = 0;
 
         allroomsSelected = false;
+
+
+        NumberOfShopKeepers = 50;
 
         //TEMPORARILY TRUE
         //pathsFinishedDiverging = true;
@@ -214,44 +225,104 @@ public class MapGenerator : MonoBehaviour
         }
         else
         {
-        //aaa
-            if (!gameManager.activeSelf)
+            //aaa
+            if (!objectsGenerated)
             {
-                gameManager.SetActive(true);
-            }
+                if (!gameManager.activeSelf)
+                {
+                    gameManager.SetActive(true);
+                }
 
-            //if(player == null)
-            if (!playermgt.finishedSpawning)
-            {
-                //for (int i = 0; i < 2; i++)
-                //{
-                //    player = Instantiate(Player, startingposition, Quaternion.identity);
-                //    player.GetComponent<SpriteRenderer>().color = 
-                //    new Color (
-                //        Random.Range(0, 1),
-                //        Random.Range(0, 1),
-                //        Random.Range(0, 1)
-                //        );
-                //    playermgt.players.Add(player);
+                //if(player == null)
+                if (!playermgt.finishedSpawning)
+                {
+                    //for (int i = 0; i < 2; i++)
+                    //{
+                    //    player = Instantiate(Player, startingposition, Quaternion.identity);
+                    //    player.GetComponent<SpriteRenderer>().color = 
+                    //    new Color (
+                    //        Random.Range(0, 1),
+                    //        Random.Range(0, 1),
+                    //        Random.Range(0, 1)
+                    //        );
+                    //    playermgt.players.Add(player);
                     playermgt.StartItself();
-                //}
+                    //}
+                }
+
+                if (endZone == null)
+                {
+                    endZone = Instantiate(EndZone, exitroom.transform.position, Quaternion.identity);
+                }
+
+                if (!enemiesspawned
+                    && playermgt.finishedSpawning)
+                {
+                    enemymgt.StartItself();
+                    enemiesspawned = true;
+                }
+
+                //SPAWN SHOPKEEPERS
+                for (int i = 0; i < NumberOfShopKeepers;)
+                {
+                    //int enemytype = Random.Range(0, 3);
+                    // Find the smallest and largest X and Y values
+                    float smallestX = occupiedPositions.Min(pos => pos.x);
+                    float largestX = occupiedPositions.Max(pos => pos.x);
+                    float smallestY = occupiedPositions.Min(pos => pos.y);
+                    float largestY = occupiedPositions.Max(pos => pos.y);
+                    int randomX = Random.Range((int)smallestX, (int)largestX + 1);
+                    int randomY = Random.Range((int)smallestY, (int)largestY + 1);
+                    Vector2 randomPosition = new Vector2(
+                        randomX,
+                       randomY
+                    );
+                    if ((listofShopkeepers.Count > 0 && IsPositionValid(randomPosition))
+                        || listofShopkeepers.Count <= 0)
+                    {
+                        GameObject shopkeeper = Instantiate(shopkeeperPrefab,
+                            randomPosition, Quaternion.identity);
+                        listofShopkeepers.Add(shopkeeper);
+                        i++;
+                    }
+                }
+                //GameObject.FindGameObjectWithTag("ShopPanel").
+                //    GetComponent<>;
+
+                SpawnTreasure();
+                CompassObject.StartItself();
+                GameObject.FindGameObjectWithTag("LoadingScreen").SetActive(false);
+                objectsGenerated = true;
             }
 
-            if (endZone == null)
-            {
-                endZone = Instantiate(EndZone, exitroom.transform.position, Quaternion.identity);
-            }
-
-            if (!enemiesspawned
-                && playermgt.finishedSpawning)
-            {
-                enemymgt.StartItself();
-                enemiesspawned = true;
-            }
-
-            SpawnTreasure();
-            CompassObject.StartItself();
         }
+    }
+
+
+    public bool IsPositionValid(Vector2 position)
+    {
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(position, 0.1f, LayerMask.GetMask("WallTilemap"));
+
+        if (colliders.Length > 0)
+        {
+            // There is a wall tile at the position
+            return false;
+        }
+
+        foreach (GameObject shopkeeper in listofShopkeepers)
+        {
+            float distance = Vector2.Distance(position, shopkeeper.transform.position);
+            //float distance2 = Vector2.Distance(position, mapGenerator.startingposition);
+
+            if (distance <= roomdimension
+                )
+            {
+                // Too close to another enemy
+                return false;
+            }
+        }
+
+        return true;
     }
 
     void spawnExitRoom()
@@ -709,116 +780,11 @@ public class MapGenerator : MonoBehaviour
 
 
 
-    float t = 0;
-
-    // Helper method to convert List<Vector2> to 2D array
-    private bool[,] ConvertTo2DArray(List<Vector2> positions)
-    {
-        float smallestX = positions.Min(pos => pos.x);
-        float largestX = positions.Max(pos => pos.x);
-        float smallestY = positions.Min(pos => pos.y);
-        float largestY = positions.Max(pos => pos.y);
-
-        int width = Mathf.CeilToInt(largestX - smallestX) + 1; // Add 1 to include the rightmost column
-        int height = Mathf.CeilToInt(largestY - smallestY) + 1; // Add 1 to include the top row
-
-        bool[,] array = new bool[width, height];
-
-        foreach (Vector2 position in positions)
-        {
-            int x = Mathf.FloorToInt(position.x - smallestX);
-            int y = Mathf.FloorToInt(position.y - smallestY);
-
-            // Check bounds before setting the value
-            if (x >= 0 && x < width && y >= 0 && y < height)
-            {
-                array[x, y] = true;
-            }
-            else
-            {
-                Debug.LogError($"Index out of bounds: x={x}, y={y}, width={width}, height={height}");
-            }
-        }
-
-        return array;
-    }
-
-
+   
     //SPAWN ROOMS THAT WILL NOT DIRECT TO THE PATH
     //private IEnumerator SpawnExtraRooms()
     // ...
-    void CA_SpawnExtraRooms()
-    {
-        // Convert List<Vector2> to 2D array
-        bool[,] occupiedArray = ConvertTo2DArray(occupiedPositions);
-
-
-        GameObject roomchosen = unbreakableWall;
-        Debug.Log("SPAWNING EXTRA ROOMS");
-        float smallestX = occupiedPositions.Min(pos => pos.x);
-        float largestX = occupiedPositions.Max(pos => pos.x);
-        float smallestY = occupiedPositions.Min(pos => pos.y);
-        float largestY = occupiedPositions.Max(pos => pos.y);
-
-
-        for (int x_cor = (int)smallestX; x_cor <= (int)largestX; x_cor += roomdimension)
-        {
-            for (int y_cor = (int)smallestY; y_cor <= (int)largestY; y_cor += roomdimension)
-
-            {
-                TrySpawnRoom(x_cor, y_cor, occupiedArray);
-            }
-
-        }
-
-        extraroomsSpawned = true;
-
-    } //end CA_SpawnExtraRooms
-
-
-
-    bool TrySpawnRoom(int x_cor, int y_cor, bool[,] occupiedArray)
-    {
-        if (occupiedArray[x_cor, y_cor])
-            return false;
-
-        int templatechosen = Random.Range(0, roomTemplates.Count);
-        GameObject roomchosen = roomTemplates[templatechosen];
-        Room rmRoom = roomchosen.GetComponent<Room>();
-
-        GameObject room = roompool.FirstOrDefault(template
-        => !template.activeSelf
-        && template.GetComponent<Room>().prefabId == rmRoom.prefabId
-        && template.GetComponent<Room>().availableDirections.Count == rmRoom.availableDirections.Count
-        );
-
-        if (room == null)
-        {
-            room = Instantiate(roomchosen, new Vector2(x_cor, y_cor), Quaternion.identity);
-            roompool.Add(room);
-            room.name = $"{room.gameObject.name} RECLONE";
-            room.transform.SetParent(roompoolParent.transform);
-
-        }
-        else
-        {
-            room.SetActive(true);
-            roompool.Remove(room);
-            room.transform.position = new Vector2(x_cor, y_cor);
-            Debug.Log("PATH POOLED");
-        }
-        room.name = $"{room.name} EXTRA ROOM";
-        generatedRooms.Add(room);
-        occupiedArray[x_cor, y_cor] = true;
-        //occupiedPositions[x_cor, y_cor] = true;
-
-        //SET AS CHILD OF MAPPARENT
-        room.transform.SetParent(mapParent.transform);
-        return true;
-    } //end TrySpawnRoom
-
-
-
+ 
     void SpawnExtraRooms()
     {
         GameObject roomchosen = unbreakableWall;
@@ -828,7 +794,6 @@ public class MapGenerator : MonoBehaviour
         float smallestY = occupiedPositions.Min(pos => pos.y);
         float largestY = occupiedPositions.Max(pos => pos.y);
 
-        t += 1 * Time.deltaTime;
         //float smallestX = -16 * 10;
         //float largestX = 16 * 10;
         //float smallestY = -16 * 10;
@@ -898,7 +863,6 @@ public class MapGenerator : MonoBehaviour
                     Debug.Log("OCCUPIED");
                 }
             }
-            t = 0;
             //yield return null;
         }
         extraroomsSpawned = true;
@@ -1449,7 +1413,7 @@ public class MapGenerator : MonoBehaviour
             if (pathsFinishedDiverging
               && !extraroomsSpawned)
             {
-                Debug.Log($"TTIME {t}");
+                //Debug.Log($"TTIME {t}");
 
                 //StartCoroutine(
                 SpawnExtraRooms();

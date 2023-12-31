@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: CharacterUnlockManager
   m_EditorClassIdentifier: 
   unlockedCharacters: 0000000001000000
-  selectedCharacters: 0100000000000000
+  selectedCharacters: 0000000001000000

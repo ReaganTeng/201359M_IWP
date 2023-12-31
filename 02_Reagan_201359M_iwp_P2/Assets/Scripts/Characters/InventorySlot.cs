@@ -12,11 +12,8 @@ public class InventorySlot : MonoBehaviour
 
 
     public Item CurrentItem;
-
     public ItemType itemtype;
-
     public int Quantity;
-
     // Assuming slot has an Image component
     public Image slotImage ;
     public TextMeshProUGUI quantityText;

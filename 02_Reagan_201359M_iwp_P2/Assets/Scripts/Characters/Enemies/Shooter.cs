@@ -16,22 +16,22 @@ public class Shooter : Enemy
     float shootTimer = 0;
     Vector3 LastKnownPosition;
     Vector3 direction;
-    float timer = 0;
-    int pelletstoshoot;
+    //float timer = 0;
+    //int pelletstoshoot;
 
-    public GameObject Projectile;
+    //public GameObject Projectile;
 
     float projectilespeed = 10.0f;
 
-    float stage1 = 1;
-    float stage2 = 2;
-
+   
     protected override void Awake()
     {
         base.Awake();
 
         meleedamage = 10;
         projectileDamage = 15;
+
+        //characterType = CharacterUnlockManager.CharacterType.SHOOTER;
     }
 
 
@@ -40,10 +40,25 @@ public class Shooter : Enemy
     {
         base.Update();
 
+        if(disabled)
+        {
+            return;
+        }
+
         switch (currentState)
         {
             case EnemyState.ABOUT_TO_ATTACK:
                 {
+                    string aboutToAttackName = characterAnimations.Find(
+                   template => template.characterType == characterType
+                   ).animationClips[1].name;
+                    //0 _ IDLE
+                    //1 _ about to atta
+                    //2 _ attack
+                    //3 _ run
+                    //4 _ death
+                    //5 - hurt
+
                     //Debug.Log("SHOOTING");
                     shootTimer += 1 * Time.deltaTime;
                     direction = LastKnownPosition - transform.position;
@@ -56,59 +71,48 @@ public class Shooter : Enemy
                     }
 
                     //ANIMATION
-                    if (!animatorComponent.GetCurrentAnimatorStateInfo(0).IsName("attack"))
+                    if (!animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(aboutToAttackName))
                     {
-                        animatorComponent.SetFloat("AttackStage", stage1);
+                        //animatorComponent.SetFloat("AttackStage", stage1);
+                        currentAnimIdx = 1;
                     }
                     break;
                 }
             case EnemyState.ATTACK:
                 {
+                    string aboutToAttackName = characterAnimations.Find(
+                   template => template.characterType == characterType
+                   ).animationClips[1].name;
+
                     //ANIMATION
-                    if (animatorComponent.GetFloat("AttackStage") == stage1)
+                    if (animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(aboutToAttackName))
                     {
-                        animatorComponent.SetFloat("AttackStage", stage2);
-                        animatorComponent.Play("attack", 0, 0f);
+                        //animatorComponent.SetFloat("AttackStage", stage2);
+                        currentAnimIdx = 2;
+                        animatorComponent.Play("clip", 0, 0f);
                     }
                     //
                     //Debug.Log("SHOOT");
-                    ShootProjectile();
+                    ShootProjectiles(
+                        ProjectileType.NORMAL,
+                        player.transform.position,
+                        transform.position//,
+                        //Quaternion.Euler(0, 0, 0)
+                        );
+                    currentAnimIdx = 0;
+                    //spriteRenderer.color = Color.blue;
+                    currentState = EnemyState.IDLE;
                     break;
                 }
-            //case EnemyState.HURT:
-            //    {
-            //        Debug.Log("OUCH SHOOTER");
-            //        break;
-            //    }
+          
             default:
                 {
-                    //Debug.Log("DEFAULT");
-                    //timer += 1 * Time.deltaTime;
-                    //if (timer >= 5)
-                    //{
-                    //    currentState = EnemyState.ABOUT_TO_ATTACK;
-                    //    timer = 0;
-                    //}
+                   
 
                     break;
                 }
         }
     }
-    void ShootProjectile()
-    {
-        // Instantiate the projectile
-        GameObject projectile = Instantiate(Projectile, transform.position, Quaternion.identity);
-
-        if (projectile != null)
-        {
-            Projectile projectilescript = projectile.GetComponent<Projectile>();
-            projectilescript.projectiletype = ProjectileType.NORMAL;
-            projectilescript.setdata(projectileDamage, projectilespeed,
-                (player.transform.position - transform.position).normalized, gameObject);
-        }
-        animatorComponent.SetFloat("AttackStage", 0);
-        //spriteRenderer.color = Color.blue;
-        currentState = EnemyState.IDLE;
-    }
+   
 
 }
