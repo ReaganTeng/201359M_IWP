@@ -119,6 +119,7 @@ MonoBehaviour:
     - {fileID: 7400000, guid: 90aa4df44c5f9584194b46cf952a39c3, type: 2}
     - {fileID: 7400000, guid: 06c4987c717f78446b336826ed64e1cf, type: 2}
     - {fileID: 7400000, guid: 0f3e95ca3a554554b87eb1f79e7e9d4d, type: 2}
+    animcon: {fileID: 9100000, guid: 9e31c00efa975c44f9db700f480e78ce, type: 2}
   - characterType: 1
     animationClips:
     - {fileID: 7400000, guid: 52da82e44b5572143b056cabad20924e, type: 2}
@@ -128,6 +129,7 @@ MonoBehaviour:
     - {fileID: 7400000, guid: 3608bb483d141cf49b3d9c0b84dc9fd4, type: 2}
     - {fileID: 7400000, guid: 7f4f237f3ba29f148b0876918b1ab7a3, type: 2}
     - {fileID: 7400000, guid: ec493507e7c872c4fb8f8001f49fe9a6, type: 2}
+    animcon: {fileID: 9100000, guid: affc4ed24b513604a902e7764f38195d, type: 2}
   - characterType: 2
     animationClips:
     - {fileID: 7400000, guid: 926001993d3ff4844afc97e723eb1c52, type: 2}
@@ -137,9 +139,9 @@ MonoBehaviour:
     - {fileID: 7400000, guid: 73ae39bd2c2edeb4aa201de144fa3032, type: 2}
     - {fileID: 7400000, guid: 7770671316f181043a2a7f7a9b7df5a7, type: 2}
     - {fileID: 7400000, guid: 8704ce438bf3a4546807b07f6048ea1a, type: 2}
-  animController: {fileID: 9100000, guid: 34b26d4fb8b1465459bf86e74f01b944, type: 2}
+    animcon: {fileID: 9100000, guid: 3d9a38bac123a5c44975f354e205f668, type: 2}
   projectilePrefab: {fileID: 7624530777093817295, guid: e6713cba1a41ac0489efd11283d8675b, type: 3}
-  currentAnimIdx: 0
+  currentAnimState: 
   animatorComponent: {fileID: 0}
   health: 0
   meleedamage: 0
@@ -150,6 +152,7 @@ MonoBehaviour:
   disabled: 0
   projectileDamage: 0
   characterType: 0
+  powerupNotificationPanel: {fileID: 0}
   moneyearnerd: {fileID: 0}
   horizontalInput: 0
   verticalInput: 0
@@ -164,6 +167,14 @@ MonoBehaviour:
   nearestEnemy: {fileID: 0}
   playerWeapon: {fileID: 0}
   listOfEnemies: []
+  IDLE: 
+  WALK_FRONT: 
+  WALK_BACK: 
+  WALK_LEFT: 
+  WALK_RIGHT: 
+  ATTACK: 
+  HURT: 
+  DEATH: 
   objectToSpawn: {fileID: 0}
   spawnRadius: 5
   occupiedLayer:
@@ -243,7 +254,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 0.5
+  m_Radius: 1
 --- !u!198 &4930092154717837102
 ParticleSystem:
   m_ObjectHideFlags: 0

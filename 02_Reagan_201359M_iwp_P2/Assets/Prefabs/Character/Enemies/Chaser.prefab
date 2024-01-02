@@ -8,12 +8,20 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 540826296877915453, guid: 25379c2e4fc28cb46b03aed1a6c6971b, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 906571104354387616, guid: 25379c2e4fc28cb46b03aed1a6c6971b, type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 9100000, guid: fc484b1374ee3e8458113e108946ad0d, type: 2}
     - target: {fileID: 4079878141343104142, guid: 25379c2e4fc28cb46b03aed1a6c6971b, type: 3}
       propertyPath: m_SortingLayer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5379587459735456582, guid: 25379c2e4fc28cb46b03aed1a6c6971b, type: 3}
+      propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5479193372864470963, guid: 25379c2e4fc28cb46b03aed1a6c6971b, type: 3}
@@ -143,6 +151,7 @@ MonoBehaviour:
     - {fileID: 7400000, guid: 1cba19809b9f3b74e96085698615b7e6, type: 2}
     - {fileID: 7400000, guid: 81704efd5c7d3ec40ab293ce8898f588, type: 2}
     - {fileID: 7400000, guid: 81704efd5c7d3ec40ab293ce8898f588, type: 2}
+    animcon: {fileID: 9100000, guid: 20a208bbe6d06a64e8aa2f399babbc51, type: 2}
   - characterType: 4
     animationClips:
     - {fileID: 7400000, guid: 780fc66367e391441b5ff92bce1795e7, type: 2}
@@ -151,6 +160,7 @@ MonoBehaviour:
     - {fileID: 7400000, guid: 12ede461227b8d74abe454df920ca23b, type: 2}
     - {fileID: 7400000, guid: 8895208e9159327448b779c475b3f010, type: 2}
     - {fileID: 7400000, guid: 8895208e9159327448b779c475b3f010, type: 2}
+    animcon: {fileID: 9100000, guid: e6e688a8959fd76409d727e2e8415393, type: 2}
   - characterType: 5
     animationClips:
     - {fileID: 7400000, guid: d6dfa3314ba02784b860cec858b6bff3, type: 2}
@@ -159,7 +169,7 @@ MonoBehaviour:
     - {fileID: 7400000, guid: d6dfa3314ba02784b860cec858b6bff3, type: 2}
     - {fileID: 7400000, guid: d6dfa3314ba02784b860cec858b6bff3, type: 2}
     - {fileID: 7400000, guid: d6dfa3314ba02784b860cec858b6bff3, type: 2}
-  animController: {fileID: 9100000, guid: e6e688a8959fd76409d727e2e8415393, type: 2}
+    animcon: {fileID: 9100000, guid: 05e3d8498af5f99439bdbb8cdfc1df16, type: 2}
   projectilePrefab: {fileID: 0}
   currentAnimIdx: 0
   animatorComponent: {fileID: 0}
@@ -172,6 +182,7 @@ MonoBehaviour:
   disabled: 0
   projectileDamage: 0
   characterType: 4
+  powerupNotificationPanel: {fileID: 0}
   stoppingdistance: 5
   distanceToIdle: 10
   itemPrefab: {fileID: 72955845208125536, guid: 5b0e3c7ba455c46408341d69e4f40f44, type: 3}

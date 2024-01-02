@@ -30,13 +30,19 @@ public class DialogueManager : MonoBehaviour
 
     int currentSentenceidx;
 
+    [HideInInspector]
+    public MenuManager MM;
+    
+
 
     void Awake()
     {
+        MM = GetComponent<MenuManager>();
         currentSentenceidx = 0;
         sentences = new Queue<string>();
         AS = GetComponent<AudioSource>();
-        dialoguePanel = GameObject.FindGameObjectWithTag("DialoguePanel");
+        //dialoguePanel = GameObject.FindGameObjectWithTag("DialoguePanel");
+        dialoguePanel = MM.dialoguePanel;
         dialogueText = dialoguePanel.GetComponentInChildren<TextMeshProUGUI>();
         dialogueText.text = "";
         currentDialogue = null;
@@ -50,11 +56,11 @@ public class DialogueManager : MonoBehaviour
         sentences.Clear();
         currentDialogue = dialogue;
 
-        Character[] charactersInScene = FindObjectsOfType<Character>();
-        foreach (Character character in charactersInScene)
-        {
-            character.disabled = true;
-        }
+        //Character[] charactersInScene = FindObjectsOfType<Character>();
+        //foreach (Character character in charactersInScene)
+        //{
+        //    character.disabled = true;
+        //}
 
         foreach (Dialogue.Sentence sentence in dialogue.sentences)
         {
@@ -81,7 +87,6 @@ public class DialogueManager : MonoBehaviour
 
             if (!isTyping)
             {
-               
                 if (currentSentenceidx < currentDialogue.sentences.Count - 1)
                 {
                     currentSentenceidx++;
@@ -219,11 +224,11 @@ public class DialogueManager : MonoBehaviour
     public void CloseDialogue()
     {
         currentSentenceidx = 0;
-        Character[] charactersInScene = FindObjectsOfType<Character>();
-        foreach (Character character in charactersInScene)
-        {
-            character.disabled = false;
-        }
+        //Character[] charactersInScene = FindObjectsOfType<Character>();
+        //foreach (Character character in charactersInScene)
+        //{
+        //    character.disabled = false;
+        //}
         dialoguePanel.SetActive(false);
         currentDialogue = null; // Reset currentDialogue
     }

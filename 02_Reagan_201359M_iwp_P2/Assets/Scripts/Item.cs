@@ -109,9 +109,9 @@ public class Item : MonoBehaviour
         {
             itemImage.sprite = itemSprites[(int)itemType];
         }
-        else
-        {
-            Debug.LogError($"Sprite for ItemType {itemType} is missing.");
-        }
+        //else
+        //{
+        //    Debug.LogError($"Sprite for ItemType {itemType} is missing.");
+        //}
     }
 }

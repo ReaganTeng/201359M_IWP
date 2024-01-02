@@ -13,13 +13,64 @@ MonoBehaviour:
   m_Name: Upgrades
   m_EditorClassIdentifier: 
   slotsToTransfer:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 8804753125660301006, guid: 7ac21b36c90182f48877466c757ba8e6, type: 3}
-  - {fileID: 8804753125660301006, guid: 7ac21b36c90182f48877466c757ba8e6, type: 3}
-  - {fileID: 8804753125660301006, guid: 7ac21b36c90182f48877466c757ba8e6, type: 3}
-  - {fileID: 8804753125660301006, guid: 7ac21b36c90182f48877466c757ba8e6, type: 3}
-  - {fileID: 8804753125660301006, guid: 7ac21b36c90182f48877466c757ba8e6, type: 3}
-  - {fileID: 8804753125660301006, guid: 7ac21b36c90182f48877466c757ba8e6, type: 3}
-  - {fileID: 8804753125660301006, guid: 7ac21b36c90182f48877466c757ba8e6, type: 3}
+  - {fileID: 9007220786065537428, guid: 7ac21b36c90182f48877466c757ba8e6, type: 3}
+  - {fileID: 9007220786065537428, guid: 7ac21b36c90182f48877466c757ba8e6, type: 3}
+  - {fileID: 9007220786065537428, guid: 7ac21b36c90182f48877466c757ba8e6, type: 3}
+  - {fileID: 9007220786065537428, guid: 7ac21b36c90182f48877466c757ba8e6, type: 3}
+  - {fileID: 9007220786065537428, guid: 7ac21b36c90182f48877466c757ba8e6, type: 3}
+  - {fileID: 9007220786065537428, guid: 7ac21b36c90182f48877466c757ba8e6, type: 3}
+  - {fileID: 9007220786065537428, guid: 7ac21b36c90182f48877466c757ba8e6, type: 3}
+  - {fileID: 9007220786065537428, guid: 7ac21b36c90182f48877466c757ba8e6, type: 3}
+  - {fileID: 9007220786065537428, guid: 7ac21b36c90182f48877466c757ba8e6, type: 3}
+  - {fileID: 9007220786065537428, guid: 7ac21b36c90182f48877466c757ba8e6, type: 3}
+  slotProperty:
+  - currentitem: {fileID: 0}
+    itemtype: 1
+    iconsprite: {fileID: 21300000, guid: aede5fc3a369f134993eca1faa2d09b5, type: 3}
+    Quantity: 6
+    quantitytext: 6
+  - currentitem: {fileID: 0}
+    itemtype: 2
+    iconsprite: {fileID: 21300000, guid: fdae880631cfd834d8281f411c1b58fd, type: 3}
+    Quantity: 8
+    quantitytext: 8
+  - currentitem: {fileID: 0}
+    itemtype: 0
+    iconsprite: {fileID: 21300000, guid: a6dd7a81acc656d43b6f5085220a82a0, type: 3}
+    Quantity: 6
+    quantitytext: 6
+  - currentitem: {fileID: 0}
+    itemtype: 11
+    iconsprite: {fileID: 7482667652216324306, guid: 045f9c59399f9d745b659ccdcd783b3f, type: 3}
+    Quantity: 0
+    quantitytext: 
+  - currentitem: {fileID: 0}
+    itemtype: 11
+    iconsprite: {fileID: 7482667652216324306, guid: 045f9c59399f9d745b659ccdcd783b3f, type: 3}
+    Quantity: 0
+    quantitytext: 
+  - currentitem: {fileID: 0}
+    itemtype: 11
+    iconsprite: {fileID: 7482667652216324306, guid: 045f9c59399f9d745b659ccdcd783b3f, type: 3}
+    Quantity: 0
+    quantitytext: 
+  - currentitem: {fileID: 0}
+    itemtype: 11
+    iconsprite: {fileID: 7482667652216324306, guid: 045f9c59399f9d745b659ccdcd783b3f, type: 3}
+    Quantity: 0
+    quantitytext: 
+  - currentitem: {fileID: 0}
+    itemtype: 11
+    iconsprite: {fileID: 7482667652216324306, guid: 045f9c59399f9d745b659ccdcd783b3f, type: 3}
+    Quantity: 0
+    quantitytext: 
+  - currentitem: {fileID: 0}
+    itemtype: 11
+    iconsprite: {fileID: 7482667652216324306, guid: 045f9c59399f9d745b659ccdcd783b3f, type: 3}
+    Quantity: 0
+    quantitytext: 
+  - currentitem: {fileID: 0}
+    itemtype: 11
+    iconsprite: {fileID: 7482667652216324306, guid: 045f9c59399f9d745b659ccdcd783b3f, type: 3}
+    Quantity: 0
+    quantitytext: 

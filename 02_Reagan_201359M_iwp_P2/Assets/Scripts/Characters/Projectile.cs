@@ -68,7 +68,9 @@ public class Projectile : MonoBehaviour
     {
         //damage either player or enemy
         if (
-            (collision.gameObject.CompareTag("Player") || collision.gameObject.CompareTag("Enemy"))
+            ((collision.gameObject.CompareTag("Player")
+            && !collision.gameObject.GetComponent<Player>().AIMode) 
+            || collision.gameObject.CompareTag("Enemy"))
             && collision.gameObject.tag != projectilesource.tag
             && !hitsomething)
         //&& collision.gameObject.GetComponent<Player>().immunity_timer <= 0.0f)

@@ -50,9 +50,9 @@ public class Treasure : Interactables
 
         //drop powerups
         int powerupdropper = (Random.Range(1, 3));
-        if(powerupdropper % 2 == 0)
+        if (powerupdropper % 2 == 0)
         {
-            PowerUps powerupchosen = (PowerUps)(Random.Range(0, 
+            PowerUps powerupchosen = (PowerUps)(Random.Range(0,
                 Enum.GetValues(typeof(PowerUps)).Length - 1));
             GameObject item = Instantiate(powerUpPrefab, transform.position, Quaternion.identity);
             item.GetComponent<PowerUp>().SetPowerUpItem(powerupchosen, 1);

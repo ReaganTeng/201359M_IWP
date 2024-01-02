@@ -19,72 +19,71 @@ public class Chaser : Enemy
     protected override void Awake()
     {
         base.Awake();
-
         //characterType = CharacterUnlockManager.CharacterType.CHASER;
         //characterAnimations =characterAnimations;
     }
 
-   
+
     float timertochase = 0;
 
 
     protected override void Update()
     {
-        base.Update();
+        PlayAnimation(currentAnimState);
+
         if (disabled)
         {
             return;
         }
 
+        base.Update();
+
+        if (health <= 0)
+        {
+            //DEATH
+            Die();
+            return;
+        }
+
         // Implement state-specific behavior in derived classes
+        StateManager();
+
+    }
+
+
+    public override void StateManager()
+    {
+        base.StateManager();
+
+
         switch (currentState)
         {
             case EnemyState.ABOUT_TO_ATTACK:
                 {
                     timertochase += 1 * Time.deltaTime;
 
-                    if(timertochase >= 3)
+                    if (timertochase >= 3)
                     {
                         currentState = EnemyState.IDLE;
                         timertochase = 0;
                     }
-                    string aboutToAttackName = characterAnimations.Find(
-                       template => template.characterType == characterType
-                       ).animationClips[1].name;
-                        //0 _ IDLE
-                        //1 _ about to atta
-                        //2 _ attack
-                        //3 _ run
-                        //4 _ death
-                        //5 - hurt
+
                     //ANIMATION
-                    if (!animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(aboutToAttackName))
+                    if (!animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(ABOUT_TO_ATTACK))
 
                     {
-                        if (distance <= 1.0f * 1.5f)
+                        if (distance <= 1.0f)
                         {
                             //animatorComponent.SetFloat("AttackStage", stage1);
-                            currentAnimIdx = 1;
+                            currentAnimState = ABOUT_TO_ATTACK;
                         }
                         else
                         {
-
                             FollowPlayer();
                         }
                     }
 
-
-                    string AttackName = characterAnimations.Find(
-                   template => template.characterType == characterType
-                   ).animationClips[2].name;
-                    //0 _ IDLE
-                    //1 _ about to atta
-                    //2 _ attack
-                    //3 _ run
-                    //4 _ death
-                    //5 - hurt
-
-                    if (animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(AttackName)
+                    if (animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(ABOUT_TO_ATTACK)
                         //&& animatorComponent.GetFloat("AttackStage") == stage1
                         && animatorComponent.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f)
                     {
@@ -96,31 +95,31 @@ public class Chaser : Enemy
             case EnemyState.ATTACK:
                 {
 
-                    string AttackName = characterAnimations.Find(
-                  template => template.characterType == characterType
-                  ).animationClips[2].name;
+                    //  string AttackName = characterAnimations.Find(
+                    //template => template.characterType == characterType
+                    //).animationClips[2].name;
 
                     //if (animatorComponent.GetFloat("AttackStage") == stage1)
-                    if (animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(AttackName))
+                    if (animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(ABOUT_TO_ATTACK))
                     {
-                            //animatorComponent.SetFloat("AttackStage", stage2);
-                        animatorComponent.Play("clip", 0, 0f);
+                        //animatorComponent.SetFloat("AttackStage", stage2);
+                        //animatorComponent.Play(ATTACK, 0, 0f);
+                        currentAnimState = ATTACK;
                     }
-                    else
-                    {
-                        currentAnimIdx = 2;
-                    }
+                    //else
+                    //{
+                    //    currentAnimState ;
+                    //}
 
                     switch (currentAttackPattern)
                     {
                         case ChaserAttackPattern.SWIPE:
                         case ChaserAttackPattern.POUNCE:
                             //animatorComponent.SetFloat("AttackStage", stage2);
-
-                            if (
-                            animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(AttackName)
-                             // animatorComponent.GetCurrentAnimatorStateInfo(0).IsName("attack")
-                             //&& animatorComponent.GetFloat("AttackStage") == stage2
+                            currentAnimState = ATTACK;
+                            if (animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(ATTACK)
+                           // animatorComponent.GetCurrentAnimatorStateInfo(0).IsName("attack")
+                           //&& animatorComponent.GetFloat("AttackStage") == stage2
                            && animatorComponent.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f
                            && attackcooldown <= 0.0)
                             {
@@ -161,15 +160,15 @@ public class Chaser : Enemy
                                     }
                                 }
 
-                                currentAnimIdx = 0;
+                                currentAnimState = IDLE;
                                 currentState = EnemyState.IDLE;
                             }
                             break;
                     }
                     break;
                 }
-            //case EnemyState.HURT:
-            //    break;
+                //case EnemyState.HURT:
+                //    break;
         }
     }
 }

@@ -42,14 +42,34 @@ public class Tanker : Enemy
 
     protected override void Update()
     {
-        base.Update();
         // Enemy is too close to the player, move away from the player.
+        PlayAnimation(currentAnimState);
 
         //PlayAnimation(characterType, currentAnimIdx);
         if (disabled)
         {
             return;
         }
+
+        base.Update();
+
+
+        if (health <= 0)
+        {
+            //DEATH
+            Die();
+            return;
+        }
+
+        StateManager();
+    }
+
+
+    public override void StateManager()
+    {
+        base.StateManager();
+
+
         switch (currentState)
         {
             case EnemyState.ABOUT_TO_ATTACK:
@@ -61,9 +81,9 @@ public class Tanker : Enemy
                     //direction = LastKnownPosition - transform.position;
                     direction = LastKnownPosition - transform.position;
 
-                    string aboutToAttackName = characterAnimations.Find(
-                    template => template.characterType == characterType
-                    ).animationClips[1].name;
+                    //string aboutToAttackName = characterAnimations.Find(
+                    //template => template.characterType == characterType
+                    //).animationClips[1].name;
                     //0 _ IDLE
                     //1 _ about to atta
                     //2 _ attack
@@ -72,9 +92,9 @@ public class Tanker : Enemy
                     //5 - hurt
 
                     //ANIMATION
-                    if (!animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(aboutToAttackName))
+                    if (!animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(ABOUT_TO_ATTACK))
                     {
-                        currentAnimIdx = 1;
+                        currentAnimState = ABOUT_TO_ATTACK;
                         //animatorComponent.SetFloat("AttackStage", stage1);
                     }
 
@@ -90,19 +110,12 @@ public class Tanker : Enemy
                 {
                     attackcollider.enabled = true;
                     circlecollider.enabled = false;
-
                     Debug.Log("CHARGE");
                     chargingtime += 1 * Time.deltaTime;
-
-                    string AttackName = characterAnimations.Find(
-                   template => template.characterType == characterType
-                   ).animationClips[1].name;
-
                     //ANIMATION
-                    //if (animatorComponent.GetFloat("AttackStage") == stage1)
-                    if (!animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(AttackName))
+                    if (!animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(ATTACK))
                     {
-                        currentAnimIdx = 1;
+                        currentAnimState = ATTACK;
                         //animatorComponent.SetFloat("AttackStage", stage2);
                         //animatorComponent.Play("attack", 0, 0f);
                     }
@@ -113,16 +126,16 @@ public class Tanker : Enemy
                         case TankerAttackPattern.STRAIGHT_CHARGE:
                         case TankerAttackPattern.CLEAVE:
                         case TankerAttackPattern.SHIELD_BASH:
-                            // Implement shield bash attack
+                            // IMPLEMENT CHARGING ATTACK
                             direction = LastKnownPosition - transform.position;
                             transform.position += direction * 10 * Time.deltaTime;
-                            spriteRenderer.color = Color.white;
+                            //spriteRenderer.color = Color.white;
                             break;
                     }
 
                     if (chargingtime >= 1.0f)
                     {
-                        currentAnimIdx = 0;
+                        currentAnimState = IDLE;
                         //animatorComponent.SetFloat("AttackStage", 0);
                         currentState = EnemyState.IDLE;
                         chargingtime = 0;
@@ -131,9 +144,7 @@ public class Tanker : Enemy
                     break;
                 }
             default:
-                //Debug.Log("DEFAULT");
-                //timer += 1 * Time.deltaTime;
-                //if (timer >= 5)
+                
                 {
                     attackcollider.enabled = false;
                     circlecollider.enabled = true;
@@ -150,9 +161,8 @@ public class Tanker : Enemy
                 }
 
         }
-
-
     }
+
 
     void OnTriggerEnter2D(Collider2D collision)
     {
@@ -174,13 +184,11 @@ public class Tanker : Enemy
                 {
                     if (collisionCharacter.activeEffects[i].Type == EffectType.SHIELD)
                     {
-                        //collisionCharacter.activeEffects[i].
                         collisionCharacter.activeEffects.Remove(collisionCharacter.activeEffects[i]);
                     }
                 }
-
+                Debug.Log("GOT SHIELD");
                 collisionCharacter.playerShield.shieldActive = false;
-                //collisionCharacter.activeEffects
             }
             else
             {
@@ -189,6 +197,7 @@ public class Tanker : Enemy
                     collisionCharacter.audioSource.clip = collisionCharacter.audioclips[0];
                     collisionCharacter.audioSource.Play();
                 }
+                Debug.Log("NO SHIELD");
                 collisionCharacter.health -= meleedamage;
             }
 

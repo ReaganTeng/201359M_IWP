@@ -4,12 +4,8 @@ using UnityEngine;
 
 public class blade : MonoBehaviour
 {
-
-
     public AudioClip HitClip;
     [HideInInspector] AudioSource AS;
-
-
     void Awake()
     {
         AS = GetComponent<AudioSource>();
@@ -26,7 +22,8 @@ public class blade : MonoBehaviour
             Debug.Log("HIT ENEMY");
 
             Enemy enemyScript = collision.gameObject.GetComponent<Enemy>();
-            Player playerscript = GetComponentInParent<Transform>().GetComponentInParent<Weapon>().playerscript;
+            Player playerscript 
+                = GetComponentInParent<Transform>().GetComponentInParent<Weapon>().playerscript;
 
             // Calculate the direction from this object to the enemy
             Vector2 directionToEnemy = 

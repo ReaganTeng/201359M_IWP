@@ -5,7 +5,6 @@ using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Tilemaps;
-//using static UnityEditor.Experimental.GraphView.GraphView;
 using System.Numerics;
 using Vector3 = UnityEngine.Vector3;
 using Quaternion = UnityEngine.Quaternion;
@@ -15,9 +14,14 @@ using static Projectile;
 using static Item;
 using TMPro;
 using UnityEngine.Playables;
+using System.Security.Cryptography.X509Certificates;
+using UnityEditor.Animations;
 
 public class Player : Character
 {
+    
+
+
     //public enum CharacterType
     //{
     //    JOE,
@@ -36,7 +40,7 @@ public class Player : Character
 
 
     //public Slider healthbar;
-    String[] tilemaptags;
+    //String[] tilemaptags;
 
     // Get input from the player
     [HideInInspector] public float horizontalInput;
@@ -66,7 +70,7 @@ public class Player : Character
     //bool gotInput;
 
 
-    //[HideInInspector]
+    [HideInInspector]
     public CharacterUnlockManager.CharacterType characterType;
 
     [HideInInspector]
@@ -78,12 +82,47 @@ public class Player : Character
     [HideInInspector]
     public Dictionary<ItemType, Action> itemActions = new Dictionary<ItemType, Action>();
 
+    [HideInInspector]
+    public string IDLE;
+    [HideInInspector]
+    public string WALK_FRONT;
+    [HideInInspector]
+    public string WALK_BACK;
+    [HideInInspector]
+    public string WALK_LEFT;
+    [HideInInspector]
+    public string WALK_RIGHT;
+    [HideInInspector]
+    public string ATTACK;
+    [HideInInspector]
+    public string HURT;
+    [HideInInspector]
+    public string DEATH;
+    [HideInInspector]
+    public PlayerState currentstate;
+    [HideInInspector]
+    public TextMeshProUGUI activeEffectsText;
+
+    //public GameObject objectToSpawn;
+    //public float spawnRadius = 5f;
+    //public LayerMask occupiedLayer;
+    List<Effect> previousActiveEffects = new List<Effect>();
 
     protected override void Awake()
     {
         base.Awake();
 
+        activeEffectsText = GameObject.FindGameObjectWithTag("ActiveEffectsText").GetComponent<TextMeshProUGUI>(); ;
+        activeEffectsText.text = "";
 
+        IDLE = "player_idle";
+        WALK_BACK = "player_WalkBack";
+        WALK_FRONT = "player_WalkFront";
+        WALK_LEFT = "player_WalkLeft";
+        WALK_RIGHT = "player_WalkRight";
+        ATTACK = "player_Attack";
+        HURT = "player_Hurt";
+        currentAnimState = IDLE;
 
         // INITIALISE THE EFFECTS AND FUNCTIONS FOR EACH ITEM
         itemActions = new Dictionary<ItemType, Action>
@@ -100,13 +139,11 @@ public class Player : Character
             => ApplyEffect(EffectType.SHIELD) },
             //POWERUPS
             { ItemType.ONE_HIT, ()
-            => 
-                
-                ApplyEffect(EffectType.ONE_HIT)
-
-                 },
+            => ApplyEffect(EffectType.ONE_HIT)
+            },
             { ItemType.MINER_SENSE,
-            () => ApplyEffect(EffectType.MINER_SENSE) },
+            () => 
+            ApplyEffect(EffectType.MINER_SENSE) },
             { ItemType.GHOST, ()
             => ApplyEffect(EffectType.GHOST) },
             { ItemType.SPIRIT_FIRE, ()
@@ -128,11 +165,6 @@ public class Player : Character
             transform.position) },
              //
         };
-
-
-
-
-
 
         playerWeapon = GetComponentInChildren<Weapon>();
         //gotInput = false;
@@ -157,11 +189,10 @@ public class Player : Character
         playerTransform = transform;
 
         moneyearnerd = GameObject.FindGameObjectWithTag("MoneyEarnedText").GetComponent<TextMeshProUGUI>();
+        moneyearnerd.text = "$0";
     }
 
-    public GameObject objectToSpawn;
-    public float spawnRadius = 5f;
-    public LayerMask occupiedLayer;
+    
 
     void SpawnRandomObject()
     {
@@ -188,8 +219,7 @@ public class Player : Character
 
     protected override void Update()
     {
-
-        base.Update();
+        PlayAnimation(currentAnimState);
 
         //IF SAME LAYER AS LAYER TILE
         //Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 0.1f, LayerMask.GetMask("WallTilemap"));
@@ -200,79 +230,121 @@ public class Player : Character
             // Put any logic specific to the disabled state here, or simply return
             return;
         }
+        base.Update();
+
+
+        //PlayAnimation("player_Attack");
 
         horizontalInput = Input.GetAxis("Horizontal");
         verticalInput = Input.GetAxis("Vertical");
         listOfEnemies = GameObject.FindGameObjectsWithTag("Enemy");
 
-
-        if (health > 0)
+        if (health <= 0)
         {
-            spriteRenderer.color = Color.white;
-            if (!AIMode)
+            return;
+        }
+        //spriteRenderer.color = Color.white;
+
+        //CONTROLS WHAT HAPPENS IF PLAYER IF IS IN PLAYER MODE OR AI MODE
+        ControlManager();
+
+
+        UpdateActiveEffectsUI();
+
+
+    }
+
+    //DISPLAY WHAT ARE THE CURRENT EFFECTS THE PLAYER HAS
+    void UpdateActiveEffectsUI()
+    {
+        // Check if there is a change in the active effects
+        if (IsEffectListEqual(previousActiveEffects, activeEffects))
+        {
+            //List<string> effectsList = new List<string>();
+            string effectName = "";
+            foreach (Effect effects in activeEffects)
             {
-                //if (Input.GetKeyDown(KeyCode.Space))
-                //{
-                //    health -= 10;
-                //}
-
-                if (verticalInput == 0
-                    && horizontalInput == 0
-                    && !playerWeapon.isRotating)
-                {
-                    currentAnimIdx = 0;
-                }
-
-                //emissionModule.enabled = true;
-                //Debug.Log($"CURRENT HEALTH IS {health}");
-                Movement();
-                cameraMovement();
-                UseItem();
+                //effectsList.Add($"{effects.name} {effects.Duration}\n");
+                effectName += $"{effects.name} {(int)effects.Duration}\n";
             }
-            else
+            activeEffectsText.text = effectName;
+
+            Debug.Log("EFFECTS UPDATED");
+            //previousActiveEffects.Clear();
+            previousActiveEffects = activeEffects;
+        }
+    }
+
+    // Check if two lists of effects are equal
+    bool IsEffectListEqual(List<Effect> list1, List<Effect> list2)
+    {
+        if (list1.Count != list2.Count)
+        {
+            Debug.Log("COUNT FALSE");
+            return false;
+        }
+
+        for (int i = 0; i < list1.Count; i++)
+        {
+            //Debug.Log($"List 1: {list1[i].Duration}");
+            //Debug.Log($"List 2: {list2[i].Duration}");
+
+            if (list1[i].Type != list2[i].Type ||
+                list1[i].Duration != list2[i].Duration)
             {
-                FSManager();
+                //Debug.Log("FALSE");
+                return false;  // Return false if there is a difference
             }
         }
-        //else
-        //{
-        //    spriteRenderer.color = Color.black;
-        //}
 
-        PlayAnimation(characterType, currentAnimIdx);
-
-
-
-        //EFFECT TESTING
-        //if (Input.GetKey(KeyCode.Space)
-        //    && !effectactive)
-        //{
-        //    effectactive = true;
-        //}
-
-        //ApplyStatusEffect(StatusEffectType.POISON, 10);
-        //ApplyPoisonEffectToPlayer(10);
-
-        //WHEN IMMUNITY_TIMER IS >= 0, PLAYER CANNOT BE HURT
-        //if (immunity_timer >= 0)
-        //{
-        //    if (immunity_timer < .3)
-        //    {
-        //        Rigidbody2D rb = GetComponent<Rigidbody2D>();
-        //        rb.velocity = Vector2.zero;
-        //    }
-
-        //    immunity_timer -= Time.deltaTime;
-        //}
-
-
-        //Attack();
-
-        //FindClosestTile(tilemaptags);
+       
+        return true;
     }
 
 
-    public PlayerState currentstate;
+
+    public void ControlManager()
+    {
+        if (!AIMode)
+        {
+            //if (Input.GetKeyDown(KeyCode.Space))
+            //{
+            //    health -= 10;
+            //}
+
+            if (Input.GetKey(KeyCode.Space))
+            {
+                if (activeEffects.Count <= 0)
+                {
+                    //Debug.Log("EFFECT APPLIED");
+                    ApplyEffect(EffectType.POISON);
+                    ApplyEffect(EffectType.BURN);
+                }
+            }
+
+            if (verticalInput == 0
+                && horizontalInput == 0
+                && !playerWeapon.isRotating)
+            {
+                currentAnimState = IDLE;
+                //currentAnimIdx = 0;
+            }
+
+            if (playerWeapon.isRotating)
+            {
+                currentAnimState = ATTACK;
+            }
+            //emissionModule.enabled = true;
+            //Debug.Log($"CURRENT HEALTH IS {health}");
+            Movement();
+            //cameraMovement();
+            UseItem();
+        }
+        else
+        {
+            FSManager();
+        }
+    }
 
 
     //HANDLES THE USAGE OF ITEMS
@@ -306,7 +378,7 @@ public class Player : Character
 
         //positonGameObject.transform.position = targetpos;
 
-        float speed = 2.0f;
+        float speed = 5.0f;
         // Calculate the direction from the follower to the target
         Vector3 direction = targetpos - transform.position;
         // Normalize the direction vector (optional, keeps the movement consistent)
@@ -336,7 +408,7 @@ public class Player : Character
             case PlayerState.FOLLOW:
             //case PlayerState.ATTACK:
             {
-                    if (distance >= 5)
+                if (distance >= 2.0)
                 {
                     FollowPlayer();
                 }
@@ -449,8 +521,6 @@ public class Player : Character
         ItemType itemchosen = ItemType.NOTHING;
         int currentslot = playerInventory.selectedSlot;
 
-        
-
         // Check if the item type is in the dictionary, then perform the associated action
         if (itemActions.ContainsKey(playerInventory.slots[currentslot].itemtype))
         {
@@ -484,30 +554,26 @@ public class Player : Character
 
     private void Movement()
     {
-        
-
         //if (currentAnimIdx <= 0)
         //{
         if (verticalInput < 0)
         {
-            currentAnimIdx = 1;
+            currentAnimState = WALK_FRONT;
         }
         else if (verticalInput > 0)
         {
-            currentAnimIdx = 2;
+            currentAnimState = WALK_BACK;
         }
 
         if (horizontalInput < 0)
         {
-            currentAnimIdx = 3;
+            currentAnimState = WALK_LEFT;
         }
         else if (horizontalInput > 0)
         {
-            currentAnimIdx = 4;
+            currentAnimState = WALK_RIGHT;
         }
         //}
-
-        
 
         // Calculate the movement vector
         Vector3 movement = new Vector3(horizontalInput, verticalInput, 0f).normalized * 5.0f * Time.deltaTime;
@@ -663,60 +729,60 @@ public class Player : Character
 
 
 
-    private void FindClosestTile(string[] tags)
-    {
-        Vector3 playerPosition = playerTransform.position;
-        Vector3 playerForward = playerTransform.forward; // Get the player's forward direction.
+    //private void FindClosestTile(string[] tags)
+    //{
+    //    Vector3 playerPosition = playerTransform.position;
+    //    Vector3 playerForward = playerTransform.forward; // Get the player's forward direction.
 
-        float closestDistance = float.MaxValue;
-        TileBase closestTile = null;
+    //    float closestDistance = float.MaxValue;
+    //    TileBase closestTile = null;
 
-        foreach (string tag in tags)
-        {
-            GameObject[] tilemapObjects = GameObject.FindGameObjectsWithTag(tag);
+    //    foreach (string tag in tags)
+    //    {
+    //        GameObject[] tilemapObjects = GameObject.FindGameObjectsWithTag(tag);
 
-            foreach (GameObject tilemapObject in tilemapObjects)
-            {
-                Tilemap tilemap = tilemapObject.GetComponent<Tilemap>();
+    //        foreach (GameObject tilemapObject in tilemapObjects)
+    //        {
+    //            Tilemap tilemap = tilemapObject.GetComponent<Tilemap>();
 
-                foreach (Vector3Int cellPosition in tilemap.cellBounds.allPositionsWithin)
-                {
-                    TileBase tile = tilemap.GetTile(cellPosition);
+    //            foreach (Vector3Int cellPosition in tilemap.cellBounds.allPositionsWithin)
+    //            {
+    //                TileBase tile = tilemap.GetTile(cellPosition);
 
-                    if (tile != null)
-                    {
-                        Vector3 tileCenter = tilemap.GetCellCenterWorld(cellPosition);
-                        float distance = Vector3.Distance(playerPosition, tileCenter);
+    //                if (tile != null)
+    //                {
+    //                    Vector3 tileCenter = tilemap.GetCellCenterWorld(cellPosition);
+    //                    float distance = Vector3.Distance(playerPosition, tileCenter);
 
-                        // Calculate the direction from the player to the tile.
-                        Vector3 tileDirection = (tileCenter - playerPosition).normalized;
+    //                    // Calculate the direction from the player to the tile.
+    //                    Vector3 tileDirection = (tileCenter - playerPosition).normalized;
 
-                        // Calculate the dot product between the player's forward direction and the tile direction.
-                        float dotProduct = Vector3.Dot(playerForward, tileDirection);
+    //                    // Calculate the dot product between the player's forward direction and the tile direction.
+    //                    float dotProduct = Vector3.Dot(playerForward, tileDirection);
 
-                        // You can adjust the threshold for what is considered the "front" of the player.
-                        // A dot product close to 1 means the tile is in front of the player.
-                        float directionThreshold = 0.9f;
+    //                    // You can adjust the threshold for what is considered the "front" of the player.
+    //                    // A dot product close to 1 means the tile is in front of the player.
+    //                    float directionThreshold = 0.9f;
 
-                        if (distance < closestDistance && dotProduct > directionThreshold)
-                        {
-                            closestDistance = distance;
-                            closestTile = tile;
-                        }
-                    }
-                }
-            }
-        }
+    //                    if (distance < closestDistance && dotProduct > directionThreshold)
+    //                    {
+    //                        closestDistance = distance;
+    //                        closestTile = tile;
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
 
-        if (closestTile != null)
-        {
-            Debug.Log("Closest Tile: " + closestTile.name);
-        }
-        //else
-        //{
-        //    Debug.Log("No tiles found with the specified tags in the specified Tilemaps.");
-        //}
-    }
+    //    if (closestTile != null)
+    //    {
+    //        Debug.Log("Closest Tile: " + closestTile.name);
+    //    }
+    //    //else
+    //    //{
+    //    //    Debug.Log("No tiles found with the specified tags in the specified Tilemaps.");
+    //    //}
+    //}
 
 
 }

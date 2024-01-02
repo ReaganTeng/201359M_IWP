@@ -41,9 +41,6 @@ public class PowerUp : Item
         base.Awake();
         // Initialize power-up durations
         InitialiseItemType();
-
-       
-        
         // Add more power-up durations as needed
     }
 
@@ -81,32 +78,89 @@ public class PowerUp : Item
     }
 
 
+    //public void SetPowerUpItem(PowerUps powerupType, int stacksize)
+    //{
+    //    Dictionary<ItemType, EffectType> itemEffects = powerUpitemType[powerupType];
+    //    ItemType itemType = ItemType.NOTHING;
+    //    // Now you can access ItemType and EffectType
+    //    foreach (var kvp in itemEffects)
+    //    {
+    //        itemType = kvp.Key;
+    //        powerUpEffectType = kvp.Value;
+    //        // Do something with itemType and effectType
+    //    }
+    //    //powerUpEffectType = powerUpitemType[powerupType];
+
+    //    base.SetItem(itemType, stacksize);
+    //    //SetItemSprite(itemType);
+
+    //    //SET THE SPRITE OF THE POWER UP
+    //    //SET BACKGROUND IMAGE
+    //    itemImage.sprite = powerupIconsList[(int)powerUpEffectType];
+    //    //powerUpIconRenderer.sprite = powerupIconsList[(int)powerUpEffectType];
+    //}
+
+
+
+
     public void SetPowerUpItem(PowerUps powerupType, int stacksize)
     {
         Dictionary<ItemType, EffectType> itemEffects = powerUpitemType[powerupType];
-
         ItemType itemType = ItemType.NOTHING;
-        // Now you can access ItemType and EffectType
         foreach (var kvp in itemEffects)
         {
             itemType = kvp.Key;
             powerUpEffectType = kvp.Value;
             // Do something with itemType and effectType
         }
-        //powerUpEffectType = powerUpitemType[powerupType];
-
         base.SetItem(itemType, stacksize);
 
-
-        //SetItemSprite(itemType);
-
-        //SET THE SPRITE OF THE POWER UP
-        //SET BACKGROUND IMAGE
-        itemImage.sprite = backgroundImage;
-        powerUpIconRenderer.sprite = powerupIconsList[(int)powerUpEffectType];
+        // Set the sprite of the power-up
+        if (powerupIconsList.Count > (int)powerUpEffectType)
+        {
+            Sprite iconSprite = powerupIconsList[(int)powerUpEffectType];
+            itemImage.sprite = CombineSprites(backgroundImage, iconSprite);
+        }
+        else
+        {
+            Debug.LogError("Index out of bounds for powerupIconsList");
+        }
     }
 
-   
+    Sprite CombineSprites(Sprite background, Sprite overlay)
+    {
+        // Create a new texture
+        Texture2D combinedTexture = new Texture2D((int)background.rect.width, (int)background.rect.height);
+        // Convert sprites to textures
+        Texture2D backgroundTexture = background.texture;
+        Texture2D overlayTexture = overlay.texture;
+        // Loop through each pixel and combine colors
+        for (int y = 0; y < combinedTexture.height; y++)
+        {
+            for (int x = 0; x < combinedTexture.width; x++)
+            {
+                // Get the pixel colors from the textures
+                Color bgColor = backgroundTexture.GetPixel((int)(background.rect.x + x), (int)(background.rect.y + y));
+                Color overlayColor = overlayTexture.GetPixel((int)(overlay.rect.width / 2 + x), (int)(overlay.rect.height / 2 + y));
+                // Combine the colors using alpha blending
+                Color combinedColor = Color.Lerp(bgColor, overlayColor, overlayColor.a);
+                // Set the pixel in the combined texture
+                combinedTexture.SetPixel(x, y, combinedColor);
+            }
+        }
+
+        // Apply changes
+        combinedTexture.Apply();
+
+        // Create and return a new sprite
+        return Sprite.Create(
+            combinedTexture,
+            new Rect(0, 0, combinedTexture.width, combinedTexture.height),
+            new Vector2(0.5f, 0.5f) // Center the pivot
+        );
+    }
+
+
 
 
     public override void Update()

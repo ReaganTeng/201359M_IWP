@@ -13,20 +13,19 @@ public class EndZone : MonoBehaviour
 
     Inventory invmanager;
 
-    float countdown;
-    bool countdown_started;
+    //float countdown;
+    //bool countdown_started;
     public float money;
-    private void Awake()
+    void Awake()
     {
         money = 0;
-        countdown = 0;
-        countdown_started = false;
+        //countdown = 0;
+        //countdown_started = false;
         player = GameObject.FindWithTag("Player");
         GameCompletePanel = GameObject.FindWithTag("GameCompletePanel");
         GameCompletePanel.SetActive(false);
 
         invmanager = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<Inventory>();
-
     }
 
 
@@ -78,11 +77,11 @@ public class EndZone : MonoBehaviour
 
             //EMPTY EVERYTHING IN INVENTORY
             //put in upgrade scriptableobject also
-            List<InventorySlot> slotsinupgrade = upgrade.slotsToTransfer;
-            foreach (InventorySlot slots in slotsinupgrade)
-            {
-                upgrade.emptySlot(slots);
-            }
+            //List<InventorySlot> slotsinupgrade = upgrade.slotsToTransfer;
+            //foreach (InventorySlot slots in slotsinupgrade)
+            //{
+            //    upgrade.emptySlot(slots);
+            //}
             //
 
 

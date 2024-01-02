@@ -38,20 +38,36 @@ public class Shooter : Enemy
 
     protected override void Update()
     {
-        base.Update();
+        PlayAnimation(currentAnimState);
 
-        if(disabled)
+        if (disabled)
         {
             return;
         }
+
+        base.Update();
+
+        if (health <= 0)
+        {
+            //DEATH
+            Die();
+            return;
+        }
+
+        StateManager();
+    }
+
+
+
+
+    public override void StateManager()
+    {
+        base.StateManager();
 
         switch (currentState)
         {
             case EnemyState.ABOUT_TO_ATTACK:
                 {
-                    string aboutToAttackName = characterAnimations.Find(
-                   template => template.characterType == characterType
-                   ).animationClips[1].name;
                     //0 _ IDLE
                     //1 _ about to atta
                     //2 _ attack
@@ -71,48 +87,37 @@ public class Shooter : Enemy
                     }
 
                     //ANIMATION
-                    if (!animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(aboutToAttackName))
+                    if (!animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(ABOUT_TO_ATTACK))
                     {
-                        //animatorComponent.SetFloat("AttackStage", stage1);
-                        currentAnimIdx = 1;
+                        currentAnimState = ABOUT_TO_ATTACK;
                     }
                     break;
                 }
             case EnemyState.ATTACK:
                 {
-                    string aboutToAttackName = characterAnimations.Find(
-                   template => template.characterType == characterType
-                   ).animationClips[1].name;
-
                     //ANIMATION
-                    if (animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(aboutToAttackName))
+                    if (!animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(ATTACK))
                     {
-                        //animatorComponent.SetFloat("AttackStage", stage2);
-                        currentAnimIdx = 2;
-                        animatorComponent.Play("clip", 0, 0f);
+                        currentAnimState = ATTACK;
+                        animatorComponent.Play(currentAnimState, 0, 0f);
+                        Debug.Log("SHOOT");
+                        ShootProjectiles(
+                            ProjectileType.NORMAL,
+                            player.transform.position,
+                            transform.position);
                     }
                     //
-                    //Debug.Log("SHOOT");
-                    ShootProjectiles(
-                        ProjectileType.NORMAL,
-                        player.transform.position,
-                        transform.position//,
-                        //Quaternion.Euler(0, 0, 0)
-                        );
-                    currentAnimIdx = 0;
+                    currentAnimState = IDLE;
                     //spriteRenderer.color = Color.blue;
                     currentState = EnemyState.IDLE;
+
                     break;
                 }
-          
             default:
                 {
-                   
-
                     break;
                 }
         }
     }
-   
 
 }

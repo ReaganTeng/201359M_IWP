@@ -54,6 +54,22 @@ public class Enemy : Character
     //2 _ attack
     //3 _ run
     //4 _ death
+    //5 _ hurt
+
+    [HideInInspector]
+    public string IDLE;
+    [HideInInspector]
+    public string ABOUT_TO_ATTACK;
+    [HideInInspector]
+    public string ATTACK;
+    [HideInInspector]
+    public string HURT;
+    [HideInInspector]
+    public string DEATH;
+    [HideInInspector]
+    public string RUN;
+
+
 
     public GameObject itemPrefab;
 
@@ -79,14 +95,11 @@ public class Enemy : Character
     protected override void Awake()
     {
         base.Awake();
-
         questManager = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<QuestManager>();
-
         attackcooldown = 0;
         enemyrb = GetComponent<Rigidbody2D>();
         meleedamage = 15;
         projectileDamage = 15;
-
         hurt_timer = 0;
         immunity_timer = 0;
         //idx = 0;
@@ -100,8 +113,7 @@ public class Enemy : Character
         //Debug.Log("HEALTH SET " + health);
         //attacked = false;
         playerlist = GameObject.FindGameObjectsWithTag("Player");
-        
-        for(int i = 0; i< playerlist.Length; i++)
+        for (int i = 0; i < playerlist.Length; i++)
         {
             if (!playerlist[i].GetComponent<Player>().AIMode)
             {
@@ -110,14 +122,22 @@ public class Enemy : Character
             }
         }
 
-
         enemymgt = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<EnemyManager>();
         //transform.position = GameObject.Find("MapGenerator").GetComponent<MapGenerator>().startingposition;
         //Debug.Log("TRANSFORM POSITION " + GameObject.Find("MapGenerator").GetComponent<MapGenerator>().startingposition);
         //raycastOrigin = transform;
 
         listOfPositions.Add(player.transform.position);
-        
+
+
+        IDLE = "enemy_idle";
+        ABOUT_TO_ATTACK = "enemy_AboutToAttack";
+        ATTACK = "enemy_Attack";
+        RUN = "enemy_run";
+        DEATH = "enemy_death";
+        HURT = "enemy_hurt";
+
+        currentAnimState = IDLE;
         //FOR POSITION TESTING
         //if (positonGameObject == null)
         //{
@@ -134,20 +154,8 @@ public class Enemy : Character
     protected void FollowPlayer()
     {
 
-        //string aboutToAttackName = characterAnimations.Find(
-        //           template => template.characterType == characterType
-        //           ).animationClips[1].name;
-        //0 _ IDLE
-        //1 _ about to atta
-        //2 _ attack
-        //3 _ run
-        //4 _ death
-        //5 - hurt
+        currentAnimState = RUN;
 
-        currentAnimIdx = 3;
-
-        //Vector3 targetpos = UpdateTargetingPosition();
-        //Vector3 targetpos = CalculatePath();
         Vector2 playerPosition = playerpos;
         Vector2 enemyPosition = transform.position;
         Vector3 targetpos = FindPath(playerPosition, enemyPosition);
@@ -166,16 +174,11 @@ public class Enemy : Character
         // Update the position of the follower toward the target
         transform.position += direction * speed * Time.deltaTime;
 
-        //float distance = Vector2.Distance(transform.position, targetpos);
-
-        //if (distance <= 0.5f)
-        //{
-        //    listOfPositions.Remove(targetpos);
-        //}
+       
 
     }
-    
-    
+
+
 
     //int CountWallHits(Vector3 start, Vector3 end)
     //{
@@ -239,13 +242,13 @@ public class Enemy : Character
 
     protected override void Update()
     {
-        base.Update();
 
-        //PlayAnimation(characterType, currentAnimIdx);
+        PlayAnimation(currentAnimState);
         if (disabled)
         {
             return;
         }
+        base.Update();
 
         healthbar.value = health;
 
@@ -271,10 +274,11 @@ public class Enemy : Character
         //THE CURRENT DISTANCE BETWEEN PLAYER AND ENEMY
         distance = Vector2.Distance(playerpos, transform.position);
 
-        if(health <= 0)
+        if (health <= 0)
         {
             //DEATH
             Die();
+            return;
         }
 
 
@@ -288,7 +292,7 @@ public class Enemy : Character
             enemyrb.velocity = Vector2.zero;
         }
 
-        if(attackcooldown >= 0)
+        if (attackcooldown >= 0)
         {
             attackcooldown -= Time.deltaTime;
         }
@@ -321,7 +325,8 @@ public class Enemy : Character
         switch (currentState)
         {
             case EnemyState.IDLE:
-                spriteRenderer.color = Color.white;
+                currentAnimState = IDLE;
+                //spriteRenderer.color = Color.white;
                 break;
             case EnemyState.CHASE:
                 //spriteRenderer.color = Color.yellow;
@@ -332,29 +337,19 @@ public class Enemy : Character
                 break;
             case EnemyState.HURT:
                 {
-                   //string dyinganimationName = characterAnimations.Find(
-                   //template => template.characterType == characterType
-                   //).animationClips[4].name;
-                    //0 _ IDLE
-                    //1 _ about to atta
-                    //2 _ attack
-                    //3 _ run
-                    //4 _ death
-                    //5 - hurt
-
                     //Debug.Log("OUCH");
                     //spriteRenderer.color = Color.black;
                     hurt_timer += 1 * Time.deltaTime;
-                    if (hurt_timer >= 1.0f)
+                    if (hurt_timer >= .5f)
                     {
                         hurt_timer = 0;
                         //animatorComponent.SetBool("hurt", false);
-                        currentAnimIdx = 5;
+                        currentAnimState = IDLE;
                         currentState = EnemyState.IDLE;
                     }
                     else
                     {
-                        currentAnimIdx = 0;
+                        currentAnimState = HURT;
                         //animatorComponent.SetBool("hurt", true);
                     }
                     break;
@@ -362,7 +357,13 @@ public class Enemy : Character
         }
     }
 
-    void Die()
+    //FOR THE ATTACK PATTERNS OF THE SPECIFIC TYPE OF ENEMIES
+    public virtual void StateManager()
+    {
+
+    }
+
+    public void Die()
     {
         //0 _ IDLE
         //1 _ about to attack
@@ -370,19 +371,16 @@ public class Enemy : Character
         //3 _ run
         //4 _ death
         //5 - hurt
-
-        //animatorComponent.SetBool("hurt", true);
-        //animatorComponent.SetFloat("health", health);
-
-        string dyinganimationName = characterAnimations.Find(
-            template => template.characterType == characterType
-            ).animationClips[4].name;
-
-        currentAnimIdx = 4;
-
+        if (!animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(DEATH))
+        {
+            Debug.Log("SWITCH TO DEATH ANIATION");
+            currentAnimState = DEATH;
+            animatorComponent.Play(DEATH, 0, 0);
+        }
+        //currentAnimIdx = 4;
         //DYING ANIMATION
-        if (animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(dyinganimationName)
-            && animatorComponent.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f)
+        if (animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(DEATH)
+            && animatorComponent.GetCurrentAnimatorStateInfo(0).normalizedTime > 1.0f)
         {//drop 10 random gems
             for (int i = 0; i < 10; i++)
             {
@@ -401,113 +399,113 @@ public class Enemy : Character
     }
     
 
-    /*private void FindClosestTile(string[] tags)
-    {
-        Vector3 playerPosition = playerTransform.position;
 
-        float closestDistance = float.MaxValue;
-        TileBase closestTile = null;
-
-        foreach (string tag in tags)
-        {
-            GameObject[] tilemapObjects = GameObject.FindGameObjectsWithTag(tag);
-
-            foreach (GameObject tilemapObject in tilemapObjects)
-            {
-                Tilemap tilemap = tilemapObject.GetComponent<Tilemap>();
-
-                foreach (Vector3Int cellPosition in tilemap.cellBounds.allPositionsWithin)
-                {
-                    TileBase tile = tilemap.GetTile(cellPosition);
-
-                    if (tile != null)
-                    {
-                        Vector3 tileCenter = tilemap.GetCellCenterWorld(cellPosition);
-                        float distance = Vector3.Distance(playerPosition, tileCenter);
-
-                        if (distance < closestDistance)
-                        {
-                            closestDistance = distance;
-                            closestTile = tile;
-                        }
-                    }
-                }
-            }
-        }
-
-        if (closestTile != null)
-        {
-            Debug.Log("Closest Tile: " + closestTile.name);
-        }
-        //else
-        //{
-        //    Debug.Log("No tiles found with the specified tags in the specified Tilemaps.");
-        //}
-    }*/
-
-
-
-
-
-
-
-    private void FindClosestTile(string[] tags)
-    {
-        //Vector3 playerPosition = playerTransform.position;
-        //Vector3 playerForward = playerTransform.forward; // Get the player's forward direction.
-
-        //float closestDistance = float.MaxValue;
-        //TileBase closestTile = null;
-
-        //foreach (string tag in tags)
-        //{
-        //    GameObject[] tilemapObjects = GameObject.FindGameObjectsWithTag(tag);
-
-        //    foreach (GameObject tilemapObject in tilemapObjects)
-        //    {
-        //        Tilemap tilemap = tilemapObject.GetComponent<Tilemap>();
-
-        //        foreach (Vector3Int cellPosition in tilemap.cellBounds.allPositionsWithin)
-        //        {
-        //            TileBase tile = tilemap.GetTile(cellPosition);
-
-        //            if (tile != null)
-        //            {
-        //                Vector3 tileCenter = tilemap.GetCellCenterWorld(cellPosition);
-        //                float distance = Vector3.Distance(playerPosition, tileCenter);
-
-        //                // Calculate the direction from the player to the tile.
-        //                Vector3 tileDirection = (tileCenter - playerPosition).normalized;
-
-        //                // Calculate the dot product between the player's forward direction and the tile direction.
-        //                float dotProduct = Vector3.Dot(playerForward, tileDirection);
-
-        //                // You can adjust the threshold for what is considered the "front" of the player.
-        //                // A dot product close to 1 means the tile is in front of the player.
-        //                float directionThreshold = 0.9f;
-
-        //                if (distance < closestDistance && dotProduct > directionThreshold)
-        //                {
-        //                    closestDistance = distance;
-        //                    closestTile = tile;
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
-
-        //if (closestTile != null)
-        //{
-        //    Debug.Log("Closest Tile: " + closestTile.name);
-        //}
-        //else
-        //{
-        //    Debug.Log("No tiles found with the specified tags in the specified Tilemaps.");
-        //}
-    }
 }
 
+///*private void FindClosestTile(string[] tags)
+//{
+//    Vector3 playerPosition = playerTransform.position;
 
+//    float closestDistance = float.MaxValue;
+//    TileBase closestTile = null;
+
+//    foreach (string tag in tags)
+//    {
+//        GameObject[] tilemapObjects = GameObject.FindGameObjectsWithTag(tag);
+
+//        foreach (GameObject tilemapObject in tilemapObjects)
+//        {
+//            Tilemap tilemap = tilemapObject.GetComponent<Tilemap>();
+
+//            foreach (Vector3Int cellPosition in tilemap.cellBounds.allPositionsWithin)
+//            {
+//                TileBase tile = tilemap.GetTile(cellPosition);
+
+//                if (tile != null)
+//                {
+//                    Vector3 tileCenter = tilemap.GetCellCenterWorld(cellPosition);
+//                    float distance = Vector3.Distance(playerPosition, tileCenter);
+
+//                    if (distance < closestDistance)
+//                    {
+//                        closestDistance = distance;
+//                        closestTile = tile;
+//                    }
+//                }
+//            }
+//        }
+//    }
+
+//    if (closestTile != null)
+//    {
+//        Debug.Log("Closest Tile: " + closestTile.name);
+//    }
+//    //else
+//    //{
+//    //    Debug.Log("No tiles found with the specified tags in the specified Tilemaps.");
+//    //}
+//}*/
+
+
+
+
+
+
+
+//private void FindClosestTile(string[] tags)
+//{
+//    //Vector3 playerPosition = playerTransform.position;
+//    //Vector3 playerForward = playerTransform.forward; // Get the player's forward direction.
+
+//    //float closestDistance = float.MaxValue;
+//    //TileBase closestTile = null;
+
+//    //foreach (string tag in tags)
+//    //{
+//    //    GameObject[] tilemapObjects = GameObject.FindGameObjectsWithTag(tag);
+
+//    //    foreach (GameObject tilemapObject in tilemapObjects)
+//    //    {
+//    //        Tilemap tilemap = tilemapObject.GetComponent<Tilemap>();
+
+//    //        foreach (Vector3Int cellPosition in tilemap.cellBounds.allPositionsWithin)
+//    //        {
+//    //            TileBase tile = tilemap.GetTile(cellPosition);
+
+//    //            if (tile != null)
+//    //            {
+//    //                Vector3 tileCenter = tilemap.GetCellCenterWorld(cellPosition);
+//    //                float distance = Vector3.Distance(playerPosition, tileCenter);
+
+//    //                // Calculate the direction from the player to the tile.
+//    //                Vector3 tileDirection = (tileCenter - playerPosition).normalized;
+
+//    //                // Calculate the dot product between the player's forward direction and the tile direction.
+//    //                float dotProduct = Vector3.Dot(playerForward, tileDirection);
+
+//    //                // You can adjust the threshold for what is considered the "front" of the player.
+//    //                // A dot product close to 1 means the tile is in front of the player.
+//    //                float directionThreshold = 0.9f;
+
+//    //                if (distance < closestDistance && dotProduct > directionThreshold)
+//    //                {
+//    //                    closestDistance = distance;
+//    //                    closestTile = tile;
+//    //                }
+//    //            }
+//    //        }
+//    //    }
+//    //}
+
+//    //if (closestTile != null)
+//    //{
+//    //    Debug.Log("Closest Tile: " + closestTile.name);
+//    //}
+//    //else
+//    //{
+//    //    Debug.Log("No tiles found with the specified tags in the specified Tilemaps.");
+//    //}
+//}
 //Vector3 CalculatePath()
 //{
 //    Vector3 enemypos = transform.position;

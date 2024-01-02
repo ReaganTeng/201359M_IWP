@@ -8,22 +8,13 @@ using static Item;
 
 public class InventorySlot : MonoBehaviour
 {
-    //public Item CurrentItem { get; set; }
-
-
     public Item CurrentItem;
     public ItemType itemtype;
     public int Quantity;
-    // Assuming slot has an Image component
     public Image slotImage ;
     public TextMeshProUGUI quantityText;
 
-    void Awake()
-    {
-        //slotImage = gameObject.GetComponentInChildren<Image>();
-        //quantityText = GetComponentInChildren<TextMeshProUGUI>();
-    }
-
+   
 
     public InventorySlot()
     {
@@ -36,7 +27,6 @@ public class InventorySlot : MonoBehaviour
     {
         return itemtype == ItemType.NOTHING || Quantity == 0;
 
-        //return CurrentItem == null || Quantity == 0;
     }
 
     public bool IsStackable(Item item)
@@ -48,15 +38,19 @@ public class InventorySlot : MonoBehaviour
 
     public void AddItem(Item item, int amount)
     {
-        //slotImage = GetComponentInChildren<Image>().sprite;
-        //quantityText = GetComponentInChildren<TextMeshProUGUI>();
-
+        
         // Set the sprite of the Image component to the item's itemimage
         if (slotImage != null)
         {
+            Debug.Log($"Before sprite change: SLOT IMG IS {slotImage.sprite}");
+
             slotImage.sprite = item.itemImage.sprite;
             //sloticon.GetComponent<Image>().sprite = item.itemImage.sprite;
-            //Debug.Log($"SLOT IMG IS {item.itemImage.sprite}");
+            Debug.Log($"SLOT IMG IS {slotImage.sprite}");
+        }
+        else
+        {
+            Debug.Log("SLOT IMG IS NULL");
         }
 
         if (IsEmpty())
@@ -77,7 +71,7 @@ public class InventorySlot : MonoBehaviour
 
         if (Quantity > 1)
         {
-            quantityText.text = Quantity.ToString();
+            quantityText.text = $"{Quantity}";
         }
         Debug.Log($"ITEM ADDED");
     }

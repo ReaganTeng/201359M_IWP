@@ -20,20 +20,22 @@ public class CharacterAnimationClips
 {
     public CharacterUnlockManager.CharacterType characterType;
     public List<AnimationClip> animationClips;
+    public AnimatorController animcon;
 }
 
 public class Character : MonoBehaviour
 {
     public List<AudioClip> audioclips;
     public List<CharacterAnimationClips> characterAnimations = new List<CharacterAnimationClips>();
-    public AnimatorController animController;
+    //public AnimatorController animController;
 
 
     public GameObject projectilePrefab;
 
+    //public AnimatorController animcon;
 
     [HideInInspector]
-    public int currentAnimIdx;
+    public String currentAnimState;
     [HideInInspector]
     public Animator animatorComponent;
     [HideInInspector]
@@ -68,26 +70,17 @@ public class Character : MonoBehaviour
     //bool effectapplied = false;
     protected virtual void Awake()
     {
-        currentAnimIdx = 0;
+        //currentAnimState = ;
         disabled = false;
         //animatorComponent = GetComponent<Animator>();
         powerupNotificationPanel = GameObject.FindGameObjectWithTag("PowerUpNotification");
         powerUpCanvasGroup = powerupNotificationPanel.GetComponent<CanvasGroup>();
         powerUpCanvasGroup.alpha = 0;
         powerUpCanvasGroup.interactable = false;
-
-
         animatorComponent = GetComponent<Animator>();
-        //animatorComponent.runtimeAnimatorController = animController;
-        // Instantiate a new instance of the AnimatorController (RuntimeAnimatorController)
-        AnimatorController newController = Instantiate(animController);
-        if (newController != null)
-        {
-            // Assign the new controller to the animatorComponent
-            animatorComponent.runtimeAnimatorController = newController;
-        }
-        
 
+        // Instantiate a new instance of the AnimatorController (RuntimeAnimatorController)
+        
         audioSource = GetComponent<AudioSource>();
         speed = .1f;
         playerShield = GetComponentInChildren<Shield>();
@@ -102,50 +95,27 @@ public class Character : MonoBehaviour
     }
 
     //[ContextMenu("Change State Motion")]
-    public void PlayAnimation(CharacterUnlockManager.CharacterType characterType, int clipIDX)
+    public void PlayAnimation(string state)
     {
-        //GET THE CLIP YOU WANT TO PLAY
-        CharacterAnimationClips characterAnimationEntry =
-        characterAnimations.Find(entry => entry.characterType == characterType);
-        AnimationClip clipToPlay = characterAnimationEntry.animationClips[clipIDX];
-        //
-
-        if (characterAnimationEntry != null && animatorComponent != null)
-        {
-            // Check if animatorComponent has a valid runtimeAnimatorController
-            //if (animatorComponent.runtimeAnimatorController == null)
-            //{
-            //    Debug.LogError("AnimatorController is missing.");
-            //    return;
-            //}
-
-            // Get the Animator Controller
-            AnimatorController animatorCon = animatorComponent.runtimeAnimatorController as AnimatorController;
-            if (animatorCon != null)
-            {
-                // Get the existing state by name
-                AnimatorStateMachine stateMachine = animatorCon.layers[0].stateMachine;
-                AnimatorState state = null;
-
-                foreach (ChildAnimatorState childState in stateMachine.states)
-                {
-                    if (childState.state.name == "clip") // Replace with your actual state name
-                    {
-                        state = childState.state;
-                        // Assign the animation clip to the state's motion
-                        state.motion = clipToPlay;
-                        // Play the animation by setting the state
-                        Debug.Log($"STATE {state.name}");
-                        animatorComponent.Play(state.name); // Replace with your actual state name
-                        break;
-                    }
-                }
-            }
-
-        }
+        animatorComponent.Play(state);
     }
 
-
+    public void AssignClipToState(string stateName, AnimationClip clip)
+    {
+        AnimatorController animatorController = animatorComponent.runtimeAnimatorController as AnimatorController;
+        if (animatorController != null)
+        {
+            AnimatorControllerLayer layer = animatorController.layers[0]; // Assuming it's the base layer
+            AnimatorStateMachine stateMachine = layer.stateMachine;
+            // Find the state by name
+            AnimatorState state = stateMachine.states.FirstOrDefault(s => s.state.name == stateName).state;
+            if (state != null)
+            {
+                state.motion = clip;
+            }
+        }
+       
+    }
     protected virtual Vector3 FindPath(
         Vector2 targetPos, //THE TARGET THE OBJECT WILL FOLLOW 
         Vector2 followerPos //THE OBJECT WHO WILL FOLLOW THE TARGET
@@ -295,17 +265,17 @@ public class Character : MonoBehaviour
             return;
         }
 
-        if (Input.GetKey(KeyCode.Space))
-        {
-            if (activeEffects.Count <= 0)
-            {
-                //Debug.Log("EFFECT APPLIED");
-                ApplyEffect(EffectType.GHOST);
-            }
-        }
+        
 
-        PlayAnimation(characterType, currentAnimIdx);
+        EffectsUpdate();
+
         // Update and check duration for each active effect
+    }
+
+
+
+    void EffectsUpdate()
+    {
         for (int i = activeEffects.Count - 1; i >= 0; i--)
         {
             Effect effect = activeEffects[i];
@@ -335,17 +305,13 @@ public class Character : MonoBehaviour
     // Apply a new effect to the player
     public void ApplyEffect(EffectType type)
     {
-        // Check if the player already has the effect
+        // Check if the player already has the effect, ELSE ALLOW THE EFFECT
         if (!HasEffect(type))
         {
             Effect newEffect = CreateEffect(type);
             activeEffects.Add(newEffect);
             Debug.Log($"{type} effect applied.");
         }
-        //else
-        //{
-        //    Debug.Log($"Player already has {type} effect.");
-        //}
     }
 
 
@@ -399,53 +365,32 @@ public class Character : MonoBehaviour
                     }
                     powerupNotificationPanel.GetComponent<PowerUpNotificationUI>().powerupName.text 
                         = "ONE HIT";
-                    powerUpCanvasGroup.alpha = 1;
-                    powerUpCanvasGroup.interactable = true;
+                    powerupNotificationPanel.GetComponent<PowerUpNotificationUI>()
+                       .NotifyPowerUp(EffectType.ONE_HIT);
                     return new OneHitEffect(10f, 3, this);
                 }
             case EffectType.SPIRIT_FIRE:
                 {
-                    //if (ps != null)
-                    //{
-                    //    ParticleSystem.MainModule mainModule = ps.main;
-                    //    mainModule.startColor = Color.white;
-                    //    emissionModule.enabled = true;
-                    //    //Debug.Log("BEGIN BURN");
-                    //}
                     powerupNotificationPanel.GetComponent<PowerUpNotificationUI>().powerupName.text
                         = "SPIRIT FIRE";
-                    powerUpCanvasGroup.alpha = 1;
-                    powerUpCanvasGroup.interactable = true;
+                    powerupNotificationPanel.GetComponent<PowerUpNotificationUI>()
+                       .NotifyPowerUp(EffectType.SPIRIT_FIRE);
                     return new SpiritFireEffect(10f, this);
                 }
             case EffectType.GEM_WISDOM:
                 {
-                    //if (ps != null)
-                    //{
-                    //    ParticleSystem.MainModule mainModule = ps.main;
-                    //    mainModule.startColor = Color.white;
-                    //    emissionModule.enabled = true;
-                    //    //Debug.Log("BEGIN BURN");
-                    //}
                     powerupNotificationPanel.GetComponent<PowerUpNotificationUI>().powerupName.text
                         = "GEM_WISDON";
-                    powerUpCanvasGroup.alpha = 1;
-                    powerUpCanvasGroup.interactable = true;
+                    powerupNotificationPanel.GetComponent<PowerUpNotificationUI>()
+                        .NotifyPowerUp(EffectType.GEM_WISDOM);
                     return new GemWisdomEffect(10f, this);
                 }
             case EffectType.MINER_SENSE:
                 {
-                    //if (ps != null)
-                    //{
-                    //    ParticleSystem.MainModule mainModule = ps.main;
-                    //    mainModule.startColor = Color.white;
-                    //    emissionModule.enabled = true;
-                    //    //Debug.Log("BEGIN BURN");
-                    //}
                     powerupNotificationPanel.GetComponent<PowerUpNotificationUI>().powerupName.text
                         = "MINER SENSE";
-                    powerUpCanvasGroup.alpha = 1;
-                    powerUpCanvasGroup.interactable = true;
+                    powerupNotificationPanel.GetComponent<PowerUpNotificationUI>()
+                       .NotifyPowerUp(EffectType.MINER_SENSE);
                     return new MinerSenseEffect(10f);
                 }
             case EffectType.GHOST:
@@ -459,8 +404,8 @@ public class Character : MonoBehaviour
                     //}
                     powerupNotificationPanel.GetComponent<PowerUpNotificationUI>().powerupName.text
                         = "GHOST";
-                    powerUpCanvasGroup.alpha = 1;
-                    powerUpCanvasGroup.interactable = true;
+                    powerupNotificationPanel.GetComponent<PowerUpNotificationUI>()
+                        .NotifyPowerUp(EffectType.GHOST);
                     return new GhostEffect(10f);
                 }
             // Add more cases for additional effects

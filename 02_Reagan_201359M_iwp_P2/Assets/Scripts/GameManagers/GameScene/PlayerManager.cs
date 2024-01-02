@@ -2,8 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.EventSystems.EventTrigger;
 
 
 public class PlayerManager : MonoBehaviour
@@ -32,8 +34,13 @@ public class PlayerManager : MonoBehaviour
 
     public GameObject characterSwitchpanel;
 
+    //public AnimatorController animcon;
+
+
+
     bool stuckmode;
 
+    [HideInInspector]
     public Slider healthbar;
 
     [HideInInspector]
@@ -52,6 +59,7 @@ public class PlayerManager : MonoBehaviour
 
 
     float aiTimer;
+
 
     //bool effectapplied = false;
     void Awake()
@@ -84,6 +92,35 @@ public class PlayerManager : MonoBehaviour
             charScript.characterType = character;
             playerScript.characterType = character;
 
+
+            //GET THE CLIP YOU WANT TO PLAY
+            int idx = 0;
+            CharacterAnimationClips characterAnimationEntry =
+            playerScript.characterAnimations.Find(entry => entry.characterType == playerScript.characterType);
+            AnimationClip clipToPlay = characterAnimationEntry.animationClips[idx];
+            //
+            playerScript.AssignClipToState(playerScript.IDLE, clipToPlay);
+            idx++;
+            clipToPlay = characterAnimationEntry.animationClips[idx];
+            playerScript.AssignClipToState(playerScript.WALK_FRONT, clipToPlay);
+            idx++;
+            clipToPlay = characterAnimationEntry.animationClips[idx];
+            playerScript.AssignClipToState(playerScript.WALK_BACK, clipToPlay);
+            idx++;
+            clipToPlay = characterAnimationEntry.animationClips[idx];
+            playerScript.AssignClipToState(playerScript.WALK_LEFT, clipToPlay);
+            idx++;
+            clipToPlay = characterAnimationEntry.animationClips[idx];
+            playerScript.AssignClipToState(playerScript.WALK_RIGHT, clipToPlay);
+            idx++;
+            clipToPlay = characterAnimationEntry.animationClips[idx];
+            playerScript.AssignClipToState(playerScript.ATTACK, clipToPlay);
+            idx++;
+            clipToPlay = characterAnimationEntry.animationClips[idx];
+            playerScript.AssignClipToState(playerScript.HURT, clipToPlay);
+
+
+
             //Professor - weak in basic attacks but can deal higher damage with Gems
             //Veteran - weak in gem attacks but can absorb more damage and damage dealt
 
@@ -93,6 +130,45 @@ public class PlayerManager : MonoBehaviour
             // Get the index using Array.IndexOf
             //int index = Array.IndexOf(enumValues, character);
             //playerScript.spriteRenderer.sprite = playerSprites[index];
+
+            //METHOD 1
+            // Instantiate a new instance of the AnimatorController (RuntimeAnimatorController)
+            AnimatorController newController
+                = playerScript.characterAnimations.Find(entry 
+                => entry.characterType == playerScript.characterType).animcon;
+            if (newController != null)
+            {
+                // Assign the new controller to the animatorComponent
+                playerScript.animatorComponent.runtimeAnimatorController = newController;
+            }
+
+
+            //METHOD 2 - INSTANTIATE ANIMCONTROLLERS
+            //int index = selectedCharacters.IndexOf(character);
+            //Debug.Log($"CHARACTER CHOSEN {character}");
+            //AnimatorController newController
+            //= new AnimatorController();
+            //AnimatorController playercon = newController = playerScript.characterAnimations.Find(entry
+            //=> entry.characterType == playerScript.characterType).animcon;
+            //// Iterate through states in the source controller
+            //foreach (ChildAnimatorState state in playercon.layers[0].stateMachine.states)
+            //{
+            //    // Create a new state in the destination controller
+            //    ChildAnimatorState newState = new ChildAnimatorState
+            //    {
+            //        state = new AnimatorState { name = state.state.name }
+            //    };
+            //    newController.layers[0].stateMachine.AddState(state.state.name);
+            //}
+            //newController.name = $"PLAYER{index}";
+            //if (newController != null)
+            //{
+            //    // Assign the new controller to the animatorComponent
+            //    playerScript.animatorComponent.runtimeAnimatorController = newController;
+            //}
+            //
+
+
 
 
             switch (character)
@@ -116,6 +192,24 @@ public class PlayerManager : MonoBehaviour
                 default:
                     break;
             }
+
+            //Character script = p.GetComponent<Character>();
+            //if (playerScript.animatorComponent.runtimeAnimatorController == null)
+            //{
+            //    //AnimatorController newController
+            //    //    = Instantiate(script.characterAnimations.Find(entry
+            //    //    => entry.characterType == script.characterType).animcon)
+            //    AnimatorController newController
+            //    = Instantiate(animcon);
+            //    newController.name = $"PLAYER{selectedCharacters.IndexOf(character)}";
+            //    if (newController != null)
+            //    {
+            //        // Assign the new controller to the animatorComponent
+            //        playerScript.animatorComponent.runtimeAnimatorController = newController;
+            //    }
+            //    //return;
+            //}
+
 
             players.Add(p);
             Debug.Log("PLAYER ADDED");
@@ -168,7 +262,7 @@ public class PlayerManager : MonoBehaviour
 
         aiTimer += 1 * Time.deltaTime;
 
-        if(aiTimer > 1.0)
+        if(aiTimer > 5.0)
         { 
             for(int i = 0; i < players.Count;i++)
             {

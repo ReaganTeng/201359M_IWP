@@ -11,6 +11,7 @@ using static UnityEngine.RuleTile.TilingRuleOutput;
 // Base class for player effects
 public abstract class Effect
 {
+    public string name { get; protected set; }
     public EffectType Type { get; protected set; }
     public float Duration { get; protected set; }
     public bool IsExpired { get; protected set; }
@@ -38,6 +39,7 @@ public class PoisonEffect : Effect
 
     public PoisonEffect(float duration, float interval, float slowFactor, Character targetCharacter)
     {
+        name = "POISON";
         intervalTimer = 0;
         Type = EffectType.POISON;
         Duration = duration;
@@ -82,6 +84,7 @@ public class ShieldEffect : Effect
 {
     public ShieldEffect(float duration, Character targetCharacter)
     {
+        name = "SHIELD";
         Type = EffectType.SHIELD;
         Duration = duration;
         TargetCharacter = targetCharacter;
@@ -105,6 +108,7 @@ public class BurnEffect : Effect
 
     public BurnEffect(float duration, float interval, Character targetCharacter)
     {
+        name = "BURNING";
         intervalTimer = 0;
         Type = EffectType.BURN;
         Duration = duration;
@@ -148,6 +152,7 @@ public class OneHitEffect : Effect
 
     public OneHitEffect(float duration, int meleeDamageIncrease, Character targetCharacter)
     {
+        name = "POWER UP: ONE HIT";
         Type = EffectType.ONE_HIT;
         Duration = duration;
         this.meleeDamageIncrease = meleeDamageIncrease;
@@ -185,6 +190,7 @@ public class SpiritFireEffect : Effect
     bool projectileshot;
     public SpiritFireEffect(float duration, Character targetCharacter)
     {
+        name = "POWER UP: SPIRIT FIRE";
         projectileshot = false;
         //Type = effectType;
         Duration = duration;
@@ -268,6 +274,7 @@ public class GemWisdomEffect : Effect
 
     public GemWisdomEffect(float duration, Character targetCharacter)
     {
+        name = "POWER UP: GEM WISDOM";
         //projectileshot =false;
         Type = EffectType.GEM_WISDOM;
         Duration = duration;
@@ -341,6 +348,7 @@ public class MinerSenseEffect : Effect
 
     public MinerSenseEffect(float duration)
     {
+        name = "POWER UP: MINER SENSE";
         Type = EffectType.MINER_SENSE;
         Duration = duration;
         //TargetCharacter = targetCharacter;
@@ -393,6 +401,7 @@ public class GhostEffect : Effect
 
     public GhostEffect(float duration)
     {
+        name = "POWER UP: GHOST";
         Type = EffectType.GHOST;
         Duration = duration;
         //this.collidersToDisable = collidersToDisable;

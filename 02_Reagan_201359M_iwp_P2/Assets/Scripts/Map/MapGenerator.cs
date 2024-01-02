@@ -1345,7 +1345,7 @@ public class MapGenerator : MonoBehaviour
 
         // Yield after processing the current frame
         //yield return null;
-        if (attemptTimer >= 10)
+        if (attemptTimer >= 1)
         {
             int no = PathsImplemented;
             for (int i = 0; i < no - 1; i++)
@@ -1361,7 +1361,7 @@ public class MapGenerator : MonoBehaviour
 
             //if (PathsImplemented == PathsImplementedChecker)
         {
-            attemptTimer += 5
+            attemptTimer += 1
             * Time.deltaTime;
             Debug.Log($"ATTEMPS {attemptTimer} {PathsImplementedChecker} {PathsImplemented}");
         }
