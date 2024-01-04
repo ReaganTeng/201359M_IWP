@@ -14,12 +14,12 @@ public class TutorialTrigger : MonoBehaviour
     public List<Dialogue> tutorialDialogues;
 
     [HideInInspector]
-    public GameObject DM;
+    public DialogueManager DM;
 
     public void Awake()
     {
         //base.Awake();
-        DM = GameObject.FindGameObjectWithTag("GameMGT");
+        DM = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<DialogueManager>();
 
         foreach (Dialogue dialogue in tutorialDialogues)
         {
@@ -39,7 +39,7 @@ public class TutorialTrigger : MonoBehaviour
     {
         if (!boolToSet)
         {
-            DM.GetComponent<DialogueManager>().StartDialogue(d);
+            DM.StartDialogue(d);
             boolToSet = !boolToSet;
         }
     }

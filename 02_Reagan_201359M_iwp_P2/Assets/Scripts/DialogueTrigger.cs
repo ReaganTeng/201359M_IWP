@@ -7,18 +7,19 @@ public class DialogueTrigger : Interactables
     public Dialogue dialogue;
 
     [HideInInspector]
-    public GameObject DM;
+    public DialogueManager DM;
 
     public override void Awake()
     {
         base.Awake();
-        DM = GameObject.FindGameObjectWithTag("GameMGT");
+        DM = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<DialogueManager>();
         dialogue.Initialize();
     }
 
     public override void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E) && textPrompt.enabled)
+        if (Input.GetKeyDown(KeyCode.E) 
+            && textPrompt.enabled)
         {
             TriggerDialogue();
         }
@@ -26,7 +27,7 @@ public class DialogueTrigger : Interactables
 
     void TriggerDialogue()
     {
-        DM.GetComponent<DialogueManager>().StartDialogue(dialogue);
+        DM.StartDialogue(dialogue);
     }
 
     public override void OnTriggerEnter2D(Collider2D other)

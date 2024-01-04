@@ -28,6 +28,8 @@ TagManager:
   - LoadingScreen
   - PowerUpNotification
   - ActiveEffectsText
+  - PlayerIcon
+  - GamePlayPanel
   layers:
   - Default
   - TransparentFX

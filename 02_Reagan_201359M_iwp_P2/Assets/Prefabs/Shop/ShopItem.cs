@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static Dialogue;
-
+using System;
 public class ShopItem : MonoBehaviour
 {
     //public enum ItemName
@@ -17,7 +17,7 @@ public class ShopItem : MonoBehaviour
     //}
 
 
-    [System.Serializable]
+    [Serializable]
 
     public class ShopItemData
     {

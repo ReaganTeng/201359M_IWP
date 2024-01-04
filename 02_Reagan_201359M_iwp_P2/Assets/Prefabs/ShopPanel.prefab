@@ -143,9 +143,9 @@ MonoBehaviour:
   m_Padding:
     m_Left: 0
     m_Right: 0
-    m_Top: 0
+    m_Top: 50
     m_Bottom: 0
-  m_ChildAlignment: 4
+  m_ChildAlignment: 1
   m_StartCorner: 0
   m_StartAxis: 0
   m_CellSize: {x: 500, y: 500}
@@ -456,6 +456,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterUnlockManager: {fileID: 11400000, guid: 67ac816dda729884db1896dbec5cab46, type: 2}
   inventoryHubWorldManager: {fileID: 0}
+  inventoryManager: {fileID: 0}
   shopItems:
   - shopItem: 0
     itemName: SPEED
@@ -605,7 +606,7 @@ CanvasGroup:
   m_Enabled: 1
   m_Alpha: 1
   m_Interactable: 1
-  m_BlocksRaycasts: 0
+  m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
 --- !u!1 &4892879471213135000
 GameObject:

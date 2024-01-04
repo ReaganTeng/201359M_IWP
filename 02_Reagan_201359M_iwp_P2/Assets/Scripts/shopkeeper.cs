@@ -4,72 +4,33 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class shopkeeper : MonoBehaviour
+public class shopkeeper : Interactables
 {
-    GameObject shopPanel;
-    TextMeshProUGUI textprompt;
 
-    bool buttonpressed;
+    [HideInInspector]
+    public HubWorldMenuManager hubWorldMenuManager;
 
-    void Awake()
+    public override void Awake()
     {
-        buttonpressed = false;
-        textprompt = GetComponentInChildren<TextMeshProUGUI>();
-        shopPanel = GameObject.FindGameObjectWithTag("ShopPanel");
-        //shopPanel.GetComponent<Shop>().DisplayItems();
+        base.Awake();
 
-        //shopPanel.GetComponent<Shop>().itemContainer = shopPanel.gameObject.GetComponent<Transform>();
-
-        //if (shopPanel.activeSelf)
-        if (shopPanel.GetComponent<CanvasGroup>().interactable)
-        {
-            shopPanel.GetComponent<CanvasGroup>().interactable = false;
-            shopPanel.GetComponent<CanvasGroup>().alpha = 0;
-            //shopPanel.SetActive(!shopPanel.activeSelf);
-        }
-        textprompt.enabled = false;
+        hubWorldMenuManager = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<HubWorldMenuManager>();
     }
 
 
 
-    private void Update()
+    public override void Update()
     {
-        //if (Input.GetKeyDown(KeyCode.E) && textprompt.enabled
-        //    && !buttonpressed)
-        //{
-        //    shopPanel.SetActive(!shopPanel.activeSelf);
-        //    Debug.Log("SHOP TOGGLED");
-        //}
-
-        //if (Input.GetKeyDown(KeyCode.E))
-        //{
-        //    buttonpressed = true;
-        //}
-        //else
-        //{
-        //    buttonpressed = false;
-        //}
-
-    }
-
-   
-
-
-    void OnTriggerEnter2D(Collider2D collision)
-    {
-        if(collision.gameObject.CompareTag("Player"))
-        {
-            textprompt.enabled = true;
-        }
         
+        base.Update();
+    }
+    public override void OnTriggerEnter2D(Collider2D other)
+    {
+        base.OnTriggerEnter2D(other);
     }
 
-
-    void OnTriggerExit2D(Collider2D collision)
+    public override void OnTriggerExit2D(Collider2D other)
     {
-        if (collision.gameObject.CompareTag("Player"))
-        {
-            textprompt.enabled = false;
-        }
+        base.OnTriggerExit2D(other);
     }
 }

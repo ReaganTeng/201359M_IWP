@@ -31,7 +31,7 @@ public class CharacterSwitch : MonoBehaviour
         //THE ICONS IN BUTTONLIST MUST BE THE SAME AS PLAYER ICON
         for(int i = 0; i < buttonlist.Count; i++)
         {
-            buttonlist[i].image = playermanager.players[i].GetComponent<Player>().icon;
+            //buttonlist[i].image = playermanager.players[i].GetComponent<Player>().icon;
         }
 
     }

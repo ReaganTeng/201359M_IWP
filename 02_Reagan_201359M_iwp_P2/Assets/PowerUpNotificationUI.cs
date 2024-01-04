@@ -15,9 +15,7 @@ public class PowerUpNotificationUI : MonoBehaviour
 
     public List<Sprite> powerupSprites;
 
-
     CanvasGroup powerUpCanvasGroup;
-
 
     [HideInInspector]
     public Dictionary<EffectType, Action> itemActions = new Dictionary<EffectType, Action>();
@@ -82,6 +80,7 @@ public class PowerUpNotificationUI : MonoBehaviour
 
         powerUpCanvasGroup.alpha = 1;
         powerUpCanvasGroup.interactable = true;
+        powerUpCanvasGroup.blocksRaycasts = true;
     }
 
 
@@ -90,5 +89,6 @@ public class PowerUpNotificationUI : MonoBehaviour
 
         powerUpCanvasGroup.alpha = 0;
         powerUpCanvasGroup.interactable = false;
+        powerUpCanvasGroup.blocksRaycasts = false;
     }
 }
