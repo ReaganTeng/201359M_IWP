@@ -60,9 +60,9 @@ MonoBehaviour:
   - tutType: 5
     dialogue: {fileID: 351672321074108312, guid: b073b6c59b1c0b7429a1d1c4d7e4e2a9, type: 3}
   - tutType: 6
-    dialogue: {fileID: 0}
+    dialogue: {fileID: 351672321074108312, guid: 5d4dc438bcecf604e99fcab467483ab1, type: 3}
   - tutType: 7
-    dialogue: {fileID: 0}
+    dialogue: {fileID: 351672321074108312, guid: 2b5e2eaaf5e299542903f0347d7c3f99, type: 3}
   DM: {fileID: 0}
 --- !u!61 &5235253364783226233
 BoxCollider2D:

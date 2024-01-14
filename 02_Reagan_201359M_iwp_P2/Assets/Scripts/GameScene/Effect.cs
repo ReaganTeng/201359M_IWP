@@ -507,7 +507,7 @@ public class GhostEffect : Effect
                 if (!IsPositionValid(p.transform.position))
                 {
                     //Debug.Log("DEDUCTING HEALTH");
-                    p.health -= p.health;
+                    p.health = -100;
                     //allPlayersValid = false;
                 }
             }
@@ -535,7 +535,7 @@ public class GhostEffect : Effect
     //if the player is stuck in wall
     public bool IsPositionValid(Vector2 position)
     {
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(position, .3f, LayerMask.GetMask("WallTilemap"));
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(position, .6f, LayerMask.GetMask("WallTilemap"));
         //Debug.Log($"LENGTH IS {colliders.Length}");
         if (colliders.Length > 0)
         {

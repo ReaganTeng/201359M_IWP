@@ -14,6 +14,8 @@ public class Inventory : MonoBehaviour
     public TextMeshProUGUI moneyearned;
     public Upgrades upgrades;
 
+    public GameObject inventoryPanelContent;
+
     [HideInInspector]
     public List<InventorySlot> slots;
 
@@ -21,16 +23,20 @@ public class Inventory : MonoBehaviour
 
     public int selectedSlot;
 
-    public GameObject slotPrefab;
+    //public GameObject slotPrefab;
     public GameObject inventoryPanel;
 
     Vector2 normalSlotScale;
     Vector2 largeSlotScale;
 
+
+    InventorySlot[] slotsincontent;
+
     //int slotScale;
     //Inventory playerInventory;
     void Awake()
     {
+        slotsincontent = inventoryPanelContent.GetComponentsInChildren<InventorySlot>();
         normalSlotScale = new Vector2(1, 1);
         largeSlotScale = new Vector2(2, 2);
 
@@ -38,27 +44,36 @@ public class Inventory : MonoBehaviour
         //itempicked.SetItem(ItemType.RED_GEM, 5);
         //AddItem(itempicked, 18);
         selectedSlot = 0;
-        InstantiateInventorySlots();
+        InitialiseInventorySlots();
         //SelectSlot(0);
     }
 
    
 
 
-    void InstantiateInventorySlots()
+    void InitialiseInventorySlots()
     {
-        //FOR TEMPORARY TESTING
-        foreach (SlotProperties slot in upgrades.slotProperty)
+        //FOR TEMPORARY TESTING, EMPTIES ALL THE SLOTS
+        //foreach (SlotProperties slot in upgrades.slotProperty)
+        //{
+        //    upgrades.emptySlotProperty(slot);
+        //}
+
+        //float totalWidth = 0;
+
+        InventorySlot[] slotsincontent = inventoryPanelContent.GetComponentsInChildren<InventorySlot>(); 
+
+        foreach(InventorySlot slot in slotsincontent)
         {
-            upgrades.emptySlotProperty(slot);
+            slot.gameObject.SetActive(false);
         }
 
-        float totalWidth = 0;
-
-       for (int i = 0; i < upgrades.slotProperty.Count; i++)
+        for (int i = 0; i < upgrades.slotProperty.Count; i++)
         {
-            GameObject slot = Instantiate(slotPrefab, inventoryPanel.GetComponent<RectTransform>());
-            InventorySlot inventorySlotComponent = slot.GetComponent<InventorySlot>();
+            InventorySlot currentslot = slotsincontent[i];
+            currentslot.gameObject.SetActive(true);
+
+            InventorySlot inventorySlotComponent = currentslot.GetComponent<InventorySlot>();
 
             SlotProperties slot2Transfer = upgrades.slotProperty[i];
             inventorySlotComponent.CurrentItem = slot2Transfer.currentitem;
@@ -82,23 +97,23 @@ public class Inventory : MonoBehaviour
                 inventorySlotComponent.slotImage.color = color;
             }
 
-            //Debug.Log("InventorySlotCom")
+            ////Debug.Log("InventorySlotCom")
             slots.Add(inventorySlotComponent);
 
-            // Adjust the position of the instantiated slot
-            RectTransform slotRect = slot.GetComponent<RectTransform>();
-            slotRect.anchoredPosition = new Vector2(totalWidth, 0);
-            totalWidth += slotRect.rect.width + 10;
-            // Adjust the spacing (10 in this case)
-            foreach (InventorySlot s in slots)
-            {
-                RectTransform stRect = s.GetComponent<RectTransform>();
-                stRect.anchoredPosition =
-                    new Vector2(
-                        stRect.anchoredPosition.x - (slotRect.rect.width * .85f),
-                        stRect.anchoredPosition.y);
-            }
-            // Customize or initialize your slot here if needed
+            //// Adjust the position of the instantiated slot
+            //RectTransform slotRect = slot.GetComponent<RectTransform>();
+            //slotRect.anchoredPosition = new Vector2(totalWidth, 0);
+            //totalWidth += slotRect.rect.width + 10;
+            //// Adjust the spacing (10 in this case)
+            //foreach (InventorySlot s in slots)
+            //{
+            //    RectTransform stRect = s.GetComponent<RectTransform>();
+            //    stRect.anchoredPosition =
+            //        new Vector2(
+            //            stRect.anchoredPosition.x - (slotRect.rect.width * .85f),
+            //            stRect.anchoredPosition.y);
+            //}
+            //// Customize or initialize your slot here if needed
         }
     }
 
@@ -248,6 +263,43 @@ public class Inventory : MonoBehaviour
             slots[selectedSlot].GetComponent<RectTransform>().localScale = largeSlotScale;
         }
         
+    }
+
+
+    public void NewSlotBought()
+    {
+        for (int i = 0; i < upgrades.slotProperty.Count; i++)
+        {
+            InventorySlot currentslot = slotsincontent[i];
+            currentslot.gameObject.SetActive(true);
+            InventorySlot inventorySlotComponent = currentslot.GetComponent<InventorySlot>();
+            SlotProperties slot2Transfer = upgrades.slotProperty[i];
+            inventorySlotComponent.CurrentItem = slot2Transfer.currentitem;
+            inventorySlotComponent.Quantity = slot2Transfer.Quantity;
+            inventorySlotComponent.itemtype = slot2Transfer.itemtype;
+            inventorySlotComponent.quantityText.text = slot2Transfer.quantitytext;
+            inventorySlotComponent.slotImage.sprite = slot2Transfer.iconsprite;
+
+            if (!inventorySlotComponent.IsEmpty()
+                && inventorySlotComponent.slotImage != null)
+            {
+                Color color = inventorySlotComponent.slotImage.color;
+                color.a = 1.0f;
+                inventorySlotComponent.slotImage.color = color;
+                //sloticon.GetComponent<Image>().sprite = item.itemImage.sprite;
+            }
+            else
+            {
+                Color color = inventorySlotComponent.slotImage.color;
+                color.a = 0.0f;
+                inventorySlotComponent.slotImage.color = color;
+            }
+
+            if (i == upgrades.slotProperty.Count - 1)
+            {
+                slots.Add(inventorySlotComponent);
+            }
+        }
     }
 
 

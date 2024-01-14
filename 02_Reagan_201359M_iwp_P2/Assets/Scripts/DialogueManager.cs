@@ -111,15 +111,18 @@ public class DialogueManager : MonoBehaviour
             && dialoguePanelCG.alpha == 1
             && dialoguePanelCG.blocksRaycasts)
         {
-            if (EventSystem.current.IsPointerOverGameObject())
-            {
-                GameObject clickedObject = EventSystem.current.currentSelectedGameObject;
 
-                if (clickedObject != null && clickedObject.GetComponent<Button>() != null)
-                {
-                    // The mouse is over a UI button, so we don't want to process game logic.
+            Button buttonComponent = dialoguePanel.GetComponentInChildren<Button>();
+
+            // if there is choice button, then we don't want to process game logic. user must click the option to continue
+            if (buttonComponent != null)
+            {
+                //GameObject clickedObject = EventSystem.current.currentSelectedGameObject;
+
+                //if (clickedObject != null && clickedObject.GetComponent<Button>() != null)
+                //{
                     return;
-                }
+                //}
             }
 
             if (!isTyping)
@@ -167,6 +170,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
+    //DISPLAY OPTION BUTTONS
     void DisplayOptions()
     {
         // Get the current sentence
@@ -175,7 +179,7 @@ public class DialogueManager : MonoBehaviour
         // Create buttons for each option
         for (int i = 0; i < currentSentence.options.Count; i++)
         {
-            Debug.Log("OPTION");
+            //Debug.Log("OPTION");
             DialogueRealTime.DialogueOption option = currentSentence.options[i];
             // Create a new button
             GameObject buttonGO = new GameObject("OptionButton" + i);

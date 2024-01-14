@@ -55,11 +55,14 @@ public class HubWorldMenuManager : MonoBehaviour
             HelpPanel.SetActive(true);
         }
 
+
+        //PlayerPrefs.SetFloat("GrossMoney", 0);
+
         StoryPanel = GameObject.FindGameObjectWithTag("StoryScreen");
 
         if (!PlayerPrefs.HasKey("GrossMoney"))
         {
-            PlayerPrefs.SetFloat("GrossMoney", 100000);
+            PlayerPrefs.SetFloat("GrossMoney", 0);
         }
         if (!PlayerPrefs.HasKey("MoneyEarned"))
         {
@@ -124,7 +127,7 @@ public class HubWorldMenuManager : MonoBehaviour
     {
         if (PlayerPrefs.HasKey("GrossMoney"))
         {
-            PlayerPrefs.SetFloat("GrossMoney", 100000);
+            PlayerPrefs.SetFloat("GrossMoney", 0);
         }
         if (PlayerPrefs.HasKey("DaysLeft"))
         {

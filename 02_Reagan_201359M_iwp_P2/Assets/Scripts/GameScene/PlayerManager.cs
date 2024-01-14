@@ -255,7 +255,7 @@ public class PlayerManager : MonoBehaviour
         bool allDead = players.All(p => p.GetComponent<Player>().health <= 0);
         if (allDead)
         {
-            gameOverPanel.SetActive(true);
+            MM.togglePanel(gameOverPanel);
         }
 
         //if (gameOverPanel.activeSelf)

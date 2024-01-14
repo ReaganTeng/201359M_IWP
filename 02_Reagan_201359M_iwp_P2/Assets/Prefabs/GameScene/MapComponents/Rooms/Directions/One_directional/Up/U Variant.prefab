@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 474319851518710450, guid: 18593062575534a4899e9c61ba14acce, type: 3}
       propertyPath: m_Name
-      value: U
+      value: U Variant
       objectReference: {fileID: 0}
     - target: {fileID: 6774382589540425943, guid: 18593062575534a4899e9c61ba14acce, type: 3}
       propertyPath: m_RootOrder

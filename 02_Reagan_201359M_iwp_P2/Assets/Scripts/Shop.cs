@@ -37,9 +37,10 @@ public class Shop : MonoBehaviour
     public AudioClip chaChingClip;
 
     [HideInInspector] public AudioSource AS;
-
+    int slotlimit;
     void Awake()
     {
+        slotlimit = 10;
         canvasGroup = GetComponent<CanvasGroup>();
         DisplayItems();
         AS = GetComponent<AudioSource>();
@@ -114,7 +115,7 @@ public class Shop : MonoBehaviour
                 (
                     (item.shopItem == ShopItemData.ShopItem.HEALTH_UPGRADE && upgradesScriptableObject.HealthBuff < 60) ||
                     (item.shopItem == ShopItemData.ShopItem.DAMAGE_UPGRADE && upgradesScriptableObject.DamageBuff < 60) ||
-                    (item.shopItem == ShopItemData.ShopItem.INVENTORY_UPGRADE && upgradesScriptableObject.slotProperty.Count < 9) ||
+                    (item.shopItem == ShopItemData.ShopItem.INVENTORY_UPGRADE && upgradesScriptableObject.slotProperty.Count < slotlimit) ||
                     (item.shopItem == ShopItemData.ShopItem.VETERAN_CHARACTER && !characterUnlockManager.unlockedCharacters.Contains(CharacterUnlockManager.CharacterType.VETERAN)) ||
                     (item.shopItem == ShopItemData.ShopItem.PROFESSOR_CHARACTER && !characterUnlockManager.unlockedCharacters.Contains(CharacterUnlockManager.CharacterType.PROFESSOR))
                 )
@@ -219,6 +220,7 @@ public class Shop : MonoBehaviour
                     //INDICATE OUT OF STOCK
                     if (upgradesScriptableObject.HealthBuff >= 60)
                     {
+                        shopItems.Remove(item);
                         CanvasGroup cg = itemGO.GetComponent<CanvasGroup>();
                         cg.interactable = false;
                         cg.alpha = .2f;
@@ -235,6 +237,7 @@ public class Shop : MonoBehaviour
 
                     if (upgradesScriptableObject.DamageBuff >= 60)
                     {
+                        shopItems.Remove(item);
                         CanvasGroup cg = itemGO.GetComponent<CanvasGroup>();
                         cg.interactable = false;
                         cg.alpha = .2f;
@@ -243,18 +246,31 @@ public class Shop : MonoBehaviour
                 }
             case ShopItemData.ShopItem.INVENTORY_UPGRADE:
                 {
-                    if (upgradesScriptableObject.slotProperty.Count < 9)
+                    if (upgradesScriptableObject.slotProperty.Count < slotlimit)
                     {
-                        upgradesScriptableObject.slotProperty.Add(new Upgrades.SlotProperties());
+                        Upgrades.SlotProperties sp = new Upgrades.SlotProperties();
+                        sp.itemtype = ItemType.NOTHING;
+
+                        upgradesScriptableObject.slotProperty.Add(sp);
+                        inventoryManager.NewSlotBought();
+
                         DeductPrice(item);
+                    }
+
+                    if(upgradesScriptableObject.slotProperty.Count >= slotlimit)
+                    {
+                        shopItems.Remove(item);
+                        CanvasGroup cg = itemGO.GetComponent<CanvasGroup>();
+                        cg.interactable = false;
+                        cg.alpha = .2f;
                     }
                     break;
                 }
             case ShopItemData.ShopItem.PROFESSOR_CHARACTER:
                 {
                     characterUnlockManager.UnlockCharacter(CharacterUnlockManager.CharacterType.PROFESSOR);
-                    shopItems.Remove(item);
                     DeductPrice(item);
+                    shopItems.Remove(item);
                     CanvasGroup cg = itemGO.GetComponent<CanvasGroup>();
                     cg.interactable = false;
                     cg.alpha = .2f;
