@@ -8,15 +8,13 @@ public class ShopItemUI : MonoBehaviour
 {
     public Image ItemImage;
     public TextMeshProUGUI ItemName;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public TextMeshProUGUI ItemPrice;
+
+    public Button buyButton;
+
+    public Button desButton;
+
+    // Start is called before the first frame update
+
 }

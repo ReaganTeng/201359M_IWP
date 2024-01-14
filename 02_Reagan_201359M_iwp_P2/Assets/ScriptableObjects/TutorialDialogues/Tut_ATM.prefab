@@ -1,0 +1,104 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &4654538712159170953
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2889409250005809744, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2889409250005809744, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2889409250005809744, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2889409250005809744, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2889409250005809744, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2889409250005809744, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2889409250005809744, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2889409250005809744, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2889409250005809744, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2889409250005809744, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2889409250005809744, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4934074169046902289, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
+      propertyPath: sentences.Array.size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4934074169046902289, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
+      propertyPath: sentences.Array.data[0].text
+      value: This is a ATM
+      objectReference: {fileID: 0}
+    - target: {fileID: 4934074169046902289, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
+      propertyPath: sentences.Array.data[1].text
+      value: Just enter the amount you currently have and transfer the money to The
+        Company
+      objectReference: {fileID: 0}
+    - target: {fileID: 4934074169046902289, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
+      propertyPath: sentences.Array.data[2].text
+      value: Although you might need to save some money for yourself
+      objectReference: {fileID: 0}
+    - target: {fileID: 4934074169046902289, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
+      propertyPath: sentences.Array.data[3].text
+      value: Make sure you donated the goal before reaching 100 days are reached
+      objectReference: {fileID: 0}
+    - target: {fileID: 4934074169046902289, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
+      propertyPath: sentences.Array.data[4].text
+      value: Use the DAY TRACKER to track how many days you have left
+      objectReference: {fileID: 0}
+    - target: {fileID: 4934074169046902289, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
+      propertyPath: sentences.Array.data[5].text
+      value: And we need to make 100000 MINE$ within that time
+      objectReference: {fileID: 0}
+    - target: {fileID: 4934074169046902289, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
+      propertyPath: sentences.Array.data[6].text
+      value: I'll be lucky to even make 100 MINE$ with these old legs of mine
+      objectReference: {fileID: 0}
+    - target: {fileID: 4934074169046902289, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
+      propertyPath: sentences.Array.data[7].text
+      value: Oh well, anytime if you're ready, enter the CAVE just behind you
+      objectReference: {fileID: 0}
+    - target: {fileID: 4934074169046902289, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
+      propertyPath: sentences.Array.data[8].text
+      value: Just be careful, there are monsters down there
+      objectReference: {fileID: 0}
+    - target: {fileID: 7477714005744658407, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
+      propertyPath: m_Name
+      value: Tut_ATM
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}

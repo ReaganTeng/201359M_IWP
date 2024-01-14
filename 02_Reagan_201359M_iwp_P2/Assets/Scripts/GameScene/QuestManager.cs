@@ -2,11 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 using static ShopItem;
-using System.Linq;
-using static UnityEditor.Progress;
-using UnityEditor.PackageManager.Requests;
 
 public class QuestManager : MonoBehaviour
 {
@@ -17,23 +15,30 @@ public class QuestManager : MonoBehaviour
 
     public GameObject questUIContent;
     public GameObject questPrefab;
+
+    [HideInInspector]
     public List<Quest> quests = new List<Quest>();
 
-    public TextMeshProUGUI questText;
 
     [HideInInspector]
     public AudioSource AS;
     public AudioClip newQuestClip, questCompletedClip;
-    
 
+
+    public Image newQuestNotification;
+    public Image questUpdatedNotification;
 
     void Awake()
     {
-        questText.text = "";
+        //questText.text = "";
         //InitializeQuests();
         AS = GetComponent<AudioSource>();
         menuManager = GetComponent<MenuManager>();
         questPanel = menuManager.QuestPanel;
+
+        newQuestNotification.enabled = false;
+        questUpdatedNotification.enabled = false;
+
     }
 
     public void InitializeQuests()
@@ -62,16 +67,12 @@ public class QuestManager : MonoBehaviour
         };
         Debug.Log("QUEST ADDED");
         quests.Add(newQuest);
-        //if(menuManager == null)
-        //{
-        //    menuManager = GetComponent<MenuManager>();
-        //}
-        //menuManager.ToggleQuestPanel();
+        
         GameObject itemObject = Instantiate(questPrefab, questUIContent.transform);
         itemObject.GetComponent<QuestUI>().UpdateUI(newQuest);
-        //menuManager.newQuestNot.SetActive(true);
-        //menuManager.questCompletedNot.SetActive(false);
-        //menuManager.ToggleQuestPanel();
+
+        newQuestNotification.enabled = true;
+        questUpdatedNotification.enabled = false;
 
         AS.clip = newQuestClip;
         AS.Play();
@@ -85,11 +86,12 @@ public class QuestManager : MonoBehaviour
     }
 
     //UPDATE WHENEVER PLAYER PERFORMS CERTAIN SPECIFIC ACTIONS
-    public void UpdateQuestProgress(string questName)
+    public void UpdateQuestProgress(QuestType questtype)
     {
         //questText.text = "Completed";
-        List<Quest> matchingQuests = quests.FindAll(q => q.hiddenVariables.questName == questName);
-
+        //FIND ALL THE MATCHING QUESTS WITH THE SAME NAME
+        List<Quest> matchingQuests = quests.FindAll(q => q.hiddenVariables.questType == questtype);
+        Debug.Log($"MATCHING QUESTS {matchingQuests.Count}");
         foreach (Quest quest in matchingQuests)
         {
             if (quest != null && !quest.hiddenVariables.isCompleted)
@@ -120,6 +122,9 @@ public class QuestManager : MonoBehaviour
             //questText.text = "Completed";
             //menuManager.newQuestNot.SetActive(false);
             //menuManager.questCompletedNot.SetActive(true);
+
+            newQuestNotification.enabled = false;
+            questUpdatedNotification.enabled = true;
 
             AS.clip = questCompletedClip;
             AS.Play();

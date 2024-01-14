@@ -10,7 +10,6 @@ public class Interactables : MonoBehaviour
     [HideInInspector]
     public TextMeshProUGUI textPrompt;
 
-    // Start is called before the first frame update
     public virtual void Awake()
     {
         sr = GetComponent<SpriteRenderer>();
@@ -24,20 +23,25 @@ public class Interactables : MonoBehaviour
         
     }
 
-
     public virtual void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            textPrompt.enabled = true;
+            //textPrompt.enabled = true;
         }
+    }
+
+
+    public virtual void Interact()
+    {
+
     }
 
     public virtual void OnTriggerExit2D(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            textPrompt.enabled = false;
+            //textPrompt.enabled = false;
         }
     }
 }

@@ -92,9 +92,15 @@ public class Enemy : Character
 
     EnemyManager enemymgt;
 
+    //CHECK IF QUEST HAS PROGRESSED
+    bool checker;
+    
     protected override void Awake()
     {
         base.Awake();
+
+        checker = false;
+
         questManager = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<QuestManager>();
         attackcooldown = 0;
         enemyrb = GetComponent<Rigidbody2D>();
@@ -363,6 +369,8 @@ public class Enemy : Character
 
     }
 
+
+
     public void Die()
     {
         //0 _ IDLE
@@ -371,17 +379,19 @@ public class Enemy : Character
         //3 _ run
         //4 _ death
         //5 - hurt
+
+        enemyrb.velocity = new Vector3(0, 0, 0);
         if (!animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(DEATH))
         {
             Debug.Log("SWITCH TO DEATH ANIATION");
             currentAnimState = DEATH;
             animatorComponent.Play(DEATH, 0, 0);
-            questManager.UpdateQuestProgress("Killing Monster");
         }
+
         //currentAnimIdx = 4;
         //DYING ANIMATION
         if (animatorComponent.GetCurrentAnimatorStateInfo(0).IsName(DEATH)
-            && animatorComponent.GetCurrentAnimatorStateInfo(0).normalizedTime > 1.0f)
+            && animatorComponent.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f)
         {//drop 10 random gems
             for (int i = 0; i < 10; i++)
             {
@@ -396,9 +406,18 @@ public class Enemy : Character
             Destroy(gameObject);
         }
 
+        if(!checker)
+        {
+            questManager.UpdateQuestProgress(QuestType.MONSTER_SLAYING);
+            checker = true;
+        }
+
     }
     
-
+    public virtual void OnDestroy()
+    {
+        //Debug.Log("DYING NOW");
+    }
 
 }
 

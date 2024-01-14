@@ -7,14 +7,11 @@ using TMPro;
 public class shopkeeper : Interactables
 {
 
-    [HideInInspector]
-    public HubWorldMenuManager hubWorldMenuManager;
-
+    
     public override void Awake()
     {
         base.Awake();
 
-        hubWorldMenuManager = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<HubWorldMenuManager>();
     }
 
 

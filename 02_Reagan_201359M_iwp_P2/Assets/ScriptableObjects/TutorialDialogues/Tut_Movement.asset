@@ -20,3 +20,5 @@ MonoBehaviour:
     options: []
   - text: Use WASD to move around
     options: []
+  - text: Use the compass to the left to reach the exit
+    options: []

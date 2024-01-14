@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
 using static Item;
 using static Projectile;
 using static UnityEngine.RuleTile.TilingRuleOutput;
@@ -23,6 +25,15 @@ public abstract class Effect
         if (Duration < 0)
         {
             IsExpired = true;
+
+            if(IsExpired)
+            {
+                Player playerScript = TargetCharacter.GetComponent<Player>();
+                if (playerScript != null)
+                {
+                    playerScript.activeEffectsText.text = "";
+                }
+            }
             return;
         }
 
@@ -97,8 +108,18 @@ public class ShieldEffect : Effect
     {
         base.UpdateEffect(deltaTime);
 
+        if(Duration <= 0)
+        {
+            TargetCharacter.playerShield.shieldActive = false;
+        }
+        else
+        {
+            TargetCharacter.playerShield.shieldActive = true;
+        }
+
+
         // Implement logic for the shield effect
-        Debug.Log("Shield: Player is protected.");
+        //Debug.Log("Shield: Player is protected.");
     }
 }
 
@@ -417,17 +438,53 @@ public class GhostEffect : Effect
         //TargetCharacter = targetCharacter;
         playerScripts = GameObject.FindObjectsOfType<Player>() ;
 
-        //if (playerScripts != null)
-        //{
-        //    foreach (Player p in playerScripts)
-        //    {
-        //        //DoNotNormalizeAttribute'T '
-        //        p.GetComponent<Collider2D>().isTrigger = true;
-        //    }
-        //}
-
-        //Character.targetCharacter;
     }
+
+    // Method to ignore collisions during the initialization
+    private void IgnoreCollisions()
+    {
+        if (playerScripts != null)
+        {
+            Collider2D[] wallTilemapColliders = GameObject.FindObjectsOfType<Collider2D>()
+                .Where(collider => collider.gameObject.layer == LayerMask.NameToLayer("WallTilemap"))
+                .ToArray();
+
+            foreach (Player p in playerScripts)
+            {
+                Collider2D playerCollider = p.GetComponent<Collider2D>();
+
+                foreach (Collider2D wallCollider in wallTilemapColliders)
+                {
+                    Physics2D.IgnoreCollision(playerCollider, wallCollider);
+                }
+            }
+        }
+    }
+
+
+    void bringbackCollission()
+    {
+        if (playerScripts != null)
+        {
+            Collider2D[] wallTilemapColliders = GameObject.FindObjectsOfType<Collider2D>()
+                .Where(collider => collider.gameObject.layer 
+                == LayerMask.NameToLayer("WallTilemap"))
+                .ToArray();
+
+            foreach (Player p in playerScripts)
+            {
+                Collider2D playerCollider = p.GetComponent<Collider2D>();
+
+                foreach (Collider2D wallCollider in wallTilemapColliders)
+                {
+                    Physics2D.IgnoreCollision(playerCollider, wallCollider, false); // Resetting collision state
+                }
+
+                Debug.Log("COLLISSION BROUGHT BACK");
+            }
+        }
+    }
+
 
     public override void UpdateEffect(float deltaTime)
     {
@@ -435,38 +492,41 @@ public class GhostEffect : Effect
         {
             return;
         }
-        //base.UpdateEffect(deltaTime);
+
         Duration -= deltaTime;
-        //if (Duration < 0)
-        //{
-        //    IsExpired = true;
-        //    return;
-        //}
+
+        IgnoreCollisions();
 
         // Disable colliders of game objects with "WallTileMap" tag
         if (Duration <= 0)
         {
-            bool allPlayersValid = true;
-
+            //bool allPlayersValid = true;
+            bringbackCollission();
             foreach (Player p in playerScripts)
             {
                 if (!IsPositionValid(p.transform.position))
                 {
-                    allPlayersValid = false;
-                    // No need to break here; continue checking other players
+                    //Debug.Log("DEDUCTING HEALTH");
+                    p.health -= p.health;
+                    //allPlayersValid = false;
                 }
             }
-
-            if (allPlayersValid)
-            {
-                foreach (Player p in playerScripts)
-                {
-                    p.GetComponent<Collider2D>().isTrigger = false;
-                    IsExpired = true;
-                }
-            }
-
+            IsExpired = true;
         }
+        //else
+        //{
+        //    Player playerChosen = null;
+        //    foreach (Player p in playerScripts)
+        //    {
+        //        if (p.activeEffects.Count > 0)
+        //        {
+        //            playerChosen = p;
+        //            Collider2D[] col = Physics2D.OverlapCircleAll(playerChosen.transform.position, 1.0f, LayerMask.GetMask("WallTilemap"));
+        //            Debug.Log($"LENGTH IS {col.Length}");
+        //            break;
+        //        }
+        //    }
+        //}
 
         //Debug.Log("Ghost: Colliders of WallTileMap objects disabled.");
     }
@@ -475,19 +535,16 @@ public class GhostEffect : Effect
     //if the player is stuck in wall
     public bool IsPositionValid(Vector2 position)
     {
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(position, 1.0f, LayerMask.GetMask("WallTilemap"));
-
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(position, .3f, LayerMask.GetMask("WallTilemap"));
+        //Debug.Log($"LENGTH IS {colliders.Length}");
         if (colliders.Length > 0)
         {
             Debug.Log("Position is inside or too close to a wall. STUCK IN WALL.");
             // There is a wall tile at or near the position
             return false;
         }
-        else
-        {
-            Debug.Log("Position is not obstructed by walls. NOT STUCK IN WALL.");
-            return true;
-        }
+        Debug.Log("Position is inside or too close to a wall. NOT STUCK IN WALL.");
+        return true;
     }
 
 

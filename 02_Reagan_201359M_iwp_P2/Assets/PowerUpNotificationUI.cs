@@ -13,7 +13,6 @@ public class PowerUpNotificationUI : MonoBehaviour
     public TextMeshProUGUI powerupDescription;
     public Image powerupImage;
 
-    public List<Sprite> powerupSprites;
 
     CanvasGroup powerUpCanvasGroup;
 
@@ -29,36 +28,35 @@ public class PowerUpNotificationUI : MonoBehaviour
         itemActions = new Dictionary<EffectType, Action>
         {
             { EffectType.ONE_HIT, () =>
-            {
-                powerupImage.sprite = powerupSprites[0];
-                powerupDescription.text = "MORE STRENGTH IN THE SWING, MORE DAMAGE TO THE ENEMY";
+                {
+                    powerupName.text = "ONE HIT";
+                    powerupDescription.text = "MORE STRENGTH IN THE SWING, MORE DAMAGE TO THE ENEMY";
                 }
-
             },
             { EffectType.MINER_SENSE, () =>
-
-                    { powerupImage.sprite = powerupSprites[1];
-                        powerupDescription.text = "ENHANCES YOUR SENSE OF WHERE THE TRASURE IS";
-                    }
-
+                {
+                    powerupName.text = "MINER SENSE";
+                    powerupDescription.text = "ENHANCES YOUR SENSE OF WHERE THE TRASURE IS";
+                }
             }
             ,
             { EffectType.GHOST, () =>
-               { powerupImage.sprite = powerupSprites[2];
-                        powerupDescription.text = "YOU CAN WAL THROUGH WALLS";
-                    }
-
+               {
+                    powerupName.text = "GHOST";
+                    powerupDescription.text = "YOU CAN WALK THROUGH WALLS, BUT BE CAREFUL NOT TO GET STUCK AFTER POWER UP EXPIRES";
+               }
             },
             { EffectType.SPIRIT_FIRE, () =>
-                { powerupImage.sprite = powerupSprites[3];
-                        powerupDescription.text = "GIVE YOU POWER TO UNLEASH UNLIMITED PROJECTILES";
-                    }
-
+                {
+                    powerupName.text = "SPIRIT FIRE";
+                    powerupDescription.text = "GIVE YOU POWER TO UNLEASH UNLIMITED PROJECTILES";
+                }
             },
             { EffectType.GEM_WISDOM, () =>
-                { powerupImage.sprite = powerupSprites[4];
-                        powerupDescription.text = "ENHANCES RED GEM AND GREEN GEM DAMAGE";
-                    }
+                {
+                    powerupName.text = "GEM WISDOM";
+                    powerupDescription.text = "ENHANCES RED GEM AND GREEN GEM DAMAGE AS PROJECTILES";
+                }
             },
             //
             
@@ -71,12 +69,14 @@ public class PowerUpNotificationUI : MonoBehaviour
         
     }
 
-    public void NotifyPowerUp(EffectType effectType)
+    public void NotifyPowerUp(EffectType effectType, Sprite sprite)
     {
         if (itemActions.ContainsKey(effectType))
         {
             itemActions[effectType].Invoke();
         }
+
+        powerupImage.sprite = sprite;
 
         powerUpCanvasGroup.alpha = 1;
         powerUpCanvasGroup.interactable = true;

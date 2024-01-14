@@ -1,21 +1,17 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Tilemaps;
 using System.Numerics;
 using Vector3 = UnityEngine.Vector3;
 using Quaternion = UnityEngine.Quaternion;
-using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using Vector2 = UnityEngine.Vector2;
 using static Projectile;
 using static Item;
 using TMPro;
-using UnityEngine.Playables;
-using System.Security.Cryptography.X509Certificates;
-using UnityEditor.Animations;
+
 
 
 [Serializable]
@@ -29,14 +25,6 @@ public class Player : Character
 {
     
 
-
-    //public enum CharacterType
-    //{
-    //    JOE,
-    //    PROFESSOR,
-    //    VETERAN,
-    //}
-
     public enum PlayerState
     {
         FOLLOW,
@@ -44,8 +32,12 @@ public class Player : Character
         HURT
     }
 
+    public TextMeshProUGUI pressEText;
+
+
     public TextMeshProUGUI moneyearnerd;
 
+    public Upgrades upgrades;
 
     //public Slider healthbar;
     //String[] tilemaptags;
@@ -69,8 +61,7 @@ public class Player : Character
     [HideInInspector] public GameObject leadingPlayer;
     [HideInInspector] public Inventory playerInventory;
 
-
-
+    
     //public GameObject projectilePrefab;
     //public float immunity_timer;
     public GameObject itemPrefab;
@@ -116,12 +107,6 @@ public class Player : Character
     [HideInInspector]
     public PowerUpNotificationUI PowerUpNotificationUI;
 
-    //public GameObject objectToSpawn;
-    //public float spawnRadius = 5f;
-    //public LayerMask occupiedLayer;
-    List<Effect> previousActiveEffects = new List<Effect>();
-
-
     public List<PlayerIcons> playericon = new List<PlayerIcons>();
 
 
@@ -132,6 +117,8 @@ public class Player : Character
         base.Awake();
 
         PowerUpNotificationUI = GameManager.GetComponent<MenuManager>().powerupNotificationPanel.GetComponent<PowerUpNotificationUI>();
+
+        pressEText.enabled = false;
 
         activeEffectsText = GameObject.FindGameObjectWithTag("ActiveEffectsText").GetComponent<TextMeshProUGUI>(); ;
         activeEffectsText.text = "";
@@ -161,18 +148,18 @@ public class Player : Character
 
             //POWERUPS
             { ItemType.ONE_HIT, ()
-            => PowerUpUsed("ONE HIT", EffectType.ONE_HIT)
+            => PowerUpUsed(EffectType.ONE_HIT)
             },
             { ItemType.MINER_SENSE, ()
-             => PowerUpUsed("MINER SENSE", EffectType.MINER_SENSE)
+             => PowerUpUsed(EffectType.MINER_SENSE)
             },
             { ItemType.GHOST, ()
-             => PowerUpUsed("GHOST", EffectType.GHOST)
+             => PowerUpUsed(EffectType.GHOST)
             },
             { ItemType.SPIRIT_FIRE, ()
-             => PowerUpUsed("SPIRIT FIRE", EffectType.SPIRIT_FIRE) },
+             => PowerUpUsed(EffectType.SPIRIT_FIRE) },
             { ItemType.GEM_WISDOM, ()
-             => PowerUpUsed("GEM WISDOM", EffectType.GEM_WISDOM) },
+             => PowerUpUsed(EffectType.GEM_WISDOM) },
             //
 
 
@@ -197,18 +184,18 @@ public class Player : Character
         PlayerPrefs.SetFloat("MoneyEarned", 0);
 
         projectileDamage = 15;
+        projectileDamage += projectileDamage * (upgrades.DamageBuff / 100);
         meleedamage = 15;
+        meleedamage += meleedamage * (upgrades.DamageBuff / 100);
+
 
         useditem = false;
         playerInventory = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<Inventory>();
-        //icon = GetComponent<Image>();
         effectactive = false;
-        health = 100 + PlayerPrefs.GetInt("HealthUpgradePercentage");
-        //Debug.Log($"PLAYER HEALTH {health}");
+        health = 100;
+        health += health * (upgrades.HealthBuff / 100);
+        Debug.Log($"PLAYER HEALTH IS {health}");
 
-        //idx = 0;
-        //listOfPositions = new List<Vector3>();
-        //listOfListofPositions = new List<List<Vector3>>();
         playercam = GetComponentInChildren<Camera>();
         attacked = false;
         playerTransform = transform;
@@ -217,12 +204,15 @@ public class Player : Character
         moneyearnerd.text = "$0";
     }
 
-    public void PowerUpUsed(string powerupName, EffectType effect)
+    public void PowerUpUsed(EffectType effect)
     {
-        PowerUpNotificationUI.powerupName.text
-                        = powerupName;
+        int currentslot = playerInventory.selectedSlot;
+        Sprite sprite = playerInventory.slots[currentslot].slotImage.sprite;
+      
+        //PowerUpNotificationUI.powerupName.text
+        //                = powerupName;
         PowerUpNotificationUI.GetComponent<PowerUpNotificationUI>()
-               .NotifyPowerUp(effect);
+               .NotifyPowerUp(effect, sprite);
         ApplyEffect(effect);
     }
 
@@ -285,47 +275,79 @@ public class Player : Character
     void UpdateActiveEffectsUI()
     {
         // Check if there is a change in the active effects
-        if (IsEffectListEqual(previousActiveEffects, activeEffects))
+        //if (!IsEffectListEqual(previousActiveEffects, activeEffects))
+        if(activeEffects.Count > 0)
         {
-            //List<string> effectsList = new List<string>();
             string effectName = "";
             foreach (Effect effects in activeEffects)
             {
-                //effectsList.Add($"{effects.name} {effects.Duration}\n");
                 effectName += $"{effects.name} {(int)effects.Duration}\n";
             }
             activeEffectsText.text = effectName;
-
             Debug.Log("EFFECTS UPDATED");
-            //previousActiveEffects.Clear();
-            previousActiveEffects = activeEffects;
         }
     }
 
-    // Check if two lists of effects are equal
-    bool IsEffectListEqual(List<Effect> list1, List<Effect> list2)
+   public void InteractableInteraction()
     {
-        if (list1.Count != list2.Count)
+        Interactables nearestInteractable = null;
+        float nearestDistance = float.MaxValue;
+
+        // Find all objects with the Interactable.cs script
+        Interactables[] interactables = GameObject.FindObjectsOfType<Interactables>();
+
+        foreach (Interactables interactable in interactables)
         {
-            Debug.Log("COUNT FALSE");
-            return false;
+            // Calculate the distance to the current interactable
+            float distance = Vector3.Distance(transform.position, interactable.transform.position);
+
+            if (interactable.gameObject.GetComponent<SpriteRenderer>() != null)
+            {
+                interactable.gameObject.GetComponent<SpriteRenderer>().color = Color.white;
+            }
+
+            
+            // Check if the distance is within the search radius and closer than the current nearest
+            if (distance < 2.0f && distance < nearestDistance)
+            {
+
+                nearestInteractable = interactable;
+                if (nearestInteractable.gameObject.GetComponent<SpriteRenderer>() != null)
+                {
+                    nearestInteractable.gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+                }
+                nearestDistance = distance;
+            }
+            //else
+            //{
+            //    pressEText.enabled = false;
+            //}
         }
 
-        for (int i = 0; i < list1.Count; i++)
+        // Check if a nearest interactable was found
+        if (nearestInteractable != null)
         {
-            //Debug.Log($"List 1: {list1[i].Duration}");
-            //Debug.Log($"List 2: {list2[i].Duration}");
-
-            if (list1[i].Type != list2[i].Type ||
-                list1[i].Duration != list2[i].Duration)
+            pressEText.enabled = true;
+            if (Input.GetKeyDown(KeyCode.E))
             {
-                //Debug.Log("FALSE");
-                return false;  // Return false if there is a difference
+                nearestInteractable.Interact();
             }
         }
-        return true;
-    }
+        else
+        {
+            pressEText.enabled = false;
+        }
+        //else
+        //{
 
+        //}
+        //else
+        //{
+        //    Debug.Log("No interactables found within the search radius.");
+        //}
+
+
+    }
 
 
     public void ControlManager()
@@ -336,14 +358,14 @@ public class Player : Character
             //{
             //    health -= 10;
             //}
-
+            InteractableInteraction();
             if (Input.GetKey(KeyCode.Space))
             {
                 if (activeEffects.Count <= 0)
                 {
                     //Debug.Log("EFFECT APPLIED");
-                    ApplyEffect(EffectType.POISON);
-                    ApplyEffect(EffectType.BURN);
+                    ApplyEffect(EffectType.GHOST);
+                    //ApplyEffect(EffectType.BURN);
                 }
             }
 
@@ -410,6 +432,16 @@ public class Player : Character
         direction.Normalize();
         // Update the position of the follower toward the target
         transform.position += direction * 6.0f * speed * Time.deltaTime;
+
+        if (transform.position.x < leadingPlayer.transform.position.x)
+        {
+            currentAnimState = WALK_RIGHT;
+        }
+        else
+        {
+            currentAnimState = WALK_LEFT;
+        }
+        
     }
    
     
@@ -428,6 +460,8 @@ public class Player : Character
         //    HURT
         //}
 
+
+
         switch (currentstate)
         {
             case PlayerState.FOLLOW:
@@ -436,6 +470,10 @@ public class Player : Character
                 if (distance >= 2.0)
                 {
                     FollowPlayer();
+                }
+                else
+                {
+                    currentAnimState = WALK_FRONT;
                 }
                 nearestEnemy = FindNearestEnemy(transform.position);
                 break;
@@ -446,8 +484,10 @@ public class Player : Character
                     if (nearestEnemy != null)
                     {
                         float distanceBetweenEnemy = Vector2.Distance(nearestEnemy.transform.position, transform.position);
+                        //ATTACK THE ENEMY WHEN NEAR
                         if (distanceBetweenEnemy < 2.0f)
                         {
+                            currentAnimState = ATTACK;
                             Enemy enemyScript = nearestEnemy.gameObject.GetComponent<Enemy>();
                             // Calculate the direction from this object to the enemy
                             Vector2 directionToEnemy =
@@ -492,6 +532,8 @@ public class Player : Character
         transform.Translate(direction * 10 * Time.deltaTime);
     }
 
+    // This method is called when a collision occurs
+    
     GameObject FindNearestEnemy(Vector3 position)
     {
        
@@ -510,11 +552,6 @@ public class Player : Character
                 nearestEnemy = enemy;
             }
         }
-
-       
-
-
-
 
         return nearestEnemy;
     }
@@ -572,8 +609,6 @@ public class Player : Character
         }
         Destroy(item);
         //
-
-
     }
 
 

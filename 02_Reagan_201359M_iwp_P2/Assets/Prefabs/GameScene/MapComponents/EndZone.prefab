@@ -143,5 +143,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cae34e78718b8c458159326aaa1b4b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  upgrade: {fileID: 11400000, guid: 638dc312793db8648a4e3a26f1afc109, type: 2}
   GameCompletePanel: {fileID: 0}
   money: 0

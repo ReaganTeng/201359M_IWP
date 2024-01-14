@@ -1,26 +1,18 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
-using Unity.VisualScripting;
-using UnityEditor.Animations;
-using UnityEditor.EditorTools;
-using UnityEditor.U2D;
+//using UnityEditor.Animations;
+
 using UnityEngine;
-using UnityEngine.TextCore.Text;
-using static CharacterUnlockManager;
-using static Item;
+
 using static Projectile;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 
-[System.Serializable]
+[Serializable]
 public class CharacterAnimationClips
 {
     public CharacterUnlockManager.CharacterType characterType;
-   // public List<AnimationClip> animationClips;
-    public AnimatorController animcon;
+    public RuntimeAnimatorController animcon; // Change the type to RuntimeAnimatorController
 }
 
 public class Character : MonoBehaviour
@@ -99,22 +91,22 @@ public class Character : MonoBehaviour
         animatorComponent.Play(state);
     }
 
-    public void AssignClipToState(string stateName, AnimationClip clip)
-    {
-        AnimatorController animatorController = animatorComponent.runtimeAnimatorController as AnimatorController;
-        if (animatorController != null)
-        {
-            AnimatorControllerLayer layer = animatorController.layers[0]; // Assuming it's the base layer
-            AnimatorStateMachine stateMachine = layer.stateMachine;
-            // Find the state by name
-            AnimatorState state = stateMachine.states.FirstOrDefault(s => s.state.name == stateName).state;
-            if (state != null)
-            {
-                state.motion = clip;
-            }
-        }
+    //public void AssignClipToState(string stateName, AnimationClip clip)
+    //{
+    //    AnimatorController animatorController = animatorComponent.runtimeAnimatorController as AnimatorController;
+    //    if (animatorController != null)
+    //    {
+    //        AnimatorControllerLayer layer = animatorController.layers[0]; // Assuming it's the base layer
+    //        AnimatorStateMachine stateMachine = layer.stateMachine;
+    //        // Find the state by name
+    //        AnimatorState state = stateMachine.states.FirstOrDefault(s => s.state.name == stateName).state;
+    //        if (state != null)
+    //        {
+    //            state.motion = clip;
+    //        }
+    //    }
        
-    }
+    //}
     protected virtual Vector3 FindPath(
         Vector2 targetPos, //THE TARGET THE OBJECT WILL FOLLOW 
         Vector2 followerPos //THE OBJECT WHO WILL FOLLOW THE TARGET
@@ -278,15 +270,15 @@ public class Character : MonoBehaviour
             Effect effect = activeEffects[i];
             effect.UpdateEffect(Time.deltaTime);
 
-            //ENABLE SHIELD
-            if (effect.Type == EffectType.SHIELD)
-            {
-                //Shield sh = GetComponentInChildren<Shield>();
-                if (playerShield != null)
-                {
-                    playerShield.shieldActive = true;
-                }
-            }
+            ////ENABLE SHIELD
+            //if (effect.Type == EffectType.SHIELD)
+            //{
+            //    //Shield sh = GetComponentInChildren<Shield>();
+            //    if (playerShield != null)
+            //    {
+            //        playerShield.shieldActive = true;
+            //    }
+            //}
 
             if (effect.IsExpired)
             {
@@ -353,13 +345,13 @@ public class Character : MonoBehaviour
                 }
             case EffectType.ONE_HIT:
                 {
-                    if (ps != null)
-                    {
-                        ParticleSystem.MainModule mainModule = ps.main;
-                        mainModule.startColor = Color.white;
-                        emissionModule.enabled = true;
-                        //Debug.Log("BEGIN BURN");
-                    }
+                    //if (ps != null)
+                    //{
+                    //    ParticleSystem.MainModule mainModule = ps.main;
+                    //    mainModule.startColor = Color.white;
+                    //    emissionModule.enabled = true;
+                    //    //Debug.Log("BEGIN BURN");
+                    //}
                     
                     return new OneHitEffect(10f, 3, this);
                 }

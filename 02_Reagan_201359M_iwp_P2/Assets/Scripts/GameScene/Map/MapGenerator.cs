@@ -27,8 +27,10 @@ public class MapGenerator : MonoBehaviour
     public GameObject unbreakableWall;
     public GameObject Player;
     public GameObject treasureParent;
+    public GameObject questTriggerParent;
+    public GameObject shopkeeperParent;
     public GameObject shopkeeperPrefab;
-    public GameObject questTriggers;
+    public GameObject questTriggerPrefab;
 
     [HideInInspector]
     public List<Vector2> occupiedPositions;
@@ -38,6 +40,9 @@ public class MapGenerator : MonoBehaviour
     public int roomdimension;
     [HideInInspector]
     public List<GameObject> listofShopkeepers = new List<GameObject>();
+    [HideInInspector]
+    public List<GameObject> listofQuestTriggers = new List<GameObject>();
+   
 
     //List <GameObject> player = new List<GameObject>();
     GameObject player;
@@ -52,6 +57,7 @@ public class MapGenerator : MonoBehaviour
     int PathsImplemented;
     int PathsImplementedChecker;
     int NumberOfShopKeepers;
+    int NumberOfQuestTriggers;
     public List<GameObject> startingRoomtemplates;
     public List<GameObject> exitRoomtemplates;
     List<GameObject> roomTemplates = new List<GameObject>(); // Array of room templates.
@@ -100,7 +106,8 @@ public class MapGenerator : MonoBehaviour
 
 
 
-
+    [HideInInspector]
+    public List<GameObject> roomswithopenpaths = new List<GameObject>();
 
     [HideInInspector]
     public int maxenemynumbers;
@@ -131,8 +138,8 @@ public class MapGenerator : MonoBehaviour
         allroomsSelected = false;
 
 
-        NumberOfShopKeepers = 50;
-
+        NumberOfShopKeepers = 20;
+        NumberOfQuestTriggers = 20;
         //TEMPORARILY TRUE
         //pathsFinishedDiverging = true;
         //extraroomsSpawned = true;
@@ -182,12 +189,7 @@ public class MapGenerator : MonoBehaviour
     {
         if (!alltreasuresSpawned)
         {
-            //HARD CODE THE VALUES FIRST
-            //float smallestX = -64;
-            //float largestX = 0;
-            //float smallestY = 0;
-            //float largestY = 32;
-
+    
             float smallestX = occupiedPositions.Min(pos => pos.x);
             float largestX = occupiedPositions.Max(pos => pos.x);
             float smallestY = occupiedPositions.Min(pos => pos.y);
@@ -207,6 +209,40 @@ public class MapGenerator : MonoBehaviour
                 chest.transform.SetParent(treasureParent.transform);
             }
             alltreasuresSpawned = true;
+        }
+    }
+
+
+    void SpawnTreasuresChests()
+    {
+        int TreasureChestsSpawned = 0;
+        while (TreasureChestsSpawned < 500)
+        {
+            foreach (Vector2 position in occupiedPositions)
+            {
+                int chance = Random.Range(0, 2);
+
+                if (chance == 0)
+                {
+                    int randomX = Random.Range(0, roomdimension + 1);
+                    int randomY = Random.Range(0, roomdimension + 1);
+                    Vector2 randomPosition = new Vector2(
+                        position.x + randomX,
+                       position.y + randomY
+                    );
+                    //if ((listofQuestTriggers.Count > 0
+                    //    && IsPositionValidQuestTriggers(randomPosition))
+                    //    || listofQuestTriggers.Count <= 0)
+                    if (IsPositionValidforTreasureChest(randomPosition))
+                    {
+                        GameObject chest =
+                        Instantiate(treasureChestPrefab, 
+                        randomPosition, Quaternion.identity);
+                        chest.transform.SetParent(treasureParent.transform);
+                        TreasureChestsSpawned += 1;
+                    }
+                }
+            }
         }
     }
 
@@ -253,6 +289,8 @@ public class MapGenerator : MonoBehaviour
                 if (endZone == null)
                 {
                     endZone = Instantiate(EndZone, exitroom.transform.position, Quaternion.identity);
+                    //Instantiate(EndZone, new Vector2 (10, 10), Quaternion.identity);
+
                 }
 
                 if (!enemiesspawned
@@ -263,43 +301,97 @@ public class MapGenerator : MonoBehaviour
                 }
 
                 //SPAWN SHOPKEEPERS
-                for (int i = 0; i < NumberOfShopKeepers;)
-                {
-                    //int enemytype = Random.Range(0, 3);
-                    // Find the smallest and largest X and Y values
-                    float smallestX = occupiedPositions.Min(pos => pos.x);
-                    float largestX = occupiedPositions.Max(pos => pos.x);
-                    float smallestY = occupiedPositions.Min(pos => pos.y);
-                    float largestY = occupiedPositions.Max(pos => pos.y);
-                    int randomX = Random.Range((int)smallestX, (int)largestX + 1);
-                    int randomY = Random.Range((int)smallestY, (int)largestY + 1);
-                    Vector2 randomPosition = new Vector2(
-                        randomX,
-                       randomY
-                    );
-                    if ((listofShopkeepers.Count > 0 && IsPositionValid(randomPosition))
-                        || listofShopkeepers.Count <= 0)
-                    {
-                        GameObject shopkeeper = Instantiate(shopkeeperPrefab,
-                            randomPosition, Quaternion.identity);
-                        listofShopkeepers.Add(shopkeeper);
-                        i++;
-                    }
-                }
-                //GameObject.FindGameObjectWithTag("ShopPanel").
-                //    GetComponent<>;
+                SpawnShopKeepers();
 
-                SpawnTreasure();
+                //SPAWN QUEST NPC
+                SpawnQuestTriggers();
+
+                //SpawnTreasure();
+
+                //SPAWN TREASURECHESTS
+                SpawnTreasuresChests();
+
+
+                gameManager.GetComponent<VolumeManager>().AdjustAllVolumes();
+
                 CompassObject.StartItself();
                 GameObject.FindGameObjectWithTag("LoadingScreen").SetActive(false);
                 objectsGenerated = true;
             }
 
         }
+
+
     }
 
 
-    public bool IsPositionValid(Vector2 position)
+    void SpawnShopKeepers()
+    {
+        int shopkeepersSpawned = 0;
+        while (shopkeepersSpawned < NumberOfShopKeepers)
+        {
+            foreach (Vector2 position in occupiedPositions)
+            {
+                int chance = Random.Range(0, 2);
+
+                if (chance == 0)
+                {
+                    int randomX = Random.Range(0, roomdimension + 1);
+                    int randomY = Random.Range(0, roomdimension + 1);
+                    Vector2 randomPosition = new Vector2(
+                        position.x + randomX,
+                       position.y + randomY
+                    );
+                    if ((listofShopkeepers.Count > 0 
+                        && IsPositionValidForShopKeeper(randomPosition))
+                        || listofShopkeepers.Count <= 0)
+                    {
+                        GameObject shopkeeper = Instantiate(shopkeeperPrefab,
+                            randomPosition, Quaternion.identity);
+                        listofShopkeepers.Add(shopkeeper);
+                        shopkeeper.transform.SetParent(shopkeeperParent.transform);
+                        shopkeepersSpawned += 1;
+                    }
+                }
+            }
+        }  
+    }
+
+    void SpawnQuestTriggers()
+    {
+        int questtriggersspawned = 0;
+        while (questtriggersspawned < NumberOfQuestTriggers)
+        {
+            foreach (Vector2 position in occupiedPositions)
+            {
+                int chance = Random.Range(0, 2);
+
+                if (chance == 0)
+                {
+                    int randomX = Random.Range(0, roomdimension + 1);
+                    int randomY = Random.Range(0, roomdimension + 1);
+                    Vector2 randomPosition = new Vector2(
+                        position.x + randomX,
+                       position.y + randomY
+                    );
+                    if ((listofQuestTriggers.Count > 0
+                        && IsPositionValidQuestTriggers(randomPosition))
+                        || listofQuestTriggers.Count <= 0)
+                    {
+                        GameObject questtrigger = Instantiate(questTriggerPrefab,
+                            randomPosition, Quaternion.identity);
+                        listofQuestTriggers.Add(questtrigger);
+                        int idx = listofQuestTriggers.IndexOf(questtrigger);
+                        questtrigger.GetComponent<QuestTrigger>().questGiverid = idx;
+                        questtrigger.transform.SetParent(questTriggerParent.transform);
+                        questtriggersspawned += 1;
+                    }
+                }
+            }
+        }
+    }
+
+    public bool IsPositionValidForShopKeeper(Vector2 position)
     {
         Collider2D[] colliders = Physics2D.OverlapCircleAll(position, 0.1f, LayerMask.GetMask("WallTilemap"));
 
@@ -324,6 +416,63 @@ public class MapGenerator : MonoBehaviour
 
         return true;
     }
+
+
+
+    public bool IsPositionValidQuestTriggers(Vector2 position)
+    {
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(position, 0.1f, LayerMask.GetMask("WallTilemap"));
+
+        if (colliders.Length > 0)
+        {
+            // There is a wall tile at the position
+            return false;
+        }
+
+        List<GameObject> obstacles = new List<GameObject>();
+        obstacles.AddRange(listofShopkeepers);
+        obstacles.AddRange(listofQuestTriggers);
+
+        foreach (GameObject obstacle in obstacles)
+        {
+            float distance = Vector2.Distance(position, obstacle.transform.position);
+            if (distance <= roomdimension)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
+
+    public bool IsPositionValidforTreasureChest(Vector2 position)
+    {
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(position, 0.1f, LayerMask.GetMask("WallTilemap"));
+
+        if (colliders.Length > 0)
+        {
+            // There is a wall tile at the position
+            return false;
+        }
+
+        List<GameObject> obstacles = new List<GameObject>();
+        obstacles.AddRange(listofShopkeepers);
+        obstacles.AddRange(listofQuestTriggers);
+
+        foreach (GameObject obstacle in obstacles)
+        {
+            float distance = Vector2.Distance(position, obstacle.transform.position);
+            if (distance <= roomdimension/2)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 
     void spawnExitRoom()
     {
@@ -1089,7 +1238,6 @@ public class MapGenerator : MonoBehaviour
 
 
 
-    public List<GameObject> roomswithopenpaths = new List<GameObject>();
 
 
     //NEW VERSION

@@ -26,12 +26,20 @@ public class Weapon : MonoBehaviour
         rotationSpeed = 360;
         rotationDuration = 1.0f;
         playerscript = GetComponentInParent<Player>();
-        blade.SetActive(false);
 
+
+        //blade.SetActive(false);
+        toggleBlade();
 
 
         //gameObject.SetActive(true);
         //gameObject.SetActive(false);
+    }
+
+    public void toggleBlade()
+    {
+        blade.GetComponent<BoxCollider2D>().enabled = !blade.GetComponent<BoxCollider2D>().enabled;
+        blade.GetComponent<SpriteRenderer>().enabled = !blade.GetComponent<SpriteRenderer>().enabled;
     }
 
 
@@ -54,7 +62,9 @@ public class Weapon : MonoBehaviour
         Debug.Log("BEGIN ATTACK");
         isRotating = true;
         rotationTimer = 0.0f;
-        blade.SetActive(true);
+        //blade.SetActive(true);
+        toggleBlade();
+
     }
 
     void Attacking()
@@ -73,7 +83,9 @@ public class Weapon : MonoBehaviour
                 isRotating = false;
                 blade.GetComponent<blade>().AS.clip = null;
                 // Hide or destroy the weapon GameObject
-                blade.SetActive(false);
+                //blade.SetActive(false);
+                toggleBlade();
+
                 // Or you can destroy it if needed: Destroy(gameObject);
                 // Reset the rotation of the weapon holder
                 transform.rotation = Quaternion.identity;

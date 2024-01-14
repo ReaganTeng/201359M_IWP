@@ -1,61 +1,100 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using System;
 using Debug = UnityEngine.Debug;
+using static TutorialTrigger;
+
+
+
+
+[Serializable]
+public class TutorialDialogues
+{
+    public TutorialType tutType;
+    public DialogueRealTime dialogue;
+}
 
 public class TutorialTrigger : MonoBehaviour
 {
     public TutorialSystem tutorialSystem;
 
+    public List<TutorialDialogues> tutorialDialogues = new List<TutorialDialogues>();
 
-    //movementdialogue
-    //attackdialogue
-    //gemdialogue
-    public List<Dialogue> tutorialDialogues;
+    public enum TutorialType
+    {
+        STORY_BEGINNING,
+        MOVEMENT,
+        CHARACTER_SWITCH,
+        ATTACK,
+        GEM,
+        ATM,
+        DAY_TRACKER,
+        SHOP_SYSTEM,
+    }
 
     [HideInInspector]
     public DialogueManager DM;
 
+    string GameScene;
+    string HubWorldScene;
+    Scene currentScene;
+
     public void Awake()
     {
-        //base.Awake();
+        GameScene = "GameScene";
+        HubWorldScene = "HubWorld";
         DM = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<DialogueManager>();
-
-        foreach (Dialogue dialogue in tutorialDialogues)
-        {
-            dialogue.Initialize();
-        }
     }
 
     void Update()
     {
-        //if ()
-        //{
-        //    TriggerDialogue();
-        //}
+        currentScene = SceneManager.GetActiveScene();
+        TriggerDialogue(TutorialType.STORY_BEGINNING, ref tutorialSystem.StoryBeginningCompleted, HubWorldScene);
+        TriggerDialogue(TutorialType.MOVEMENT, ref tutorialSystem.MovementTutorialCompleted, GameScene);
+
+
+
+        if (GameObject.FindGameObjectsWithTag("Player").Length > 1 && tutorialSystem.MovementTutorialCompleted)
+        {
+            TriggerDialogue(TutorialType.CHARACTER_SWITCH, ref tutorialSystem.SwitchCharactersCompleted, GameScene);
+        }
     }
 
-    void TriggerDialogue(Dialogue d, ref bool boolToSet)
+    void TriggerDialogue(TutorialType tutType, ref bool boolToSet, string requiredScene)
     {
-        if (!boolToSet)
+        if (DM.currentDialogue != null)
+        {
+            return;
+        }
+
+        DialogueRealTime d = tutorialDialogues.Find(entry => entry.tutType == tutType).dialogue;
+        if (!boolToSet && currentScene.name == requiredScene)
         {
             DM.StartDialogue(d);
-            boolToSet = !boolToSet;
+            boolToSet = true;
         }
     }
 
     public void OnTriggerEnter2D(Collider2D other)
     {
-        switch(other.tag)
+        switch (other.tag)
         {
-            case "Player":
-                TriggerDialogue(tutorialDialogues[0], ref tutorialSystem.MovementTutorialCompleted);
-                break;
             case "Item":
-                TriggerDialogue(tutorialDialogues[1], ref tutorialSystem.GemTutorialCompleted);
+                TriggerDialogue(TutorialType.GEM, ref tutorialSystem.GemTutorialCompleted, GameScene);
                 break;
             case "Enemy":
-                TriggerDialogue(tutorialDialogues[2], ref tutorialSystem.AttackTutorialCompleted);
+                TriggerDialogue(TutorialType.ATTACK, ref tutorialSystem.AttackTutorialCompleted, GameScene);
+                break;
+            case "DayTracker":
+                TriggerDialogue(TutorialType.DAY_TRACKER, ref tutorialSystem.DayTrackerCompleted, HubWorldScene);
+                break;
+            case "ATM":
+                TriggerDialogue(TutorialType.ATM, ref tutorialSystem.ATMCompleted, HubWorldScene);
+                break;
+            case "Shopkeeper":
+                TriggerDialogue(TutorialType.SHOP_SYSTEM, ref tutorialSystem.ShopTutorialCompleted, HubWorldScene);
                 break;
             default:
                 break;
@@ -64,6 +103,6 @@ public class TutorialTrigger : MonoBehaviour
 
     public void OnTriggerExit2D(Collider2D other)
     {
-
+        // Handle OnTriggerExit2D if needed
     }
 }

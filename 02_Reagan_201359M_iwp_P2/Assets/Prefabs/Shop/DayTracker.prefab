@@ -253,7 +253,7 @@ GameObject:
   - component: {fileID: -5592329340835199685}
   m_Layer: 0
   m_Name: DayTracker
-  m_TagString: Untagged
+  m_TagString: DayTracker
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -310,8 +310,8 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 4, y: 4}
-    newSize: {x: 1, y: 1}
+    oldSize: {x: 0.75, y: 0.5}
+    newSize: {x: 1.5, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 1
     adaptiveTiling: 0
@@ -360,12 +360,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: a6dd7a81acc656d43b6f5085220a82a0, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 923e54514967b9348a27253dfc8f47b0, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 1
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 1.5, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -383,6 +383,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea00cd7b660158240b0ad5b73b2171ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sr: {fileID: 0}
+  textPrompt: {fileID: 0}
+  hubWorldMenuManager: {fileID: 0}
+  dayPanel: {fileID: 0}
 --- !u!1 &9031256582133390766
 GameObject:
   m_ObjectHideFlags: 0

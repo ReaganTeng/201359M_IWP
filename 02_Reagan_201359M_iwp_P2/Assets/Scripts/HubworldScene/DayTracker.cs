@@ -5,14 +5,20 @@ using UnityEngine;
 
 public class DayTracker : Interactables
 {
-    [HideInInspector]
+    //[HideInInspector]
     public HubWorldMenuManager hubWorldMenuManager;
+
+    //[HideInInspector]
+    public GameObject dayPanel;
 
     public override void Awake()
     {
         base.Awake();
 
         hubWorldMenuManager = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<HubWorldMenuManager>();
+        
+
+        //dayPanel = hubWorldMenuManager.DayPanel;
     }
 
 
@@ -20,8 +26,28 @@ public class DayTracker : Interactables
     {
 
         base.Update();
+
+        if(dayPanel == null )
+        {
+            dayPanel = hubWorldMenuManager.DayPanel;
+
+        }
+
+        //if (Input.GetKeyDown(KeyCode.E)
+        //    && textPrompt.enabled)
+        //{
+        //    hubWorldMenuManager.togglePanel(dayPanel);
+        //}
     }
 
+
+    public override void Interact()
+    {
+        base.Interact();
+
+        
+        hubWorldMenuManager.togglePanel(dayPanel);
+    }
 
     public override void OnTriggerEnter2D(Collider2D other)
     {

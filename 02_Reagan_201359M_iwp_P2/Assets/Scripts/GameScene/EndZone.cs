@@ -5,10 +5,15 @@ using TMPro;
 using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using static Upgrades;
 public class EndZone : MonoBehaviour
 {
-    public Upgrades upgrade;
+    //public Upgrades upgrade;
     GameObject player;
+
+    [HideInInspector]
+    public MenuManager MM;
+    [HideInInspector]
     public GameObject GameCompletePanel;
 
     Inventory invmanager;
@@ -22,8 +27,9 @@ public class EndZone : MonoBehaviour
         //countdown = 0;
         //countdown_started = false;
         player = GameObject.FindWithTag("Player");
-        GameCompletePanel = GameObject.FindWithTag("GameCompletePanel");
-        GameCompletePanel.SetActive(false);
+        MM = GameObject.FindWithTag("GameMGT").GetComponent<MenuManager>();
+        GameCompletePanel = MM.GameCompletePanel;
+        //GameCompletePanel.SetActive(false);
 
         invmanager = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<Inventory>();
     }
@@ -43,11 +49,28 @@ public class EndZone : MonoBehaviour
         //}
     }
 
+
+    void emptyInventory()
+    {
+        foreach (InventorySlot slot in invmanager.slots)
+        {
+            if (slot.itemtype != Item.ItemType.BOMB
+                && slot.itemtype != Item.ItemType.POTION
+                && slot.itemtype != Item.ItemType.BULLET)
+            {
+                slot.itemtype = Item.ItemType.NOTHING;
+                slot.Quantity = 0;
+                slot.quantityText.text = "";
+                slot.CurrentItem = null;
+                slot.slotImage.sprite = null;
+            }
+        }
+    }
     void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("Player")
         && !collision.gameObject.GetComponent<Player>().AIMode
-        && !GameCompletePanel.activeSelf)
+        && !GameCompletePanel.GetComponent<CanvasGroup>().interactable)
         {
             PlayerPrefs.SetInt("RoundsCompleted",
             PlayerPrefs.GetInt("RoundsCompleted") + 1);
@@ -61,17 +84,19 @@ public class EndZone : MonoBehaviour
                 PlayerPrefs.GetInt("DaysLeft") - 1);
             }
 
-            //COUNT DOWN THE MONEY
-            //foreach(var slot in invmanager.slots)
-            //{
-            //    for(int i = 0; i < slot.Quantity; i++)
-            //    {
+
+            emptyInventory();
+
             //money += (int)slot.CurrentItem.money;
             money = PlayerPrefs.GetFloat("MoneyEarned");
             PlayerPrefs.SetFloat("GrossMoney", PlayerPrefs.GetFloat("GrossMoney") + money);
             GameCompletePanel.GetComponentInChildren<TextMeshProUGUI>().text = $"GAME OVER, YOU EARNED {money}\nDAYS LEFT:\n{PlayerPrefs.GetInt("DaysLeft")}";
             PlayerPrefs.SetInt("MoneyEarned", 0);
 
+
+
+
+            MM.togglePanel(GameCompletePanel);
             //    }
             //}
 
@@ -85,15 +110,11 @@ public class EndZone : MonoBehaviour
             //
 
 
-            GameCompletePanel.SetActive(true);
+            //GameCompletePanel.SetActive(true);
             //countdown_started = true;
 
 
-            Time.timeScale = 0;
-
-
-
-            
+            //Time.timeScale = 0;
 
         }
     }

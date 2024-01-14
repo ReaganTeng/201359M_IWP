@@ -5,9 +5,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using static Item;
 using TMPro;
-using System.Linq;
-using UnityEditor;
+
 using static Upgrades;
+
 
 public class Inventory : MonoBehaviour
 {
@@ -24,11 +24,17 @@ public class Inventory : MonoBehaviour
     public GameObject slotPrefab;
     public GameObject inventoryPanel;
 
+    Vector2 normalSlotScale;
+    Vector2 largeSlotScale;
 
-
+    //int slotScale;
     //Inventory playerInventory;
     void Awake()
     {
+        normalSlotScale = new Vector2(1, 1);
+        largeSlotScale = new Vector2(2, 2);
+
+        //slotScale = 1;
         //itempicked.SetItem(ItemType.RED_GEM, 5);
         //AddItem(itempicked, 18);
         selectedSlot = 0;
@@ -41,24 +47,15 @@ public class Inventory : MonoBehaviour
 
     void InstantiateInventorySlots()
     {
+        //FOR TEMPORARY TESTING
         foreach (SlotProperties slot in upgrades.slotProperty)
         {
             upgrades.emptySlotProperty(slot);
         }
 
-        //for(int i = 0; i < upgrades.slotsToTransfer.Count; i++) 
-        //{
-        //    typesInUpgrade.Add(upgrades.slotsToTransfer[i].itemtype);
-        //}
-
         float totalWidth = 0;
 
-        //for (int i = 0; i < upgrades.slotsToTransfer.Count; i++)
-        //{
-        //    Debug.Log($"QUANTITY {upgrades.slotsToTransfer[i].Quantity} {upgrades.slotsToTransfer[i].itemtype}");
-        //}
-
-        for (int i = 0; i < upgrades.slotProperty.Count; i++)
+       for (int i = 0; i < upgrades.slotProperty.Count; i++)
         {
             GameObject slot = Instantiate(slotPrefab, inventoryPanel.GetComponent<RectTransform>());
             InventorySlot inventorySlotComponent = slot.GetComponent<InventorySlot>();
@@ -110,16 +107,36 @@ public class Inventory : MonoBehaviour
     public void Update()
     {
 
-        //EMPTY ALL THE SLOTS FOR TESTING PURPOSES
-        //if (Input.GetKey(KeyCode.K))
-        //{
-        //    foreach (SlotProperties slot in upgrades.slotProperty)
-        //    {
-        //        upgrades.emptySlotProperty(slot);
-        //    }
-        //}
-        //   
+        ChangesInInventory();
+        InventorySelection();
+    }
 
+
+
+    void InventorySelection()
+    {
+        for (int i = 1; i < slots.Count + 1; i++)
+        {
+            if (Input.GetKeyDown(i.ToString()))
+            {
+                selectedSlot = i - 1; // Adjust to zero-based index
+                                      //SelectSlot(selectedSlot);
+                foreach (var slot in slots)
+                {
+                    slot.GetComponent<RectTransform>().localScale = normalSlotScale;
+                }
+                slots[selectedSlot].GetComponent<RectTransform>().localScale = largeSlotScale;
+
+                //if (!slots[selectedSlot].IsEmpty())
+                //{
+                //    Debug.Log($"SELECTED SLOT HAS ITEM: {slots[selectedSlot].itemtype}");
+                //}
+            }
+        }
+    }
+
+    public void ChangesInInventory()
+    {
         List<SlotProperties> slotprops = upgrades.slotProperty;
         for (int i = 0; i < slotprops.Count; i++)
         {
@@ -147,29 +164,7 @@ public class Inventory : MonoBehaviour
             }
             //Debug.Log($"ITEM NOW IS {slotsinupgrade[i].itemtype} {slotsinupgrade[i].Quantity} {slotsinupgrade[i].slotImage.sprite}");
         }
-
-
-
-        for (int i = 1; i < slots.Count; i++)
-        {
-            if (Input.GetKeyDown(i.ToString()))
-            {
-                selectedSlot = i - 1; // Adjust to zero-based index
-                                      //SelectSlot(selectedSlot);
-                foreach (var slot in slots)
-                {
-                    slot.GetComponent<Image>().color = Color.white;
-                }
-                slots[selectedSlot].GetComponent<Image>().color = Color.red;
-
-                if (!slots[selectedSlot].IsEmpty())
-                {
-                    Debug.Log($"SELECTED SLOT HAS ITEM: {slots[selectedSlot].itemtype}");
-                }
-            }
-        }
     }
-
 
     public void LoadInventory()
     {
@@ -177,49 +172,64 @@ public class Inventory : MonoBehaviour
     }
 
     //amount = amount of items added
-    public void AddItem(Item item, int amount)
+    public bool AddItem(Item item, int amount)
     {
-        foreach (InventorySlot slot in slots)
+        bool successFullyAddedItem = false;
+
+        //FIND THE SUITABLE SLOT THAT FUFILS THESEE CRITERIA
+        //1. MUST BE THE SAME ITEMTYPE
+        //2. THE QUANTITY INSIDE MUST BE LESS THAN THE STACKSIZE OF THAT ITEM
+        InventorySlot SuitableSlot = slots.Find(template => 
+        template.itemtype == item.type
+        && template.Quantity < item.StackSize);
+
+        //IF FOUND SUITABLE SLOT
+        if (SuitableSlot != null)
         {
-            // If the quantity in the slot is less than the stack size of the item
-            if ((slot.itemtype != ItemType.NOTHING 
-                && slot.Quantity < item.StackSize
-                && slot.itemtype == item.type)
-                || slot.itemtype == ItemType.NOTHING
-                )
+            AddItemToSlot(item, SuitableSlot, amount);
+            successFullyAddedItem = true;
+        }
+        else
+        {
+            foreach (InventorySlot slot in slots)
             {
-                int remainingCapacity = item.StackSize - slot.Quantity;
-                // Check if the remaining capacity is greater than the amount to add
-                int amountToAdd = Mathf.Min(amount, remainingCapacity);
-                // Add the item to the slot
-                slot.AddItem(item, amountToAdd);
-                // Subtract the added amount from the total
-                amount -= amountToAdd;
-
-                PlayerPrefs.SetFloat("MoneyEarned", PlayerPrefs.GetFloat("MoneyEarned") + item.money);
-                moneyearned.text = $"{PlayerPrefs.GetFloat("MoneyEarned")}";
-
-                Destroy(item.gameObject);
-                // If we've added the required amount, break out of the loop
-                if (amount <= 0)
+                if (slot.itemtype == ItemType.NOTHING)
                 {
-                    break;
+                    AddItemToSlot(item, slot, amount);
+                    successFullyAddedItem = true;
+
+                    // If we've added the required amount, break out of the loop
+                    //if (amount <= 0)
+                    {
+                        break;
+                    }
                 }
             }
-            //continue;
         }
-
-        //foreach(InventorySlot slot in slots)
-        //{
-        //    slots.Remove(slot);
-        //    Destroy(slot.gameObject);
-        //}
-        //InstantiateInventorySlots();
-
-        slots[selectedSlot].GetComponent<Image>().color = Color.red;
-        //EditorUtility.SetDirty(upgrades);
-        //AssetDatabase.SaveAssets();
+       
+        slots[selectedSlot].GetComponent<RectTransform>().localScale = largeSlotScale;
         //
+
+        return successFullyAddedItem;
+    }
+
+
+    void AddItemToSlot(Item item, InventorySlot slot, int amount)
+    {
+        int remainingCapacity = item.StackSize - slot.Quantity;
+        // Check if the remaining capacity is greater than the amount to add
+        int amountToAdd = Mathf.Min(amount, remainingCapacity);
+        // Add the item to the slot
+        slot.AddItem(item, amountToAdd);
+        // Subtract the added amount from the total
+        amount -= amountToAdd;
+        PlayerPrefs.SetFloat("MoneyEarned", PlayerPrefs.GetFloat("MoneyEarned") + item.money);
+
+        if (moneyearned != null)
+        {
+            moneyearned.text = $"{PlayerPrefs.GetFloat("MoneyEarned")}";
+        }
+        Destroy(item.gameObject);
     }
 
 
@@ -228,29 +238,19 @@ public class Inventory : MonoBehaviour
         // Reset colors of all slots
         foreach (var slot in slots)
         {
-            slot.GetComponent<Image>().color = Color.white;
+            slot.GetComponent<RectTransform>().localScale = normalSlotScale;
         }
 
         if (slotNumber >= 1 && slotNumber <= slots.Count)
         { 
             selectedSlot = slotNumber - 1; // Convert to 0-based index
                                            // Set the color of the selected slot
-            slots[selectedSlot].GetComponent<Image>().color = Color.red;
+            slots[selectedSlot].GetComponent<RectTransform>().localScale = largeSlotScale;
         }
-        else
-        {
-            //Debug.Log($"Invalid slot number. Please choose a slot between 1 and {slots.Count}.");
-        }
+        
     }
 
 
-    public void DisplayInventory()
-    {
-        for (int i = 0; i < slots.Count; i++)
-        {
-            //Debug.Log($"Slot {i + 1}: {slots[i].Quantity} {slots[i].CurrentItem.type}");
-        }
-    }
 }
 
 

@@ -30,6 +30,12 @@ TagManager:
   - ActiveEffectsText
   - PlayerIcon
   - GamePlayPanel
+  - Shopkeeper
+  - ATM
+  - DayTracker
+  - CharacterSwitchPanel
+  - MainPanel
+  - SettingsPanel
   layers:
   - Default
   - TransparentFX

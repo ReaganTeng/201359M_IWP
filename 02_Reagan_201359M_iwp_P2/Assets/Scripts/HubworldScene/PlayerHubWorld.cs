@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class PlayerHubWorld : MonoBehaviour
@@ -23,11 +24,112 @@ public class PlayerHubWorld : MonoBehaviour
 
     string currentAnimState;
 
+    [HideInInspector]
+    public bool disabled;
     // Start is called before the first frame update
+
+
+
+
+
+
+
+
+    public TextMeshProUGUI pressEText;
+
+
+
+
+
+
+
+
+    void Start()
+    {
+        AdjustVolumes();
+    }
+
+    void AdjustVolumes()
+    {
+        float Volume = PlayerPrefs.GetFloat("MasterVolume"); // Adjust this value as needed
+
+        // Find all AudioSource components in the scene
+        AudioSource[] audioSources = FindObjectsOfType<AudioSource>();
+
+        // Adjust the volume of each AudioSource
+        foreach (AudioSource audioSource in audioSources)
+        {
+            audioSource.volume = Volume;
+        }
+    }
+
+
+
+    public void InteractableInteraction()
+    {
+        Interactables nearestInteractable = null;
+        float nearestDistance = float.MaxValue;
+
+        // Find all objects with the Interactable.cs script
+        Interactables[] interactables = GameObject.FindObjectsOfType<Interactables>();
+
+        foreach (Interactables interactable in interactables)
+        {
+            // Calculate the distance to the current interactable
+            float distance = Vector3.Distance(transform.position, interactable.transform.position);
+
+            if (interactable.gameObject.GetComponent<SpriteRenderer>() != null)
+            {
+                interactable.gameObject.GetComponent<SpriteRenderer>().color = Color.white;
+            }
+
+
+            // Check if the distance is within the search radius and closer than the current nearest
+            if (distance < 2.0f && distance < nearestDistance)
+            {
+
+                nearestInteractable = interactable;
+                if (nearestInteractable.gameObject.GetComponent<SpriteRenderer>() != null)
+                {
+                    nearestInteractable.gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+                }
+                nearestDistance = distance;
+            }
+            //else
+            //{
+            //    pressEText.enabled = false;
+            //}
+        }
+
+        // Check if a nearest interactable was found
+        if (nearestInteractable != null)
+        {
+            pressEText.enabled = true;
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                nearestInteractable.Interact();
+            }
+        }
+        else
+        {
+            pressEText.enabled = false;
+        }
+        //else
+        //{
+
+        //}
+        //else
+        //{
+        //    Debug.Log("No interactables found within the search radius.");
+        //}
+
+
+    }
+
     void Awake()
     {
         Time.timeScale = 1;
-
+        disabled = false;
         currentAnimState = IDLE;
         IDLE = "player_idle";
         WALK_BACK = "player_WalkBack";
@@ -51,14 +153,13 @@ public class PlayerHubWorld : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        if(disabled)
+        {
+            return;
+        }
         GetComponent<Animator>().Play(currentAnimState);
-        //if (!ATMPanel.activeSelf
-        //    && !shopPanel.GetComponent<CanvasGroup>().interactable
-        //    && !dayPanel.activeSelf)
-        //{
-            Movement();
-        //}
+        Movement();
+        InteractableInteraction();
     }
 
     void Movement()
@@ -104,8 +205,8 @@ public class PlayerHubWorld : MonoBehaviour
     }
 
 
-    public void IncreaseHealth(int val)
-    {
-        PlayerPrefs.SetInt("HealthUpgradePercentage", PlayerPrefs.GetInt("HealthUpgradePercentage") + val);
-    }
+    //public void IncreaseHealth(int val)
+    //{
+    //    PlayerPrefs.SetInt("HealthUpgradePercentage", PlayerPrefs.GetInt("HealthUpgradePercentage") + val);
+    //}
 }

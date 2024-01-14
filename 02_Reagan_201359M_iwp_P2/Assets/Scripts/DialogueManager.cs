@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 
 public class DialogueManager : MonoBehaviour
 {
@@ -18,7 +19,6 @@ public class DialogueManager : MonoBehaviour
     public float typingSpeed = 0.05f;
     Queue<string> sentences;
 
-
     [HideInInspector]
     public AudioSource AS;
 
@@ -27,54 +27,85 @@ public class DialogueManager : MonoBehaviour
     [HideInInspector]
     public bool dialogueMode;
     bool isTyping = false;
-    Dialogue currentDialogue;
+
+    [HideInInspector]
+    public DialogueRealTime currentDialogue;
 
     int currentSentenceidx;
 
     [HideInInspector]
     public MenuManager MM;
-    
+
+    [HideInInspector]
+    public HubWorldMenuManager hubWorldMM;
+
     void Awake()
     {
         MM = GetComponent<MenuManager>();
-
-
-
-        dialoguePanel = MM.dialoguePanel;
-        dialogueText = dialoguePanel.GetComponentInChildren<TextMeshProUGUI>();
-        dialogueText.text = "";
-        dialoguePanelCG = dialoguePanel.GetComponent<CanvasGroup>();
-
+        hubWorldMM = GetComponent<HubWorldMenuManager>();
 
         currentSentenceidx = 0;
         sentences = new Queue<string>();
         AS = GetComponent<AudioSource>();
-        
         currentDialogue = null;
     }
 
-    public void StartDialogue(Dialogue dialogue)
+    public void StartDialogue(DialogueRealTime dialogue)
     {
-        MM.togglePanel(dialoguePanel);
-
-        sentences.Clear();
-        currentDialogue = dialogue;
-
-        //Character[] charactersInScene = FindObjectsOfType<Character>();
-        //foreach (Character character in charactersInScene)
-        //{
-        //    character.disabled = true;
-        //}
-
-        foreach (Dialogue.Sentence sentence in dialogue.sentences)
+        if (currentDialogue == null 
+            && !dialoguePanel.GetComponent<CanvasGroup>().interactable)
         {
-            sentences.Enqueue(sentence.text);
+            Scene currentScene = SceneManager.GetActiveScene();
+            switch (currentScene.name)
+            {
+                case "HubWorld":
+                    hubWorldMM.togglePanel(dialoguePanel);
+                    break;
+                case "GameScene":
+                    MM.togglePanel(dialoguePanel);
+                    break;
+                default:
+                    break;
+            }
+
+            sentences.Clear();
+            currentDialogue = dialogue;
+
+            foreach (DialogueRealTime.Sentence sentence in dialogue.sentences)
+            {
+                sentences.Enqueue(sentence.text);
+            }
+            StartCoroutine(DisplayNextSentence());
         }
-        StartCoroutine(DisplayNextSentence());
     }
 
     void Update()
     {
+        if (dialoguePanel == null)
+        {
+            Scene currentScene = SceneManager.GetActiveScene();
+            switch (currentScene.name)
+            {
+                case "HubWorld":
+                    {
+                        dialoguePanel = hubWorldMM.dialoguePanel;
+                        break;
+                    }
+                case "GameScene":
+                    {
+                        dialoguePanel = MM.dialoguePanel;
+                        break;
+                    }
+                default:
+                    break;
+            }
+
+            dialogueText = dialoguePanel.GetComponentInChildren<TextMeshProUGUI>();
+            dialogueText.text = "";
+            dialoguePanelCG = dialoguePanel.GetComponent<CanvasGroup>();
+        }
+
+
         if (Input.GetMouseButtonDown(0)
             && dialoguePanelCG.interactable
             && dialoguePanelCG.alpha == 1
@@ -106,7 +137,7 @@ public class DialogueManager : MonoBehaviour
             }
             else
             {
-                typingSpeed = 0.0f;
+                typingSpeed = -1.0f;
             }
         }
     }
@@ -139,20 +170,17 @@ public class DialogueManager : MonoBehaviour
     void DisplayOptions()
     {
         // Get the current sentence
-        Dialogue.Sentence currentSentence = currentDialogue.sentences[currentSentenceidx];
+        DialogueRealTime.Sentence currentSentence = currentDialogue.sentences[currentSentenceidx];
 
         // Create buttons for each option
         for (int i = 0; i < currentSentence.options.Count; i++)
         {
             Debug.Log("OPTION");
-            Dialogue.DialogueOption option = currentSentence.options[i];
+            DialogueRealTime.DialogueOption option = currentSentence.options[i];
             // Create a new button
             GameObject buttonGO = new GameObject("OptionButton" + i);
             buttonGO.transform.SetParent(dialoguePanel.transform);
-            // Add a Canvas component to the button
-            //Canvas canvas = buttonGO.AddComponent<Canvas>();
-            //canvas.overrideSorting = true;
-            //canvas.sortingOrder = 10;
+            
             // Add a TextMeshProUGUI component to the button
             TextMeshProUGUI buttonText = new GameObject("Text").AddComponent<TextMeshProUGUI>();
             buttonText.transform.SetParent(buttonGO.transform);
@@ -165,9 +193,8 @@ public class DialogueManager : MonoBehaviour
             button.interactable = true;
             // Customize the appearance of the button
             CustomizeButton(button);
-            // Assign the click event to the option's action
-            //Debug.Log("Adding click listener for option: " + option.optionText);
-            button.onClick.AddListener(() => //Debug.Log("LOM"));
+           
+            button.onClick.AddListener(() => 
             OnOptionSelected(option));
             // Position the button
             RectTransform rectTransform = buttonGO.GetComponent<RectTransform>();
@@ -214,7 +241,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    void OnOptionSelected(Dialogue.DialogueOption option)
+    void OnOptionSelected(DialogueRealTime.DialogueOption option)
     {
         // Handle the selected option
         Debug.Log($"Selected option: {option.optionText}");
@@ -230,7 +257,31 @@ public class DialogueManager : MonoBehaviour
     public void CloseDialogue()
     {
         currentSentenceidx = 0;
-        MM.togglePanel(dialoguePanel);
+        Scene currentScene = SceneManager.GetActiveScene();
+        switch (currentScene.name)
+        {
+            case "HubWorld":
+                {
+                    //hubWorldMM.togglePanel(dialoguePanel);
+                    hubWorldMM.dialoguePanel.GetComponent<CanvasGroup>().interactable = false;
+                    hubWorldMM.dialoguePanel.GetComponent<CanvasGroup>().blocksRaycasts = false;
+                    hubWorldMM.dialoguePanel.GetComponent<CanvasGroup>().alpha = 0;
+                    //Debug.Log("CLOSE FROM HUB WORLD");
+                    break;
+                }
+            case "GameScene":
+                {
+                    //MM.togglePanel(dialoguePanel);
+                    MM.dialoguePanel.GetComponent<CanvasGroup>().interactable = false;
+                    MM.dialoguePanel.GetComponent<CanvasGroup>().blocksRaycasts = false;
+                    MM.dialoguePanel.GetComponent<CanvasGroup>().alpha = 0;
+                    //Debug.Log("CLOSE FROM GAME WORLD");
+                    break;
+                }
+            default:
+                break;
+        }
+
         currentDialogue = null; // Reset currentDialogue
     }
 

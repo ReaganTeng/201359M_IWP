@@ -12,65 +12,46 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 659e31f5f8022c942b6909d9102474ca, type: 3}
   m_Name: Upgrades
   m_EditorClassIdentifier: 
-  slotsToTransfer:
-  - {fileID: 9007220786065537428, guid: 7ac21b36c90182f48877466c757ba8e6, type: 3}
-  - {fileID: 9007220786065537428, guid: 7ac21b36c90182f48877466c757ba8e6, type: 3}
-  - {fileID: 9007220786065537428, guid: 7ac21b36c90182f48877466c757ba8e6, type: 3}
-  - {fileID: 9007220786065537428, guid: 7ac21b36c90182f48877466c757ba8e6, type: 3}
-  - {fileID: 9007220786065537428, guid: 7ac21b36c90182f48877466c757ba8e6, type: 3}
-  - {fileID: 9007220786065537428, guid: 7ac21b36c90182f48877466c757ba8e6, type: 3}
-  - {fileID: 9007220786065537428, guid: 7ac21b36c90182f48877466c757ba8e6, type: 3}
-  - {fileID: 9007220786065537428, guid: 7ac21b36c90182f48877466c757ba8e6, type: 3}
-  - {fileID: 9007220786065537428, guid: 7ac21b36c90182f48877466c757ba8e6, type: 3}
-  - {fileID: 9007220786065537428, guid: 7ac21b36c90182f48877466c757ba8e6, type: 3}
+  DamageBuff: 0
+  HealthBuff: 0
   slotProperty:
   - currentitem: {fileID: 0}
     itemtype: 1
     iconsprite: {fileID: 21300000, guid: aede5fc3a369f134993eca1faa2d09b5, type: 3}
-    Quantity: 6
-    quantitytext: 6
-  - currentitem: {fileID: 0}
-    itemtype: 2
-    iconsprite: {fileID: 21300000, guid: fdae880631cfd834d8281f411c1b58fd, type: 3}
-    Quantity: 8
-    quantitytext: 8
+    Quantity: 4
+    quantitytext: 4
   - currentitem: {fileID: 0}
     itemtype: 0
     iconsprite: {fileID: 21300000, guid: a6dd7a81acc656d43b6f5085220a82a0, type: 3}
-    Quantity: 6
-    quantitytext: 6
+    Quantity: 2
+    quantitytext: 2
+  - currentitem: {fileID: 0}
+    itemtype: 4
+    iconsprite: {fileID: 21300000, guid: 404dc5629c1187a46942f27b87b53d48, type: 2}
+    Quantity: 1
+    quantitytext: 1
+  - currentitem: {fileID: 0}
+    itemtype: 3
+    iconsprite: {fileID: 21300000, guid: 418c93285dff7114490b7a76237086d1, type: 3}
+    Quantity: 3
+    quantitytext: 3
+  - currentitem: {fileID: 0}
+    itemtype: 2
+    iconsprite: {fileID: 21300000, guid: fdae880631cfd834d8281f411c1b58fd, type: 3}
+    Quantity: 3
+    quantitytext: 3
+  - currentitem: {fileID: 0}
+    itemtype: 7
+    iconsprite: {fileID: 21300000, guid: 1279edebc447f394f9be87722985232d, type: 3}
+    Quantity: 1
+    quantitytext: 1
+  - currentitem: {fileID: 0}
+    itemtype: 5
+    iconsprite: {fileID: 21300000, guid: 415ba910aea682349bb699ec03fb7bb0, type: 3}
+    Quantity: 2
+    quantitytext: 2
   - currentitem: {fileID: 0}
     itemtype: 11
-    iconsprite: {fileID: 7482667652216324306, guid: 045f9c59399f9d745b659ccdcd783b3f, type: 3}
-    Quantity: 0
-    quantitytext: 
-  - currentitem: {fileID: 0}
-    itemtype: 11
-    iconsprite: {fileID: 7482667652216324306, guid: 045f9c59399f9d745b659ccdcd783b3f, type: 3}
-    Quantity: 0
-    quantitytext: 
-  - currentitem: {fileID: 0}
-    itemtype: 11
-    iconsprite: {fileID: 7482667652216324306, guid: 045f9c59399f9d745b659ccdcd783b3f, type: 3}
-    Quantity: 0
-    quantitytext: 
-  - currentitem: {fileID: 0}
-    itemtype: 11
-    iconsprite: {fileID: 7482667652216324306, guid: 045f9c59399f9d745b659ccdcd783b3f, type: 3}
-    Quantity: 0
-    quantitytext: 
-  - currentitem: {fileID: 0}
-    itemtype: 11
-    iconsprite: {fileID: 7482667652216324306, guid: 045f9c59399f9d745b659ccdcd783b3f, type: 3}
-    Quantity: 0
-    quantitytext: 
-  - currentitem: {fileID: 0}
-    itemtype: 11
-    iconsprite: {fileID: 7482667652216324306, guid: 045f9c59399f9d745b659ccdcd783b3f, type: 3}
-    Quantity: 0
-    quantitytext: 
-  - currentitem: {fileID: 0}
-    itemtype: 11
-    iconsprite: {fileID: 7482667652216324306, guid: 045f9c59399f9d745b659ccdcd783b3f, type: 3}
+    iconsprite: {fileID: 0}
     Quantity: 0
     quantitytext: 

@@ -4,39 +4,37 @@ using Debug = UnityEngine.Debug;
 
 public class DialogueTrigger : Interactables
 {
-    public Dialogue dialogue;
+    [HideInInspector]
+    public DialogueRealTime dialogue;
 
     [HideInInspector]
     public DialogueManager DM;
 
+
     public override void Awake()
     {
         base.Awake();
+        dialogue = GetComponent<DialogueRealTime>();
+
+
         DM = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<DialogueManager>();
         dialogue.Initialize();
     }
 
     public override void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E) 
-            && textPrompt.enabled)
-        {
-            TriggerDialogue();
-        }
+        
     }
 
-    void TriggerDialogue()
+    public override void Interact()
+    {
+        //Debug.Log("IMTERACT");
+        //base.Interact();
+        TriggerDialogue();
+    }
+
+    public virtual void TriggerDialogue()
     {
         DM.StartDialogue(dialogue);
-    }
-
-    public override void OnTriggerEnter2D(Collider2D other)
-    {
-        base.OnTriggerEnter2D(other);
-    }
-
-    public override void OnTriggerExit2D(Collider2D other)
-    {
-        base.OnTriggerExit2D(other);
     }
 }

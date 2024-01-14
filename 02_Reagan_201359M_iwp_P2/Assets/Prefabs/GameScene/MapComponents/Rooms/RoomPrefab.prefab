@@ -2722,7 +2722,7 @@ GameObject:
   - component: {fileID: 8599887526721424067}
   - component: {fileID: 8544252773810438289}
   - component: {fileID: 2176801570520602079}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Walls
   m_TagString: WallTilemap
   m_Icon: {fileID: 0}

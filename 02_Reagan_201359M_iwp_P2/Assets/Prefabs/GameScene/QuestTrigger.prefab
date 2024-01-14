@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 679605246197987925}
   - component: {fileID: 3558913340211218730}
   - component: {fileID: -1441213990987062448}
+  - component: {fileID: 3537035939106168072}
   m_Layer: 0
   m_Name: QuestTrigger
   m_TagString: Untagged
@@ -75,16 +76,16 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 045f9c59399f9d745b659ccdcd783b3f, type: 3}
+  m_SortingOrder: 1
+  m_Sprite: {fileID: 21300000, guid: 65202c3c7ddeade49b27e2c1abc91c9a, type: 3}
   m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
-  m_DrawMode: 0
+  m_DrawMode: 1
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!61 &3558913340211218730
@@ -123,10 +124,10 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 0.16, y: 0.16}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
-    drawMode: 0
+    drawMode: 1
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
@@ -146,12 +147,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sr: {fileID: 0}
   textPrompt: {fileID: 0}
+  dialogue: {fileID: 0}
+  DM: {fileID: 0}
   questGivername: 
   questName: Killing Monster
   questGiverid: 0
   QuestDes: 
   requiredCount: 0
   QM: {fileID: 0}
+  givenQuest: 0
+  itemPrefab: {fileID: 72955845208125536, guid: 5b0e3c7ba455c46408341d69e4f40f44, type: 3}
+  powerUpPrefab: {fileID: 72955845208125536, guid: 7f4e33fddb3a3a54db06aa12bc2e5da9, type: 3}
+--- !u!114 &3537035939106168072
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1662021743312830382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88017d9545ae1164db14c9de15d74785, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dialogueGiver: 2
+  sentences:
+  - text: I need you to kill some Monsters, mind helping?
+    options:
+    - optionText: YES
+    - optionText: NO
 --- !u!1 &4324538630859047761
 GameObject:
   m_ObjectHideFlags: 0

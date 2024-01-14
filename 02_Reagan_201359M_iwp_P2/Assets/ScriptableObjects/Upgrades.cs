@@ -7,6 +7,9 @@ using static Item;
 [CreateAssetMenu(fileName = "Upgrades", menuName = "Upgrades")]
 public class Upgrades : ScriptableObject
 {
+    public int DamageBuff;
+    public int HealthBuff;
+
     //public Inventory inventory;
     [System.Serializable]
     public class SlotProperties
@@ -18,7 +21,7 @@ public class Upgrades : ScriptableObject
         public string quantitytext;
     }
 
-    public List<InventorySlot> slotsToTransfer = new List<InventorySlot>();
+    //public List<InventorySlot> slotsToTransfer = new List<InventorySlot>();
 
     public List<SlotProperties> slotProperty = new List<SlotProperties>();
 
@@ -40,23 +43,23 @@ public class Upgrades : ScriptableObject
     }
 
 
-    public void emptySlot(InventorySlot slot)
-    {
-        slot.CurrentItem = null;
-        slot.itemtype = ItemType.NOTHING;
-        slot.Quantity = 0;
-        // Assuming slot has an Image component
-        slot.slotImage.sprite = null;
-        //slot.slotImage = null;
-        //slot.quantityText.text = $"{slot.Quantity}";
-        if (slot.Quantity > 0)
-        {
-            slot.quantityText.text = $"{slot.Quantity}";
-        }
-        else
-        {
-            slot.quantityText.text = "";
-        }
-        //slot.quantityText.text = $"{slot.Quantity}";
-    }
+    //public void emptySlot(InventorySlot slot)
+    //{
+    //    slot.CurrentItem = null;
+    //    slot.itemtype = ItemType.NOTHING;
+    //    slot.Quantity = 0;
+    //    // Assuming slot has an Image component
+    //    slot.slotImage.sprite = null;
+    //    //slot.slotImage = null;
+    //    //slot.quantityText.text = $"{slot.Quantity}";
+    //    if (slot.Quantity > 0)
+    //    {
+    //        slot.quantityText.text = $"{slot.Quantity}";
+    //    }
+    //    else
+    //    {
+    //        slot.quantityText.text = "";
+    //    }
+    //    //slot.quantityText.text = $"{slot.Quantity}";
+    //}
 }

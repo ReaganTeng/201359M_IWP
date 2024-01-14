@@ -1,11 +1,9 @@
-using System;
-using System.Collections;
+
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityEngine.EventSystems.EventTrigger;
+//using UnityEditor.Animations;
 
 
 public class PlayerManager : MonoBehaviour
@@ -21,7 +19,7 @@ public class PlayerManager : MonoBehaviour
     //    VETERAN,
     //}
     //MAKE SURE THE SAME ORDER AS THE COMMENTED ENUM ABOVE, EXAMPLE SPRITE OF JOE THE SAME INDEX AS JOE
-    public List<Sprite> playerSprites = new List<Sprite>();
+    //public List<Sprite> playerSprites = new List<Sprite>();
 
 
     //GAMEOBJECTS TO DRAG IN INSPECTOR
@@ -31,8 +29,6 @@ public class PlayerManager : MonoBehaviour
     int currentPlayerIndex = 0;
     int numberOfPlayers;
     public Camera mainCamera; // Reference to the main camera
-
-    public GameObject characterSwitchpanel;
 
     //public AnimatorController animcon;
 
@@ -54,23 +50,27 @@ public class PlayerManager : MonoBehaviour
     [HideInInspector]
     public Image playerIcon;
 
-    //[HideInInspector]
-    //public GameObject dialoguePanel;
-
-    //public List<Image> icons = new List<Image>();
-
+    [HideInInspector]
+    public MenuManager MM;
+    [HideInInspector]
+    public GameObject characterSwitchPanel;
 
 
     public GameObject playerPrefab;
 
-
     float aiTimer;
+    public GameObject playerSwitchButtonPrefab;  // Reference to the UI button prefab
 
 
+    public GameObject PlayerParent;
+
+    List<CharacterUnlockManager.CharacterType> selectedCharacters;
     //bool effectapplied = false;
     void Awake()
     {
         aiTimer = 0;
+
+        MM = GetComponent<MenuManager>();
 
         playerIcon = GameObject.FindGameObjectWithTag("PlayerIcon").GetComponent<Image>();
 
@@ -79,101 +79,67 @@ public class PlayerManager : MonoBehaviour
         //StartItself();
         gameOverPanel = GameObject.FindGameObjectWithTag("GameOverPanel");
 
-        if (gameOverPanel != null)
-        {
-            gameOverPanel.SetActive(false);
-        }
+        //if (gameOverPanel != null)
+        //{
+        //    gameOverPanel.SetActive(false);
+        //}
         //Debug.Log("AWAKE");
+    }
+
+
+    void SwitchPlayerByButton(CharacterUnlockManager.CharacterType character)
+    {
+        // Find the index of the selected character
+        int nextPlayerIndex = selectedCharacters.IndexOf(character);
+        currentPlayerIndex = nextPlayerIndex;
+
+        // Switch to the selected player
+        SwitchPlayer(currentPlayerIndex);
+
+        MM.togglePanel(characterSwitchPanel);
     }
 
     public void StartItself()
     {
+        if (characterSwitchPanel == null)
+        {
+            characterSwitchPanel = MM.CharacterSwitchPanel;
+        }
+
         //INSTANTIATE PLAYERS FIRST
-        List<CharacterUnlockManager.CharacterType> selectedCharacters = characterUnlockManager.selectedCharacters;
+        selectedCharacters = characterUnlockManager.selectedCharacters;
         foreach (CharacterUnlockManager.CharacterType character in selectedCharacters)
         {
             // Instantiate characters in the game scene based on unlocked characters
             GameObject p = Instantiate(playerPrefab, Vector2.zero, Quaternion.identity);
+            p.transform.SetParent(PlayerParent.transform);
+
             Character charScript = p.GetComponent<Character>();
             Player playerScript = p.GetComponent<Player>();
             charScript.characterType = character;
             playerScript.characterType = character;
 
 
-            //GET THE CLIP YOU WANT TO PLAY
-            //int idx = 0;
-            //CharacterAnimationClips characterAnimationEntry =
-            //playerScript.characterAnimations.Find(entry => entry.characterType == playerScript.characterType);
-            //AnimationClip clipToPlay = characterAnimationEntry.animationClips[idx];
-            ////
-            //playerScript.AssignClipToState(playerScript.IDLE, clipToPlay);
-            //idx++;
-            //clipToPlay = characterAnimationEntry.animationClips[idx];
-            //playerScript.AssignClipToState(playerScript.WALK_FRONT, clipToPlay);
-            //idx++;
-            //clipToPlay = characterAnimationEntry.animationClips[idx];
-            //playerScript.AssignClipToState(playerScript.WALK_BACK, clipToPlay);
-            //idx++;
-            //clipToPlay = characterAnimationEntry.animationClips[idx];
-            //playerScript.AssignClipToState(playerScript.WALK_LEFT, clipToPlay);
-            //idx++;
-            //clipToPlay = characterAnimationEntry.animationClips[idx];
-            //playerScript.AssignClipToState(playerScript.WALK_RIGHT, clipToPlay);
-            //idx++;
-            //clipToPlay = characterAnimationEntry.animationClips[idx];
-            //playerScript.AssignClipToState(playerScript.ATTACK, clipToPlay);
-            //idx++;
-            //clipToPlay = characterAnimationEntry.animationClips[idx];
-            //playerScript.AssignClipToState(playerScript.HURT, clipToPlay);
-
-
-
             //Professor - weak in basic attacks but can deal higher damage with Gems
             //Veteran - weak in gem attacks but can absorb more damage and damage dealt
 
-            // Get an array of all enum values
-            //CharacterUnlockManager.CharacterType[] enumValues 
-            //    = (CharacterUnlockManager.CharacterType[])Enum.GetValues(typeof(CharacterUnlockManager.CharacterType));
-            // Get the index using Array.IndexOf
-            //int index = Array.IndexOf(enumValues, character);
-            //playerScript.spriteRenderer.sprite = playerSprites[index];
-
-            //METHOD 1
-            // Instantiate a new instance of the AnimatorController (RuntimeAnimatorController)
-            AnimatorController newController
-                = playerScript.characterAnimations.Find(entry 
-                => entry.characterType == playerScript.characterType).animcon;
-            if (newController != null)
-            {
-                // Assign the new controller to the animatorComponent
-                playerScript.animatorComponent.runtimeAnimatorController = newController;
-            }
-
-
-            //METHOD 2 - INSTANTIATE ANIMCONTROLLERS
-            //int index = selectedCharacters.IndexOf(character);
-            //Debug.Log($"CHARACTER CHOSEN {character}");
             //AnimatorController newController
-            //= new AnimatorController();
-            //AnimatorController playercon = newController = playerScript.characterAnimations.Find(entry
-            //=> entry.characterType == playerScript.characterType).animcon;
-            //// Iterate through states in the source controller
-            //foreach (ChildAnimatorState state in playercon.layers[0].stateMachine.states)
-            //{
-            //    // Create a new state in the destination controller
-            //    ChildAnimatorState newState = new ChildAnimatorState
-            //    {
-            //        state = new AnimatorState { name = state.state.name }
-            //    };
-            //    newController.layers[0].stateMachine.AddState(state.state.name);
-            //}
-            //newController.name = $"PLAYER{index}";
+            //    = playerScript.characterAnimations.Find(entry 
+            //    => entry.characterType == playerScript.characterType).animcon;
             //if (newController != null)
             //{
             //    // Assign the new controller to the animatorComponent
             //    playerScript.animatorComponent.runtimeAnimatorController = newController;
             //}
-            //
+
+
+            RuntimeAnimatorController overrideController = playerScript.characterAnimations.Find(entry => 
+            entry.characterType == playerScript.characterType).animcon;
+            if (overrideController != null)
+            {
+                // Assign the new override controller to the animatorComponent
+                playerScript.animatorComponent.runtimeAnimatorController = overrideController;
+            }
 
 
             playerScript.icon 
@@ -201,24 +167,6 @@ public class PlayerManager : MonoBehaviour
                     break;
             }
 
-            //Character script = p.GetComponent<Character>();
-            //if (playerScript.animatorComponent.runtimeAnimatorController == null)
-            //{
-            //    //AnimatorController newController
-            //    //    = Instantiate(script.characterAnimations.Find(entry
-            //    //    => entry.characterType == script.characterType).animcon)
-            //    AnimatorController newController
-            //    = Instantiate(animcon);
-            //    newController.name = $"PLAYER{selectedCharacters.IndexOf(character)}";
-            //    if (newController != null)
-            //    {
-            //        // Assign the new controller to the animatorComponent
-            //        playerScript.animatorComponent.runtimeAnimatorController = newController;
-            //    }
-            //    //return;
-            //}
-
-
             players.Add(p);
             Debug.Log("PLAYER ADDED");
         }
@@ -229,8 +177,26 @@ public class PlayerManager : MonoBehaviour
 
         for (int i = 0; i < numberOfPlayers; i++)
         {
+            //SET THE LEADING PLAYER
             players[i].GetComponent<Player>().leadingPlayer = players[currentPlayerIndex];
         }
+
+        //INSTANTIATE BUTTONS to SWITCH CHARACTERS
+        for (int i = 0; i < numberOfPlayers; i++)
+        {
+            float angleStep = 360f / numberOfPlayers;
+            float angle = i * angleStep;
+            float x = Mathf.Cos(Mathf.Deg2Rad * angle) * 90.0f;
+            float y = Mathf.Sin(Mathf.Deg2Rad * angle) * 90.0f;
+            GameObject playerSwitchButton = Instantiate(playerSwitchButtonPrefab, characterSwitchPanel.GetComponent<RectTransform>());
+            playerSwitchButton.GetComponent<RectTransform>().sizeDelta *= .2f;
+            playerSwitchButton.GetComponentInChildren<Image>().sprite = players[i].GetComponent<Player>().icon;
+            // Set the position of the button
+            playerSwitchButton.GetComponent<RectTransform>().anchoredPosition = new Vector2(x, y);
+            int currentIndex = i;  // Capture the current index in the lambda
+            playerSwitchButton.GetComponentInChildren<Button>().onClick.AddListener(() => SwitchPlayerByButton(selectedCharacters[currentIndex]));
+        }
+        //
 
         for (int i = 0; i < numberOfPlayers; i++)
         {
@@ -241,6 +207,7 @@ public class PlayerManager : MonoBehaviour
             }
         }
 
+        //SET UP PLAYER'S HEALTHBAR
         healthbar = GameObject.FindGameObjectWithTag("HPBar").GetComponent<Slider>();
         healthbar.minValue = 0;
         healthbar.maxValue = players[currentPlayerIndex].GetComponent<Player>().health;
@@ -248,11 +215,9 @@ public class PlayerManager : MonoBehaviour
 
         finishedSpawning = true;
 
-        SwitchPlayer();
+        SwitchPlayer(0);
 
-        Debug.Log("START ITSELF FINISH");
-
-        //dialoguePanel.SetActive(false);
+        //Debug.Log("START ITSELF FINISH");
     }
 
     void Update()
@@ -293,28 +258,34 @@ public class PlayerManager : MonoBehaviour
             gameOverPanel.SetActive(true);
         }
 
-        if (gameOverPanel.activeSelf)
-        {
-            Time.timeScale = 0;
-        }
+        //if (gameOverPanel.activeSelf)
+        //{
+        //    Time.timeScale = 0;
+        //}
         //if(playerGameObject)
 
-        if (characterSwitchpanel.activeSelf == true)
-        {
-            //SLOW DOWN TIME
-            Time.timeScale = .1f;
-        }
+        //if (characterSwitchpanel.activeSelf == true)
+        //{
+        //    //SLOW DOWN TIME
+        //    Time.timeScale = .1f;
+        //}
 
         if (players.Count >= 0)
         {
-            if (Input.GetKeyDown(KeyCode.Tab)
-                || (!allDead
-                && players[currentPlayerIndex].GetComponent<Player>().health <= 0)
+            if (!allDead
+                && players[currentPlayerIndex].GetComponent<Player>().health <= 0
                 )
             {
                 //characterSwitchpanel.SetActive(true);
-                SwitchPlayer();
+
+                SwitchPlayerWhenDied();
             }
+
+            if (Input.GetKeyDown(KeyCode.Tab))
+            {
+                MM.togglePanel(characterSwitchPanel);
+            }
+
             cameraFollow();
         }
         
@@ -364,7 +335,7 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    public void SwitchPlayer()
+    public void SwitchPlayerWhenDied()
     {
         int nextPlayerIndex = (currentPlayerIndex + 1) % numberOfPlayers;
         stuckmode = false;
@@ -387,9 +358,38 @@ public class PlayerManager : MonoBehaviour
 
             }
             playerIcon.sprite = players[currentPlayerIndex].GetComponent<Player>().icon;
-            characterSwitchpanel.SetActive(false);
+            //characterSwitchpanel.SetActive(false);
         }
         
+    }
+
+
+    public void SwitchPlayer(int playerclicked)
+    {
+        int nextPlayerIndex = playerclicked;
+        stuckmode = false;
+
+        if (players[nextPlayerIndex].GetComponent<Character>().health > 0)
+        {
+            currentPlayerIndex = nextPlayerIndex;
+            Debug.Log($"Switching to Player {currentPlayerIndex + 1}");
+            //SET PLAYERS IN PLAYER MODE
+            SetPlayerToPlayerMode(currentPlayerIndex);
+
+            for (int i = 0; i < numberOfPlayers; i++)
+            {
+                if (i != currentPlayerIndex)
+                {
+                    //SET PLAYERS TO AI MODE
+                    SetPlayerToAIMode(i);
+                }
+                players[i].GetComponent<Player>().leadingPlayer = players[currentPlayerIndex];
+
+            }
+            playerIcon.sprite = players[currentPlayerIndex].GetComponent<Player>().icon;
+            //characterSwitchpanel.SetActive(false);
+        }
+
     }
 
     void SetPlayerToPlayerMode(int index)
