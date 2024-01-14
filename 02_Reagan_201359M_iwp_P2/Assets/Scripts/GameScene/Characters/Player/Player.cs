@@ -70,8 +70,8 @@ public class Player : Character
     //bool gotInput;
 
 
-    [HideInInspector]
-    public CharacterUnlockManager.CharacterType characterType;
+    //[HideInInspector]
+    //public CharacterUnlockManager.CharacterType characterType;
 
     [HideInInspector]
     public GameObject nearestEnemy;

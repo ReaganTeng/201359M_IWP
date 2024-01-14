@@ -88,7 +88,15 @@ public class Character : MonoBehaviour
     //[ContextMenu("Change State Motion")]
     public void PlayAnimation(string state)
     {
-        animatorComponent.Play(state);
+
+        int layerIndex = 0; 
+
+        // Check if the layer index is valid
+        if (layerIndex >= 0 && layerIndex < animatorComponent.layerCount)
+        {
+            animatorComponent.Play(state, layerIndex);
+        }
+       
     }
 
     //public void AssignClipToState(string stateName, AnimationClip clip)

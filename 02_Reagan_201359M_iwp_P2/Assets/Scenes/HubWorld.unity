@@ -7483,13 +7483,13 @@ RectTransform:
   - {fileID: 1419180396}
   - {fileID: 905824318}
   - {fileID: 1068029535}
-  - {fileID: 1900584120}
-  - {fileID: 1790640990}
   - {fileID: 2100302726}
   - {fileID: 482808120}
   - {fileID: 1381560709}
   - {fileID: 2024258565}
   - {fileID: 662208062}
+  - {fileID: 1900584120}
+  - {fileID: 1790640990}
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -56471,7 +56471,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1790640990
 RectTransform:
   m_ObjectHideFlags: 0
@@ -59190,7 +59190,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1900584120
 RectTransform:
   m_ObjectHideFlags: 0
@@ -60437,6 +60437,14 @@ PrefabInstance:
     - target: {fileID: 736893996411956853, guid: 43503ea3d665af842baafbc707ac8daa, type: 3}
       propertyPath: m_SizeDelta.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1567143586700397853, guid: 43503ea3d665af842baafbc707ac8daa, type: 3}
+      propertyPath: m_Size
+      value: 0.9517386
+      objectReference: {fileID: 0}
+    - target: {fileID: 1567143586700397853, guid: 43503ea3d665af842baafbc707ac8daa, type: 3}
+      propertyPath: m_Value
+      value: 1.0000031
       objectReference: {fileID: 0}
     - target: {fileID: 1615398024319673484, guid: 43503ea3d665af842baafbc707ac8daa, type: 3}
       propertyPath: inventoryManager
