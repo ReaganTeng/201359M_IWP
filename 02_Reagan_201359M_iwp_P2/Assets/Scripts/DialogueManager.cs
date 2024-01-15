@@ -205,7 +205,7 @@ public class DialogueManager : MonoBehaviour
             rectTransform.anchorMin = new Vector2(0.5f, 0);
             rectTransform.anchorMax = new Vector2(0.5f, 0);
             rectTransform.pivot = new Vector2(0.5f, 0);
-            rectTransform.anchoredPosition = new Vector2(-i * 200, dialoguePanel.transform.position.y); // Negative to arrange from top to bottom
+            rectTransform.anchoredPosition = new Vector2(-i * 250, dialoguePanel.transform.position.y - 200); // Negative to arrange from top to bottom
             // Set the button's size
             rectTransform.sizeDelta = new Vector2(100, 50); // Adjust size as needed
         }

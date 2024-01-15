@@ -2363,7 +2363,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: -0.00027645915}
-  m_SizeDelta: {x: 1922.8315, y: 500}
+  m_SizeDelta: {x: 750.546, y: 227.243}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &41221584
 MonoBehaviour:
@@ -10024,14 +10024,14 @@ RectTransform:
   m_Children:
   - {fileID: 149966341}
   - {fileID: 335888336}
-  - {fileID: 1464126527}
-  - {fileID: 1221866120}
   - {fileID: 1266008253}
   - {fileID: 516983328}
   - {fileID: 450221806}
-  - {fileID: 274974349}
   - {fileID: 1410144853}
   - {fileID: 1535082783}
+  - {fileID: 1464126527}
+  - {fileID: 1221866120}
+  - {fileID: 274974349}
   - {fileID: 907332444}
   m_Father: {fileID: 0}
   m_RootOrder: 3
@@ -10178,8 +10178,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: -1831333587, guid: 13c7e668d371d204c9387668a2386453, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -17509,7 +17509,7 @@ GameObject:
   - component: {fileID: 500413753}
   - component: {fileID: 500413752}
   m_Layer: 5
-  m_Name: ToggleQuest
+  m_Name: ToggleQuestButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17587,6 +17587,18 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 1464126526}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1666197276}
+        m_TargetAssemblyTypeName: QuestManager, Assembly-CSharp
+        m_MethodName: DisableNotifications
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -22580,8 +22592,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1979909912}
   m_HandleRect: {fileID: 1979909911}
   m_Direction: 2
-  m_Value: 1.0000025
-  m_Size: 0.7827483
+  m_Value: 1
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -27290,6 +27302,7 @@ MonoBehaviour:
   shopkeeperParent: {fileID: 897563800}
   shopkeeperPrefab: {fileID: 7858503774673311384, guid: fb3fb7627c5fd4343ab056117d8573c6, type: 3}
   questTriggerPrefab: {fileID: 1662021743312830382, guid: b7964f1d4fe6e8d4abc15d3452fb9e0c, type: 3}
+  musicPlayerPrefab: {fileID: 4929132728632659972, guid: 54c87c978f6119c4f8303b2551c77acd, type: 3}
   occupiedPositions: []
   startingposition: {x: 0, y: 0}
   roomdimension: 0
@@ -33150,15 +33163,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: -1831333587, guid: 13c7e668d371d204c9387668a2386453, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -33554,7 +33567,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6095944438362678489, guid: 34cf188ea52a11b4ba680c2fe444257b, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0.4
+      value: 0.90900004
       objectReference: {fileID: 0}
     - target: {fileID: 6095944438362678489, guid: 34cf188ea52a11b4ba680c2fe444257b, type: 3}
       propertyPath: m_AnchorMin.x
@@ -33562,15 +33575,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6095944438362678489, guid: 34cf188ea52a11b4ba680c2fe444257b, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 0.16000001
       objectReference: {fileID: 0}
     - target: {fileID: 6095944438362678489, guid: 34cf188ea52a11b4ba680c2fe444257b, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 0.0050049
       objectReference: {fileID: 0}
     - target: {fileID: 6095944438362678489, guid: 34cf188ea52a11b4ba680c2fe444257b, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: -3.497696
       objectReference: {fileID: 0}
     - target: {fileID: 6095944438362678489, guid: 34cf188ea52a11b4ba680c2fe444257b, type: 3}
       propertyPath: m_LocalPosition.x
@@ -33602,11 +33615,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6095944438362678489, guid: 34cf188ea52a11b4ba680c2fe444257b, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: -0.0025024414
       objectReference: {fileID: 0}
     - target: {fileID: 6095944438362678489, guid: 34cf188ea52a11b4ba680c2fe444257b, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -7.0466003
       objectReference: {fileID: 0}
     - target: {fileID: 6095944438362678489, guid: 34cf188ea52a11b4ba680c2fe444257b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -34202,15 +34215,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: -1831333587, guid: 13c7e668d371d204c9387668a2386453, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -38745,39 +38758,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 7077946905035371500, guid: 71e0b9ca96d322946b35d8057b955d1d, type: 3}
   m_PrefabInstance: {fileID: 1535082782}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1535082784 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 9064836472781220419, guid: 71e0b9ca96d322946b35d8057b955d1d, type: 3}
-  m_PrefabInstance: {fileID: 1535082782}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1535082785 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1216947221529675169, guid: 71e0b9ca96d322946b35d8057b955d1d, type: 3}
-  m_PrefabInstance: {fileID: 1535082782}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1535082786 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7033086736300413801, guid: 71e0b9ca96d322946b35d8057b955d1d, type: 3}
-  m_PrefabInstance: {fileID: 1535082782}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1571846700
 GameObject:
   m_ObjectHideFlags: 0
@@ -38939,7 +38919,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2136237128}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.38224876
+  m_Size: 0.979287
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -39383,7 +39363,6 @@ GameObject:
   - component: {fileID: 1666197276}
   - component: {fileID: 1666197275}
   - component: {fileID: 1666197274}
-  - component: {fileID: 1666197277}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: GameMGT
@@ -39492,9 +39471,6 @@ MonoBehaviour:
   GameCompletePanel: {fileID: 0}
   GameOverPanel: {fileID: 0}
   SettingsPanel: {fileID: 0}
-  MasterVolumeSlider: {fileID: 1535082786}
-  MusicVolumeSlider: {fileID: 1535082785}
-  SoundVolumeSlider: {fileID: 1535082784}
 --- !u!82 &1666197274
 AudioSource:
   m_ObjectHideFlags: 0
@@ -39635,19 +39611,6 @@ MonoBehaviour:
   questCompletedClip: {fileID: 8300000, guid: b9761a91d79b7a34ea7e6f5d66241c30, type: 3}
   newQuestNotification: {fileID: 543625782}
   questUpdatedNotification: {fileID: 272031243}
---- !u!114 &1666197277
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1666197266}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bd5c3f3ba28f982419424877012e6ce3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mastervolume: 0
 --- !u!1 &1687746580
 GameObject:
   m_ObjectHideFlags: 0

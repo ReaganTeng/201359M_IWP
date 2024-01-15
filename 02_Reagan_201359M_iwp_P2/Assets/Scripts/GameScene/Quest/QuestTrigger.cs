@@ -70,8 +70,10 @@ public class QuestTrigger : DialogueTrigger
         itemActions = new Dictionary<QuestType, Action>
         {
             { QuestType.MONSTER_SLAYING, () =>
-                questName = "Killing Monsters"
-
+            {
+                questName = "Killing Monsters";
+                QuestDes = "Kill some monsters";
+            }
             },
             
              //
@@ -94,6 +96,8 @@ public class QuestTrigger : DialogueTrigger
         //{
         //    Debug.Log("MUTEEEE");
         //}
+
+        
     }
 
     public override void Interact()
@@ -105,8 +109,9 @@ public class QuestTrigger : DialogueTrigger
         }
         else
         {
+
             Quest quest = QM.quests.Find(template
-                => template.hiddenVariables.questGiverID == questGiverid);
+            => template.hiddenVariables.questGiverID == questGiverid);
             if (quest != null &&
                 quest.hiddenVariables.isCompleted)
             {
@@ -136,10 +141,39 @@ public class QuestTrigger : DialogueTrigger
                 }
 
 
-
-                Destroy(this.gameObject);
             }
+
+
+            //List<Quest> quests = QM.quests.FindAll(template
+            //   => template.hiddenVariables.questGiverID == questGiverid);
+            //foreach (Quest q in quests)
+            //{
+            //    if (q != null &&
+            //        q.hiddenVariables.isCompleted)
+            //    {
+            //        //Debug.Log("QUEST COMPLETED");
+            //        int idx = QM.quests.IndexOf(q);
+            //        GameObject questUI = QM.questUIContent.GetComponent<RectTransform>().GetChild(idx).gameObject;
+            //        Destroy(questUI);
+            //        QM.quests.Remove(q);
+
+
+            //        QM.updateContentSize();
+
+            //    }
+            //}
+
+            Destroy(gameObject);
+            
+
+
+
         }
+
+        //QM.updateContentSize();
+
+
+
     }
 
 

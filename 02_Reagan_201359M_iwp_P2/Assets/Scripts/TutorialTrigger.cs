@@ -49,6 +49,7 @@ public class TutorialTrigger : MonoBehaviour
     }
 
     void Update()
+
     {
         currentScene = SceneManager.GetActiveScene();
         TriggerDialogue(TutorialType.STORY_BEGINNING, ref tutorialSystem.StoryBeginningCompleted, HubWorldScene);

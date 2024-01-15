@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Random = UnityEngine.Random;
 
 [Serializable]
 public class DialogueRealTime : MonoBehaviour
@@ -129,18 +130,22 @@ public class DialogueRealTime : MonoBehaviour
     public void AcceptQuest(ref QuestManager QM, QuestTrigger QT)
 
     {
-        //int localID = QT.questGiverid;
-        //Quest foundQuest = QM.quests.Find(template => template.hiddenVariables.questGiverID == localID);
-        //if (foundQuest != null)
-        //{
+        //for (int i = 0; i < 10; i++)
+        {
+            //int localID = QT.questGiverid;
+            //Quest foundQuest = QM.quests.Find(template => template.hiddenVariables.questGiverID == localID);
+            //if (foundQuest != null)
+            //{
             //Debug.Log("TRIGGERED");
-            QT.requiredCount = 3;
+            QT.requiredCount = 1;
+            //QT.requiredCount = Random.Range(1, 11);
             //AddQuest(string questName, string description, int requiredCount);
             QM.AddQuest(QT.questName, QT.QuestDes, QT.requiredCount, QT.questGiverid);
-            QT.givenQuest = true;
-        //Debug.Log($"GIVEN QUEST IS {givenQuest}");
-        //}
-            
+            //Debug.Log($"GIVEN QUEST IS {givenQuest}");
+            //}
+        }
+        QT.givenQuest = true;
+
 
         CloseDialogue();
     }

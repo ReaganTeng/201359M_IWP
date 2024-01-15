@@ -33,6 +33,8 @@ public class HubWorldMenuManager : MonoBehaviour
     public GameObject DayPanel;
     [HideInInspector]
     public GameObject GamePlayPanel;
+    [HideInInspector]
+    public GameObject SettingsPanel;
 
 
     // Start is called before the first frame update
@@ -43,11 +45,13 @@ public class HubWorldMenuManager : MonoBehaviour
         ATMPanel = GameObject.FindGameObjectWithTag("ATMPanel");
         DayPanel = GameObject.FindGameObjectWithTag("DayPanel");
         GamePlayPanel = GameObject.FindGameObjectWithTag("GamePlayPanel");
+        SettingsPanel = GameObject.FindGameObjectWithTag("SettingsPanel");
 
         togglePanel(ShopPanel);
         togglePanel(ATMPanel);
         togglePanel(DayPanel);
         togglePanel(dialoguePanel);
+        togglePanel(SettingsPanel);
 
         HelpPanel = GameObject.FindGameObjectWithTag("HelpPanel");
         if (HelpPanel != null)
@@ -159,6 +163,11 @@ public class HubWorldMenuManager : MonoBehaviour
         //{
         //    Time.timeScale = 1.0f;
         //}
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            togglePanel(SettingsPanel);
+        }
 
 
         grossMoney.text = $"${PlayerPrefs.GetFloat("GrossMoney")}";

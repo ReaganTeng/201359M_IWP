@@ -30,9 +30,9 @@ public class MenuManager : MonoBehaviour
 
     //bool buttonpressed;
 
-    public Slider MasterVolumeSlider;
-    public Slider MusicVolumeSlider;
-    public Slider SoundVolumeSlider;
+    //public Slider MasterVolumeSlider;
+    //public Slider MusicVolumeSlider;
+    //public Slider SoundVolumeSlider;
 
     void Awake()
     {
@@ -61,43 +61,28 @@ public class MenuManager : MonoBehaviour
         //GamePlayPanel.GetComponent<CanvasGroup>().interactable = true;
         //GamePlayPanel.GetComponent<CanvasGroup>().alpha = 1;
         //GamePlayPanel.GetComponent<CanvasGroup>().blocksRaycasts = true;
-        if (PlayerPrefs.HasKey("MasterVolume"))
-        {
-            MasterVolumeSlider.value = PlayerPrefs.GetFloat("MasterVolume");
-        }
+     
 
-        if (PlayerPrefs.HasKey("SoundVolume"))
-        {
-            SoundVolumeSlider.value = PlayerPrefs.GetFloat("SoundVolume");
-        }
-
-        if (PlayerPrefs.HasKey("MusicVolume"))
-        {
-            MusicVolumeSlider.value = PlayerPrefs.GetFloat("MusicVolume");
-        }
-
-
-
-        OnValueChangedSliders();
+        //OnValueChangedSliders();
     }
 
 
-    public void OnValueChangedSliders()
-    {
-        MasterVolumeSlider.onValueChanged.AddListener((float value) => AdjustVolume("MasterVolume", MasterVolumeSlider));
-        SoundVolumeSlider.onValueChanged.AddListener((float value) => AdjustVolume("SoundVolume", SoundVolumeSlider));
-        MusicVolumeSlider.onValueChanged.AddListener((float value) => AdjustVolume("MusicVolume", MusicVolumeSlider));
+    //public void OnValueChangedSliders()
+    //{
+    //    MasterVolumeSlider.onValueChanged.AddListener((float value) => AdjustVolume("MasterVolume", MasterVolumeSlider));
+    //    SoundVolumeSlider.onValueChanged.AddListener((float value) => AdjustVolume("SoundVolume", SoundVolumeSlider));
+    //    MusicVolumeSlider.onValueChanged.AddListener((float value) => AdjustVolume("MusicVolume", MusicVolumeSlider));
 
-    }
+    //}
 
-    public void AdjustVolume(string dataname, Slider slider)
-    {
-        //string dataname = "MasterVolume";
-        float val = slider.value;
-        PlayerPrefs.SetFloat(dataname, val);
-        Debug.Log($"VALUE IS {val}");
-        //SendJSON(dataname, val);
-    }
+    //public void AdjustVolume(string dataname, Slider slider)
+    //{
+    //    //string dataname = "MasterVolume";
+    //    float val = slider.value;
+    //    PlayerPrefs.SetFloat(dataname, val);
+    //    Debug.Log($"VALUE IS {val}");
+    //    //SendJSON(dataname, val);
+    //}
 
 
 

@@ -51,6 +51,12 @@ public class QuestManager : MonoBehaviour
     }
 
 
+    public void DisableNotifications()
+    {
+        newQuestNotification.enabled = false;
+        questUpdatedNotification.enabled = false;
+    }
+
     public void AddQuest(string questName, string description, int requiredCount, int QuestGiverId)
     {
         Quest newQuest = new Quest
@@ -70,7 +76,21 @@ public class QuestManager : MonoBehaviour
         
         GameObject itemObject = Instantiate(questPrefab, questUIContent.transform);
         itemObject.GetComponent<QuestUI>().UpdateUI(newQuest);
+        itemObject.GetComponent<RectTransform>().sizeDelta
+            = new Vector2(questUIContent.GetComponent<RectTransform>().sizeDelta.x
+             ,itemObject.GetComponent<RectTransform>().sizeDelta.y);
 
+        questUIContent.GetComponent<RectTransform>().sizeDelta =
+            new Vector2(questUIContent.GetComponent<RectTransform>().sizeDelta.x
+             , questUIContent.GetComponent<RectTransform>().sizeDelta.y + itemObject.GetComponent<RectTransform>().sizeDelta.y);
+
+        //questUIContent.GetComponent<RectTransform>().sizeDelta =
+        //   new Vector2(questUIContent.GetComponent<RectTransform>().sizeDelta.x
+        //    , questUIContent.GetComponent<RectTransform>().sizeDelta.y + itemObject.GetComponent<RectTransform>().sizeDelta.y);
+
+
+        //foreach(RectTransform trans )
+        //updateContentSize();
         newQuestNotification.enabled = true;
         questUpdatedNotification.enabled = false;
 
@@ -79,10 +99,44 @@ public class QuestManager : MonoBehaviour
     }
 
 
+    public void updateContentSize()
+    {
+        int childCount = 0;
 
+        //GameObject itemObject = Instantiate(questPrefab);
+
+
+        foreach (RectTransform trans in questUIContent.GetComponentsInChildren<RectTransform>())
+        {
+            QuestUI questUIComponent = trans.GetComponent<QuestUI>();
+
+            if (questUIComponent != null)
+            {
+                childCount++;
+                Debug.Log($"FOUND CHILD {childCount}");
+            }
+        }
+
+        questUIContent.GetComponent<RectTransform>().sizeDelta =
+           new Vector2(questUIContent.GetComponent<RectTransform>().sizeDelta.x
+            , questPrefab.GetComponent<RectTransform>().sizeDelta.y * childCount);
+
+        //Destroy(itemObject);
+
+    }
     private void Update()
     {
+
+        updateContentSize();
         //UpdateQuestProgress("Killing Monster");
+
+        //foreach (RectTransform trans in questUIContent.GetComponentsInChildren<RectTransform>())
+        //{
+        //    if(trans.GetComponent<QuestUI>() != null)
+        //    {
+        //        int childcount = questUIContent.transform.GetComponent<QuestUI>().childCount;
+        //    }
+        //}
     }
 
     //UPDATE WHENEVER PLAYER PERFORMS CERTAIN SPECIFIC ACTIONS

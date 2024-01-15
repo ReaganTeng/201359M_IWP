@@ -32,6 +32,9 @@ public class MapGenerator : MonoBehaviour
     public GameObject shopkeeperPrefab;
     public GameObject questTriggerPrefab;
 
+    public GameObject musicPlayerPrefab;
+
+
     [HideInInspector]
     public List<Vector2> occupiedPositions;
     [HideInInspector]
@@ -312,10 +315,13 @@ public class MapGenerator : MonoBehaviour
                 SpawnTreasuresChests();
 
 
-                gameManager.GetComponent<VolumeManager>().AdjustAllVolumes();
+                FindAnyObjectByType<VolumeManager>().AdjustAllVolumes();
 
                 CompassObject.StartItself();
                 GameObject.FindGameObjectWithTag("LoadingScreen").SetActive(false);
+
+
+                Instantiate(musicPlayerPrefab);
                 objectsGenerated = true;
             }
 

@@ -36,6 +36,7 @@ TagManager:
   - CharacterSwitchPanel
   - MainPanel
   - SettingsPanel
+  - MusicPlayer
   layers:
   - Default
   - TransparentFX

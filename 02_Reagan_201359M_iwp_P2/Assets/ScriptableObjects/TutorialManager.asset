@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 504448114c3622048ba718b94ed74188, type: 3}
   m_Name: TutorialManager
   m_EditorClassIdentifier: 
-  StoryBeginningCompleted: 1
-  MovementTutorialCompleted: 1
-  AttackTutorialCompleted: 1
-  GemTutorialCompleted: 1
-  SwitchCharactersCompleted: 1
-  ShopTutorialCompleted: 1
-  DayTrackerCompleted: 1
-  ATMCompleted: 1
-  CaveCompleted: 1
+  StoryBeginningCompleted: 0
+  MovementTutorialCompleted: 0
+  AttackTutorialCompleted: 0
+  GemTutorialCompleted: 0
+  SwitchCharactersCompleted: 0
+  ShopTutorialCompleted: 0
+  DayTrackerCompleted: 0
+  ATMCompleted: 0
+  CaveCompleted: 0

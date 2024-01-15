@@ -47,7 +47,7 @@ public class blade : MonoBehaviour
 
             //DAMAGE ENEMY
             int playerDamage = playerscript.meleedamage;
-            //enemyScript.health -= 1000000;
+            enemyScript.health -= 1000000;
             
             enemyScript.health -= playerDamage;
 
