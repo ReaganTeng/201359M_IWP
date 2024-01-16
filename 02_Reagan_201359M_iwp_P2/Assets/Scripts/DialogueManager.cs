@@ -52,6 +52,7 @@ public class DialogueManager : MonoBehaviour
 
     public void StartDialogue(DialogueRealTime dialogue)
     {
+        Debug.Log("Dialogue STARTED");
         if (currentDialogue == null 
             //&& dialoguePanel != null
             && !dialoguePanel.GetComponent<CanvasGroup>().interactable)
