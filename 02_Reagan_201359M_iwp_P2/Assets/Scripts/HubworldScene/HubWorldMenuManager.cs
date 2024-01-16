@@ -37,6 +37,8 @@ public class HubWorldMenuManager : MonoBehaviour
     public GameObject SettingsPanel;
 
 
+    public GameObject shopkeeperPrefab;
+
     // Start is called before the first frame update
     void Awake()
     {
@@ -87,6 +89,8 @@ public class HubWorldMenuManager : MonoBehaviour
         {
             PlayerPrefs.SetInt("RoundsCompleted", 0);
         }
+
+        Instantiate(shopkeeperPrefab, new Vector3(-13.0599995f, -0.409999847f, 0), Quaternion.identity);
 
         goalamount = 100000;
     }
