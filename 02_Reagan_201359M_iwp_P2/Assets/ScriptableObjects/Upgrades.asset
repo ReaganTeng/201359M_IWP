@@ -30,3 +30,8 @@ MonoBehaviour:
     iconsprite: {fileID: 0}
     Quantity: 0
     quantitytext: 
+  - currentitem: {fileID: 0}
+    itemtype: 11
+    iconsprite: {fileID: 0}
+    Quantity: 0
+    quantitytext: 

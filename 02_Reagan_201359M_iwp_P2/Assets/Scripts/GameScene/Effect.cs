@@ -15,12 +15,26 @@ public abstract class Effect
 {
     public string name { get; protected set; }
     public EffectType Type { get; protected set; }
-    public float Duration { get; protected set; }
+    public float Duration { get; set; }
     public bool IsExpired { get; protected set; }
     public Character TargetCharacter { get; protected set; }
 
+    public float maxDuration;
+
+    bool maxdurationset;
+
+    //public Effect()
+    //{
+    //    maxdurationset = false;
+    //    maxDuration = Duration;
+    //}
+    //public virtual void Awake()
+    //{
+    //    maxDuration = Duration;
+    //}
     public virtual void UpdateEffect(float deltaTime)
     {
+        
         Duration -= deltaTime;
         if (Duration < 0)
         {
@@ -34,10 +48,16 @@ public abstract class Effect
                     playerScript.activeEffectsText.text = "";
                 }
             }
-            return;
+            //return;
         }
 
-        Debug.Log("UPDATING EFFECT");
+        //if (!maxdurationset)
+        //{
+        //    maxDuration = Duration;
+        //    maxdurationset = !maxdurationset;
+        //}
+
+        //Debug.Log("UPDATING EFFECT");
     }
 }
 
@@ -103,6 +123,8 @@ public class ShieldEffect : Effect
         Duration = duration;
         TargetCharacter = targetCharacter;
     }
+
+
 
     public override void UpdateEffect(float deltaTime)
     {
@@ -177,17 +199,20 @@ public class BurnEffect : Effect
 // ONE_HIT effect
 public class OneHitEffect : Effect
 {
-    private int meleeDamageIncrease;
-    private int originalMeleeDamage;
+    //private int meleeDamageIncrease;
+    private int OriginalMeleeDamage;
 
-    public OneHitEffect(float duration, int meleeDamageIncrease, Character targetCharacter)
+    public OneHitEffect(float duration, int originalMeleeDamage, Character targetCharacter)
     {
+        Debug.Log($"DAMAGE ORIGINAL {targetCharacter.meleedamage}");
+
         name = "POWER UP: ONE HIT";
         Type = EffectType.ONE_HIT;
         Duration = duration;
-        this.meleeDamageIncrease = meleeDamageIncrease;
+        OriginalMeleeDamage = originalMeleeDamage;
         TargetCharacter = targetCharacter;
-        originalMeleeDamage = targetCharacter.meleedamage;
+        //originalMeleeDamage = targetCharacter.meleedamage;
+
         TargetCharacter.meleedamage = 1000;
     }
 
@@ -197,7 +222,8 @@ public class OneHitEffect : Effect
 
         if(Duration <= 0)
         {
-            TargetCharacter.meleedamage = originalMeleeDamage;
+            TargetCharacter.meleedamage = OriginalMeleeDamage;
+            Debug.Log($"DAMAGE SWITCH {TargetCharacter.meleedamage}");
         }
         // Apply melee damage increase
         //Debug.Log($"OneHit: Melee damage increased to {TargetCharacter.meleedamage}.");

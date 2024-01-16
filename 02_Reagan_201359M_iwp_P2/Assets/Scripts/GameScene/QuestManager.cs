@@ -76,13 +76,16 @@ public class QuestManager : MonoBehaviour
         
         GameObject itemObject = Instantiate(questPrefab, questUIContent.transform);
         itemObject.GetComponent<QuestUI>().UpdateUI(newQuest);
-        itemObject.GetComponent<RectTransform>().sizeDelta
-            = new Vector2(questUIContent.GetComponent<RectTransform>().sizeDelta.x
-             ,itemObject.GetComponent<RectTransform>().sizeDelta.y);
+        
 
         questUIContent.GetComponent<RectTransform>().sizeDelta =
             new Vector2(questUIContent.GetComponent<RectTransform>().sizeDelta.x
              , questUIContent.GetComponent<RectTransform>().sizeDelta.y + itemObject.GetComponent<RectTransform>().sizeDelta.y);
+
+
+        itemObject.GetComponent<RectTransform>().sizeDelta
+            = new Vector2(questUIContent.GetComponent<RectTransform>().sizeDelta.x
+             , itemObject.GetComponent<RectTransform>().sizeDelta.y);
 
         //questUIContent.GetComponent<RectTransform>().sizeDelta =
         //   new Vector2(questUIContent.GetComponent<RectTransform>().sizeDelta.x

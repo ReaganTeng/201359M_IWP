@@ -53,6 +53,7 @@ public class DialogueManager : MonoBehaviour
     public void StartDialogue(DialogueRealTime dialogue)
     {
         if (currentDialogue == null 
+            //&& dialoguePanel != null
             && !dialoguePanel.GetComponent<CanvasGroup>().interactable)
         {
             Scene currentScene = SceneManager.GetActiveScene();

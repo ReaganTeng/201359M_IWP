@@ -95,10 +95,7 @@ public class PlayerHubWorld : MonoBehaviour
                 }
                 nearestDistance = distance;
             }
-            //else
-            //{
-            //    pressEText.enabled = false;
-            //}
+           
         }
 
         // Check if a nearest interactable was found
@@ -114,15 +111,7 @@ public class PlayerHubWorld : MonoBehaviour
         {
             pressEText.enabled = false;
         }
-        //else
-        //{
-
-        //}
-        //else
-        //{
-        //    Debug.Log("No interactables found within the search radius.");
-        //}
-
+        
 
     }
 

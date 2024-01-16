@@ -249,7 +249,7 @@ public class Character : MonoBehaviour
             {
                 //projectile.transform.rotation = projectile_Rotation;
                 projectile.GetComponent<Projectile>().setdata(projectileDamage, 
-                    10, direction, gameObject);
+                    20.0f, direction, gameObject);
                 //Debug.Log($"ROTATION IS {projectile.transform.rotation.eulerAngles}");
             }
         }
@@ -307,13 +307,21 @@ public class Character : MonoBehaviour
         {
             Effect newEffect = CreateEffect(type);
             activeEffects.Add(newEffect);
-            Debug.Log($"{type} effect applied.");
+            //Debug.Log($"{type} effect applied.");
+        }
+        else
+        //if (HasEffect(type))
+        {
+            Effect effectChosen = activeEffects.Find(
+                template => template.Type == type
+                );
+            effectChosen.Duration = 10;
+            Debug.Log($"DURATION {effectChosen.Duration}");
+            //effectChosen =
         }
     }
 
 
-    
-    // Check if the player has a specific effect
     public bool HasEffect(EffectType type)
     {
         return activeEffects.Exists(effect => effect.Type == type);
@@ -361,11 +369,11 @@ public class Character : MonoBehaviour
                     //    //Debug.Log("BEGIN BURN");
                     //}
                     
-                    return new OneHitEffect(10f, 3, this);
+                    return new OneHitEffect(15f, meleedamage, this);
                 }
             case EffectType.SPIRIT_FIRE:
                 {
-                    return new SpiritFireEffect(10f, this);
+                    return new SpiritFireEffect(15f, this);
                 }
             case EffectType.GEM_WISDOM:
                 {

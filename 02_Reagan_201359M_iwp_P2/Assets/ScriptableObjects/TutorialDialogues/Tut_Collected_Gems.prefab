@@ -54,7 +54,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4934074169046902289, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
       propertyPath: sentences.Array.size
-      value: 7
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 4934074169046902289, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
       propertyPath: sentences.Array.data[0].text
@@ -84,6 +84,11 @@ PrefabInstance:
     - target: {fileID: 4934074169046902289, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
       propertyPath: sentences.Array.data[6].text
       value: RIGHT CLICK TO use blue gem when it is selected in your inventory
+      objectReference: {fileID: 0}
+    - target: {fileID: 4934074169046902289, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
+      propertyPath: sentences.Array.data[7].text
+      value: You can also RIGHT CLICK to use whatever's in your selected inventouy
+        slot
       objectReference: {fileID: 0}
     - target: {fileID: 7477714005744658407, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
       propertyPath: m_Name

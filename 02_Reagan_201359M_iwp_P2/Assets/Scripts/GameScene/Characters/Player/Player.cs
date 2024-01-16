@@ -116,6 +116,8 @@ public class Player : Character
     {
         base.Awake();
 
+     
+
         PowerUpNotificationUI = GameManager.GetComponent<MenuManager>().powerupNotificationPanel.GetComponent<PowerUpNotificationUI>();
 
         pressEText.enabled = false;
@@ -202,6 +204,9 @@ public class Player : Character
 
         moneyearnerd = GameObject.FindGameObjectWithTag("MoneyEarnedText").GetComponent<TextMeshProUGUI>();
         moneyearnerd.text = "$0";
+
+        //ApplyEffect(EffectType.GHOST);
+        //ApplyEffect(EffectType.ONE_HIT);
     }
 
     public void PowerUpUsed(EffectType effect)
@@ -286,6 +291,10 @@ public class Player : Character
             activeEffectsText.text = effectName;
             Debug.Log("EFFECTS UPDATED");
         }
+        else
+        {
+            activeEffectsText.text = "";
+        }
     }
 
    public void InteractableInteraction()
@@ -359,13 +368,13 @@ public class Player : Character
             //    health -= 10;
             //}
             InteractableInteraction();
-            if (Input.GetKey(KeyCode.Space))
+            if (Input.GetKeyDown(KeyCode.Space))
             {
-                if (activeEffects.Count <= 0)
+                //if (activeEffects.Count <= 0)
                 {
                     //Debug.Log("EFFECT APPLIED");
-                    ApplyEffect(EffectType.GHOST);
-                    //ApplyEffect(EffectType.BURN);
+                    //ApplyEffect(EffectType.GHOST);
+                    //ApplyEffect(EffectType.ONE_HIT);
                 }
             }
 

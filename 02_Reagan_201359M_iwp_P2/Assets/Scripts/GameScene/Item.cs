@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
@@ -43,12 +44,13 @@ public class Item : MonoBehaviour
     public ItemType type { get; set; }
    public int StackSize { get; set; }
 
-
+    float duration;
     GameObject[] player;
     GameObject gameManager;
 
     protected virtual void Awake()
     {
+        duration = 0;
         itemImage = GetComponent<SpriteRenderer>();
         player = GameObject.FindGameObjectsWithTag("Player");
         gameManager = GameObject.FindGameObjectWithTag("GameMGT");
@@ -72,6 +74,24 @@ public class Item : MonoBehaviour
                 }
             }
         }
+
+
+        if(duration <= .5)
+        {
+            duration += 1 * Time.deltaTime;
+        }
+        if (duration >= .5)
+        {
+            Collider2D[] CollidersToIgnore = GameObject.FindObjectsOfType<Collider2D>()
+         .Where(collider => collider.CompareTag("Item") || collider.CompareTag("Enemy"))
+         .ToArray();
+
+            foreach (Collider2D wallCollider in CollidersToIgnore)
+            {
+                Physics2D.IgnoreCollision(GetComponent<Collider2D>(), wallCollider);
+            }
+        }
+
     }
     public virtual void SetItem(ItemType itemType, int stacksize)
     {
