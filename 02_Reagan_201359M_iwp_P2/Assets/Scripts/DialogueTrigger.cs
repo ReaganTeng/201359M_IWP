@@ -28,7 +28,7 @@ public class DialogueTrigger : Interactables
 
     public override void Interact()
     {
-        //Debug.Log("IMTERACT");
+        Debug.Log("IMTERACT TRIGGER");
         //base.Interact();
         TriggerDialogue();
     }
