@@ -83,6 +83,8 @@ public class DialogueRealTime : MonoBehaviour
 
     void EnableShopPanel()
     {
+
+        Debug.Log("EnableShopPanel called");
         GameObject gameManager = GameObject.FindGameObjectWithTag("GameMGT");
         CanvasGroup shopPanel = null;
 
