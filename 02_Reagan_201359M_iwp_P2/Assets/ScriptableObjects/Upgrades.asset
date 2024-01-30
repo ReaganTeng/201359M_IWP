@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DamageBuff: 0
   HealthBuff: 0
+  WonGame: 0
   slotProperty:
   - currentitem: {fileID: 0}
     itemtype: 11

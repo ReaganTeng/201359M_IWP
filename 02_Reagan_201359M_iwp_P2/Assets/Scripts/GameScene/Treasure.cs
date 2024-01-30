@@ -74,7 +74,7 @@ public class Treasure : Interactables
         }
         //
 
-        textPrompt.enabled = false;
+        //textPrompt.enabled = false;
         sr.sprite = chestSprites[1];
         unlocked = true;
     }
@@ -95,7 +95,7 @@ public class Treasure : Interactables
             //&& !unlocked
             )
         {
-            textPrompt.enabled = false;
+            //textPrompt.enabled = false;
             //unlocked = true;
         }
     }

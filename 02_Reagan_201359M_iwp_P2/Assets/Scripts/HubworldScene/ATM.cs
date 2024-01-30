@@ -46,7 +46,7 @@ public class ATM : Interactables
         base.Interact();
 
         
-            hubWorldMenuManager.togglePanel(atmPanel);
+        hubWorldMenuManager.togglePanel(atmPanel);
         
     }
 

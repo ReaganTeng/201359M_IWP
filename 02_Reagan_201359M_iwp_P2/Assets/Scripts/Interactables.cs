@@ -7,14 +7,14 @@ public class Interactables : MonoBehaviour
 {
     [HideInInspector]
     public SpriteRenderer sr;
-    [HideInInspector]
-    public TextMeshProUGUI textPrompt;
+    //[HideInInspector]
+    //public TextMeshProUGUI textPrompt;
 
     public virtual void Awake()
     {
         sr = GetComponent<SpriteRenderer>();
-        textPrompt = GetComponentInChildren<TextMeshProUGUI>();
-        textPrompt.enabled = false;
+        //textPrompt = GetComponentInChildren<TextMeshProUGUI>();
+        //textPrompt.enabled = false;
     }
 
     // Update is called once per frame

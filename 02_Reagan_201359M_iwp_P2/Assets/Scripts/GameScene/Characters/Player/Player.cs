@@ -334,7 +334,8 @@ public class Player : Character
         }
 
         // Check if a nearest interactable was found
-        if (nearestInteractable != null)
+        if (nearestInteractable != null
+            )
         {
             pressEText.enabled = true;
             if (Input.GetKeyDown(KeyCode.E))

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System.Linq;
 
 public class MenuManager : MonoBehaviour
 {
@@ -28,6 +29,14 @@ public class MenuManager : MonoBehaviour
     [HideInInspector]
     public GameObject SettingsPanel;
 
+    [HideInInspector]
+    public GameObject PausePanel;
+
+
+    //WHEN THESE PANELS ARE UP, FREEZE THE GAME
+    [HideInInspector]
+    public List<GameObject> panelsToFreezegame = new List<GameObject>();
+
     //bool buttonpressed;
 
     //public Slider MasterVolumeSlider;
@@ -36,32 +45,37 @@ public class MenuManager : MonoBehaviour
 
     void Awake()
     {
+        GamePlayPanel = GameObject.FindGameObjectWithTag("GamePlayPanel");
+
+
+
         dialoguePanel = GameObject.FindGameObjectWithTag("DialoguePanel");
         powerupNotificationPanel = GameObject.FindGameObjectWithTag("PowerUpNotification");
         instructions = GameObject.FindGameObjectWithTag("Instructions");
         QuestPanel = GameObject.FindGameObjectWithTag("QuestPanel");
         ShopPanel = GameObject.FindGameObjectWithTag("ShopPanel");
         CharacterSwitchPanel = GameObject.FindGameObjectWithTag("CharacterSwitchPanel");
-        GamePlayPanel = GameObject.FindGameObjectWithTag("GamePlayPanel");
         GameCompletePanel = GameObject.FindGameObjectWithTag("GameCompletePanel");
         GameOverPanel = GameObject.FindGameObjectWithTag("GameOverPanel");
         SettingsPanel = GameObject.FindGameObjectWithTag("SettingsPanel");
+        PausePanel = GameObject.FindGameObjectWithTag("PausePanel");
 
-        togglePanel(dialoguePanel);
-        togglePanel(powerupNotificationPanel);
-        togglePanel(QuestPanel);
-        togglePanel(ShopPanel);
-        togglePanel(CharacterSwitchPanel);
-        togglePanel(GameCompletePanel);
-        togglePanel(GameOverPanel);
-        togglePanel(SettingsPanel);
+        toggleAndPanelToList(dialoguePanel);
+        toggleAndPanelToList(powerupNotificationPanel);
+        toggleAndPanelToList(QuestPanel);
+        toggleAndPanelToList(ShopPanel);
+        toggleAndPanelToList(CharacterSwitchPanel);
+        toggleAndPanelToList(GameCompletePanel);
+        toggleAndPanelToList(GameOverPanel);
+        toggleAndPanelToList(SettingsPanel);
+        toggleAndPanelToList(PausePanel);
 
         //togglePanel(instructions);
 
         //GamePlayPanel.GetComponent<CanvasGroup>().interactable = true;
         //GamePlayPanel.GetComponent<CanvasGroup>().alpha = 1;
         //GamePlayPanel.GetComponent<CanvasGroup>().blocksRaycasts = true;
-     
+
 
         //OnValueChangedSliders();
     }
@@ -106,6 +120,27 @@ public class MenuManager : MonoBehaviour
     }
 
 
+    public void toggleAndPanelToList(GameObject panel)
+    {
+        //Debug.Log("TOGGLING PANEL");
+        CanvasGroup panelCG = panel.GetComponent<CanvasGroup>();
+        panelCG.interactable = !panelCG.interactable;
+        panelCG.blocksRaycasts = !panelCG.blocksRaycasts;
+        if (panelCG.interactable
+           && panelCG.blocksRaycasts)
+        {
+            panelCG.alpha = 1;
+        }
+        else
+        {
+            panelCG.alpha = 0;
+        }
+
+        panelsToFreezegame.Add(panel);
+
+    }
+
+
     public void togglePanel_CloseButton(GameObject closeButtonGO)
     {
         CanvasGroup panelCG = closeButtonGO.GetComponentInParent<CanvasGroup>();
@@ -133,18 +168,13 @@ public class MenuManager : MonoBehaviour
 
         if(Input.GetKeyDown(KeyCode.Escape))
         {
-            togglePanel(SettingsPanel);
+            togglePanel(PausePanel);
         }
 
 
-        if (!dialoguePanel.GetComponent<CanvasGroup>().interactable
-        && !powerupNotificationPanel.GetComponent<CanvasGroup>().interactable
-        && !QuestPanel.GetComponent<CanvasGroup>().interactable
-        && !ShopPanel.GetComponent<CanvasGroup>().interactable
-        && !CharacterSwitchPanel.GetComponent<CanvasGroup>().interactable
-        && !GameOverPanel.GetComponent<CanvasGroup>().interactable
-         && !GameCompletePanel.GetComponent<CanvasGroup>().interactable
-          && !SettingsPanel.GetComponent<CanvasGroup>().interactable)
+        if (panelsToFreezegame.All(
+            template => !template.GetComponent<CanvasGroup>().interactable)
+            )
         {
             if (!GamePlayPanel.GetComponent<CanvasGroup>().interactable)
             {
@@ -198,11 +228,30 @@ public class MenuManager : MonoBehaviour
     public void ReturnToHubWorld()
     {
 
-
         //LOAD BACK TO HUBWORLD;
         SceneManager.LoadScene("HubWorld");
     }
 
+    public void QuitGame()
+    {
+        Inventory invmanager = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<Inventory>();
+
+        foreach (InventorySlot slot in invmanager.slots)
+        {
+            if (slot.itemtype != Item.ItemType.BOMB
+                && slot.itemtype != Item.ItemType.POTION
+                && slot.itemtype != Item.ItemType.BULLET)
+            {
+                slot.itemtype = Item.ItemType.NOTHING;
+                slot.Quantity = 0;
+                slot.quantityText.text = "";
+                slot.CurrentItem = null;
+                slot.slotImage.sprite = null;
+            }
+        }
+        invmanager.ChangesInInventory();
+        SceneManager.LoadScene("HubWorld");
+    }
 
     public void ReturnToHubWorldFromGameOver()
     {

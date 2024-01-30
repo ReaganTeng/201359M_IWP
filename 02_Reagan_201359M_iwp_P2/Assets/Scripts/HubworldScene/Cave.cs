@@ -3,54 +3,39 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-public class Cave : MonoBehaviour
+public class Cave : Interactables
 {
-    TextMeshProUGUI textprompt;
+    //TextMeshProUGUI textprompt;
 
-    bool buttonpressed;
+    //bool buttonpressed;
 
-    void Awake()
+    public override void Update()
     {
-        buttonpressed = false;
-        textprompt = GetComponentInChildren<TextMeshProUGUI>();
-       
-        textprompt.enabled = false;
 
-    }
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.E) && textprompt.enabled
-            && !buttonpressed)
-        {
-            SceneManager.LoadScene("GameScene");
-            //Debug.Log("SHOP TOGGLED");
-        }
-
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            buttonpressed = true;
-        }
-        else
-        {
-            buttonpressed = false;
-        }
+        base.Update();
     }
 
-    void OnTriggerEnter2D(Collider2D collision)
+    public override void OnTriggerEnter2D(Collider2D other)
     {
-        if (collision.gameObject.CompareTag("Player"))
-        {
-            textprompt.enabled = true;
-        }
+
+        base.OnTriggerEnter2D(other);
+
 
     }
 
-
-    void OnTriggerExit2D(Collider2D collision)
+    public override void Interact()
     {
-        if (collision.gameObject.CompareTag("Player"))
-        {
-            textprompt.enabled = false;
-        }
+        base.Interact();
+
+
+        SceneManager.LoadScene("GameScene");
+    }
+
+    public override void OnTriggerExit2D(Collider2D other)
+    {
+
+        base.OnTriggerExit2D(other);
+
+
     }
 }
