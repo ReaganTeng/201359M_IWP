@@ -219,7 +219,7 @@ public class MapGenerator : MonoBehaviour
     void SpawnTreasuresChests()
     {
         int TreasureChestsSpawned = 0;
-        while (TreasureChestsSpawned < 500)
+        while (TreasureChestsSpawned < 250)
         {
             foreach (Vector2 position in occupiedPositions)
             {

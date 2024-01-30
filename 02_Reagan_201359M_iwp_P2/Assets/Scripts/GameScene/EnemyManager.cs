@@ -10,6 +10,10 @@ public class EnemyManager : MonoBehaviour
     float timer;
 
 
+    //public Camera playercam;
+
+    public bool disabled;
+
     //public AnimatorController animcon;
 
     //THE NUMBER OF ENEMIES DECIDED TO GO CHASE MODE
@@ -147,6 +151,14 @@ public class EnemyManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //if(disabled)
+        //{
+        //    return;
+        //}
+        
+        
+
+
         if (!generationover
             ||
              enemyList == null
@@ -238,13 +250,16 @@ public class EnemyManager : MonoBehaviour
                 numberofEnemiesChosen = Random.Range(1, enemiesInChaseMode.Count);
                 for (int i = 0; i < numberofEnemiesChosen; i++)
                 {
+
                     int enemyindex = Random.Range(0, enemiesInChaseMode.Count);
 
-                    Enemy enemyScript = enemiesInChaseMode[enemyindex].GetComponent<Enemy>();
-
-                    enemyScript.currentState = Enemy.EnemyState.ABOUT_TO_ATTACK;
-                    //enemyScript.spriteRenderer.color = Color.red;
-                    //Debug.Log("ABOUT TO ATTACK");
+                    if (enemiesInChaseMode[enemyindex].GetComponent<MonoBehaviour>().enabled)
+                    {
+                        Enemy enemyScript = enemiesInChaseMode[enemyindex].GetComponent<Enemy>();
+                        enemyScript.currentState = Enemy.EnemyState.ABOUT_TO_ATTACK;
+                        //enemyScript.spriteRenderer.color = Color.red;
+                        //Debug.Log("ABOUT TO ATTACK");
+                    }
                 }
             }
             enemiesInChaseMode.Clear();

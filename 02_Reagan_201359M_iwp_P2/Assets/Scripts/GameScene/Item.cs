@@ -55,6 +55,8 @@ public class Item : MonoBehaviour
         player = GameObject.FindGameObjectsWithTag("Player");
         gameManager = GameObject.FindGameObjectWithTag("GameMGT");
 
+        transform.SetParent(GameObject.Find("ItemParent").transform);
+
     }
     public virtual void Update()
     {
@@ -75,20 +77,27 @@ public class Item : MonoBehaviour
             }
         }
 
+        Collider2D[] playerColliders = FindObjectsOfType<Collider2D>()
+         .Where(playerCollider => playerCollider.CompareTag("Player"))
+         .ToArray();
+        foreach (Collider2D Collider in playerColliders)
+        {
+            Physics2D.IgnoreCollision(GetComponent<Collider2D>(), Collider);
+        }
 
-        if(duration <= .5)
+        if (duration <= .5)
         {
             duration += 1 * Time.deltaTime;
         }
         if (duration >= .5)
         {
-            Collider2D[] CollidersToIgnore = GameObject.FindObjectsOfType<Collider2D>()
-         .Where(collider => collider.CompareTag("Item") || collider.CompareTag("Enemy"))
-         .ToArray();
+            Collider2D[] CollidersToIgnore = FindObjectsOfType<Collider2D>()
+             .Where(collider => collider.CompareTag("Item") || collider.CompareTag("Enemy"))
+             .ToArray();
 
-            foreach (Collider2D wallCollider in CollidersToIgnore)
+            foreach (Collider2D Collider in CollidersToIgnore)
             {
-                Physics2D.IgnoreCollision(GetComponent<Collider2D>(), wallCollider);
+                Physics2D.IgnoreCollision(GetComponent<Collider2D>(), Collider);
             }
         }
 

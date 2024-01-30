@@ -46,12 +46,20 @@ public class Inventory : MonoBehaviour
         selectedSlot = 0;
         InitialiseInventorySlots();
         //SelectSlot(0);
+
+        
     }
 
    
+    public void EmptyInventory()
+    {
+        foreach (var slot in slots)
+        {
+            slot.EmptySlot();
+        }
+    }
 
-
-    void InitialiseInventorySlots()
+    public void InitialiseInventorySlots()
     {
         //FOR TEMPORARY TESTING, EMPTIES ALL THE SLOTS
         //foreach (SlotProperties slot in upgrades.slotProperty)
@@ -60,6 +68,7 @@ public class Inventory : MonoBehaviour
         //}
 
         //float totalWidth = 0;
+
 
         InventorySlot[] slotsincontent = inventoryPanelContent.GetComponentsInChildren<InventorySlot>(); 
 
@@ -115,6 +124,9 @@ public class Inventory : MonoBehaviour
             //}
             //// Customize or initialize your slot here if needed
         }
+
+        //CHANGE THS SHOP
+        FindObjectOfType<Shop>().CheckItemAvailability();
     }
 
 
@@ -179,6 +191,8 @@ public class Inventory : MonoBehaviour
             }
             //Debug.Log($"ITEM NOW IS {slotsinupgrade[i].itemtype} {slotsinupgrade[i].Quantity} {slotsinupgrade[i].slotImage.sprite}");
         }
+
+        FindObjectOfType<Shop>().CheckItemAvailability();
     }
 
     public void LoadInventory()
@@ -224,7 +238,6 @@ public class Inventory : MonoBehaviour
        
         slots[selectedSlot].GetComponent<RectTransform>().localScale = largeSlotScale;
         //
-
         return successFullyAddedItem;
     }
 

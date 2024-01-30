@@ -30,6 +30,7 @@ public class CharacterUnlockManager : ScriptableObject
         if (!unlockedCharacters.Contains(character))
         {
             unlockedCharacters.Add(character);
+            selectedCharacters.Add(character);
         }
     }
 

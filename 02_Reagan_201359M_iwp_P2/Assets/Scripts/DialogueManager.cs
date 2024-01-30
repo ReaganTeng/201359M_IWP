@@ -31,7 +31,8 @@ public class DialogueManager : MonoBehaviour
     [HideInInspector]
     public DialogueRealTime currentDialogue;
 
-    int currentSentenceidx;
+    [HideInInspector]
+    public int currentSentenceidx;
 
     [HideInInspector]
     public MenuManager MM;

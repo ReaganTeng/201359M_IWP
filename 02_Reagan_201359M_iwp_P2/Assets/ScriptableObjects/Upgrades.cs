@@ -10,6 +10,10 @@ public class Upgrades : ScriptableObject
     public int DamageBuff;
     public int HealthBuff;
 
+    //[HideInInspector]
+    public bool WonGame;
+
+
     //public Inventory inventory;
     [System.Serializable]
     public class SlotProperties
@@ -25,6 +29,31 @@ public class Upgrades : ScriptableObject
 
     public List<SlotProperties> slotProperty = new List<SlotProperties>();
 
+
+    public void Reset()
+    {
+        DamageBuff = 0; 
+        HealthBuff = 0; 
+        WonGame = false;
+
+        //RESET INVENTORY
+        for (int i = slotProperty.Count - 1; i >= 0; i--)
+        {
+            emptySlotProperty(slotProperty[i]);
+            // Alternatively, you can remove the line above and just do the following:
+            // slotProperty.RemoveAt(i);
+        }
+
+        for (int i = 0; i < 4; i++)
+        {
+            Upgrades.SlotProperties sp = new Upgrades.SlotProperties();
+            sp.itemtype = ItemType.NOTHING;
+            slotProperty.Add(sp);
+            //inventoryManager.NewSlotBought();
+            //DeductPrice(item);
+        }
+
+    }
 
     public void emptySlotProperty(SlotProperties slotP)
     {

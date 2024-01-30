@@ -25,6 +25,17 @@ public class InventorySlot : MonoBehaviour
     }
 
 
+    public void EmptySlot()
+    {
+        CurrentItem = null;
+        itemtype = ItemType.NOTHING;
+        Quantity = 0;
+        quantityText.text = "";
+        slotImage.sprite = null;
+
+    }
+
+
     public InventorySlot()
     {
         itemtype = ItemType.NOTHING;

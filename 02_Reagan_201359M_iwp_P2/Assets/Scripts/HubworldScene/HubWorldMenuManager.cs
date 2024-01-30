@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using static Item;
+using UnityEngine.SceneManagement;
+using System.Linq;
 
 public class HubWorldMenuManager : MonoBehaviour
 {
@@ -37,30 +40,58 @@ public class HubWorldMenuManager : MonoBehaviour
     public GameObject SettingsPanel;
 
 
+    [HideInInspector]
+    public GameObject PausePanel;
+    //WHEN THESE PANELS ARE UP, FREEZE THE GAME
+    [HideInInspector]
+    public List<GameObject> panelsToFreezegame = new List<GameObject>();
+
+
     public GameObject shopkeeperPrefab;
+
+    public Upgrades upgrades;
+    public CharacterUnlockManager characterUnlockManager;
+
+
+    public DialogueRealTime winDialogue;
+    public DialogueRealTime loseDialogue;
+    DialogueManager dialogueManager;
+
+
+
 
     // Start is called before the first frame update
     void Awake()
     {
+
+        GamePlayPanel = GameObject.FindGameObjectWithTag("GamePlayPanel");
+
+
         dialoguePanel = GameObject.FindGameObjectWithTag("DialoguePanel");
         ShopPanel = GameObject.FindGameObjectWithTag("ShopPanel");
         ATMPanel = GameObject.FindGameObjectWithTag("ATMPanel");
         DayPanel = GameObject.FindGameObjectWithTag("DayPanel");
-        GamePlayPanel = GameObject.FindGameObjectWithTag("GamePlayPanel");
         SettingsPanel = GameObject.FindGameObjectWithTag("SettingsPanel");
+        PausePanel = GameObject.FindGameObjectWithTag("PausePanel");
 
-        togglePanel(ShopPanel);
-        togglePanel(ATMPanel);
-        togglePanel(DayPanel);
-        togglePanel(dialoguePanel);
-        togglePanel(SettingsPanel);
+
+        dialogueManager = GetComponent<DialogueManager>();
+
+
+        toggleAndPanelToList(ShopPanel);
+        toggleAndPanelToList(ATMPanel);
+        toggleAndPanelToList(DayPanel);
+        toggleAndPanelToList(dialoguePanel);
+        toggleAndPanelToList(SettingsPanel);
+        toggleAndPanelToList(PausePanel);
+
+
 
         HelpPanel = GameObject.FindGameObjectWithTag("HelpPanel");
         if (HelpPanel != null)
         {
             HelpPanel.SetActive(true);
         }
-
 
         //PlayerPrefs.SetFloat("GrossMoney", 0);
 
@@ -90,9 +121,32 @@ public class HubWorldMenuManager : MonoBehaviour
             PlayerPrefs.SetInt("RoundsCompleted", 0);
         }
 
+
         Instantiate(shopkeeperPrefab, new Vector3(-13.0599995f, -0.409999847f, 0), Quaternion.identity);
 
         goalamount = 100000;
+    }
+
+
+
+    public void toggleAndPanelToList(GameObject panel)
+    {
+        Debug.Log("TOGGLING PANEL");
+        CanvasGroup panelCG = panel.GetComponent<CanvasGroup>();
+        panelCG.interactable = !panelCG.interactable;
+        panelCG.blocksRaycasts = !panelCG.blocksRaycasts;
+        if (panelCG.interactable
+           && panelCG.blocksRaycasts)
+        {
+            panelCG.alpha = 1;
+        }
+        else
+        {
+            panelCG.alpha = 0;
+        }
+
+        panelsToFreezegame.Add(panel);
+
     }
 
     public void togglePanel_CloseButton(GameObject closeButtonGO)
@@ -131,7 +185,7 @@ public class HubWorldMenuManager : MonoBehaviour
     }
 
 
-    public void ResetPrefs()
+    public void ResetGame()
     {
         if (PlayerPrefs.HasKey("GrossMoney"))
         {
@@ -153,6 +207,16 @@ public class HubWorldMenuManager : MonoBehaviour
         {
             PlayerPrefs.SetInt("RoundsCompleted", 0);
         }
+
+
+        WinPanel.SetActive(false);
+        GameOverPanel.SetActive(false);
+
+        FindObjectOfType<Inventory>().EmptyInventory();
+        upgrades.Reset();
+
+       
+
     }
 
     // Update is called once per frame
@@ -170,7 +234,7 @@ public class HubWorldMenuManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            togglePanel(SettingsPanel);
+            togglePanel(PausePanel);
         }
 
 
@@ -183,10 +247,10 @@ public class HubWorldMenuManager : MonoBehaviour
 
 
         //DISABLE/ENABLE GAMEPLAY PANEL DEPENDING IF OTHER PANELS ARE ACTIVE
-        if (!dialoguePanel.GetComponent<CanvasGroup>().interactable
-        && !ShopPanel.GetComponent<CanvasGroup>().interactable
-        && !ATMPanel.GetComponent<CanvasGroup>().interactable
-        && !DayPanel.GetComponent<CanvasGroup>().interactable
+        if (panelsToFreezegame.All(
+            template => !template.GetComponent<CanvasGroup>().interactable)
+        && !GameOverPanel.activeSelf
+        && !WinPanel.activeSelf
         )
         {
             if (!GamePlayPanel.GetComponent<CanvasGroup>().interactable)
@@ -223,26 +287,74 @@ public class HubWorldMenuManager : MonoBehaviour
         }
 
 
-
-
         if (PlayerPrefs.GetInt("DaysLeft") > 0)
         {
-            GameOverPanel.SetActive(false);
-            WinPanel.SetActive(false);
+            //GameOverPanel.SetActive(false);
+            //WinPanel.SetActive(false);
+           
         }
 
+        //LOSING CONDITION
         if (PlayerPrefs.GetFloat("MoneyDonated") < goalamount
-            && PlayerPrefs.GetInt("DaysLeft") <= 0)
+            && PlayerPrefs.GetInt("DaysLeft") <= 0
+            && !GameOverPanel.activeSelf
+            && !upgrades.WonGame)
         {
-            GameOverPanel.SetActive(true);
+
+            GetComponent<DialogueManager>().StartDialogue(loseDialogue);
         }
 
+
+        //WINNING CONDITION
         if (PlayerPrefs.GetFloat("MoneyDonated") >= goalamount
-            && PlayerPrefs.GetInt("DaysLeft") <= 0)
+            && PlayerPrefs.GetInt("DaysLeft") <= 0
+            && !WinPanel.activeSelf
+            && !upgrades.WonGame)
         {
-            WinPanel.SetActive(true);
+            upgrades.WonGame = true;
+            dialogueManager.StartDialogue(winDialogue);
         }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (dialogueManager.currentDialogue == winDialogue
+                && dialogueManager.currentSentenceidx == dialogueManager.currentDialogue.sentences.Count - 1)
+            {
+                WinPanel.SetActive(true);
+            }
+            if (dialogueManager.currentDialogue == loseDialogue
+                && dialogueManager.currentSentenceidx == dialogueManager.currentDialogue.sentences.Count - 1)
+            {
+                GameOverPanel.SetActive(true);
+            }
+        }
+
+
+
     }
+
+
+    public void QuitGame()
+    {
+        Inventory invmanager = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<Inventory>();
+
+        foreach (InventorySlot slot in invmanager.slots)
+        {
+            if (slot.itemtype != Item.ItemType.BOMB
+                && slot.itemtype != Item.ItemType.POTION
+                && slot.itemtype != Item.ItemType.BULLET)
+            {
+                slot.itemtype = Item.ItemType.NOTHING;
+                slot.Quantity = 0;
+                slot.quantityText.text = "";
+                slot.CurrentItem = null;
+                slot.slotImage.sprite = null;
+            }
+        }
+        invmanager.ChangesInInventory();
+        SceneManager.LoadScene("MainMenu");
+    }
+
 
 
     public void Deposit()

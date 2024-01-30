@@ -595,6 +595,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5235253364783226233, guid: 93e62588c24292d46a3bec0a27df7d4c, type: 3}
+      propertyPath: m_Size.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5235253364783226233, guid: 93e62588c24292d46a3bec0a27df7d4c, type: 3}
+      propertyPath: m_Size.y
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8347023231976679194, guid: 93e62588c24292d46a3bec0a27df7d4c, type: 3}
       propertyPath: tutorialDialogues.Array.data[3]
       value: 
