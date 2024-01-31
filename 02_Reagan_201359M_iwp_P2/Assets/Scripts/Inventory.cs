@@ -36,10 +36,12 @@ public class Inventory : MonoBehaviour
     //Inventory playerInventory;
     void Awake()
     {
-
-        upgrades.LoadUpgrades();
-
+       
+        // Subscribe to the application quit event to save upgrades when the game is about to close
+        Application.wantsToQuit += SaveUpgradesOnQuit;
         slotsincontent = inventoryPanelContent.GetComponentsInChildren<InventorySlot>();
+
+
         normalSlotScale = new Vector2(1, 1);
         largeSlotScale = new Vector2(2, 2);
 
@@ -318,9 +320,21 @@ public class Inventory : MonoBehaviour
         }
     }
 
+
+    private bool SaveUpgradesOnQuit()
+    {
+        // Save upgrades when the game is about to close
+        upgrades.SaveUpgrades();
+
+        // Return true to allow the application to quit
+        return true;
+    }
+
+
     private void OnDestroy()
     {
-        upgrades.SaveUpgrades();
+        // Unsubscribe from the application quit event
+        Application.wantsToQuit -= SaveUpgradesOnQuit;
     }
 
 }
