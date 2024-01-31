@@ -331,6 +331,12 @@ public class Inventory : MonoBehaviour
     }
 
 
+    private void OnApplicationQuit()
+    {
+        // Save upgrades when the application is quitting
+        upgrades.SaveUpgrades();
+    }
+
     private void OnDestroy()
     {
         // Unsubscribe from the application quit event
