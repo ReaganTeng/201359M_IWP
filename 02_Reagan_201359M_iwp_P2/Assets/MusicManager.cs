@@ -34,7 +34,6 @@ public class MusicManager : MonoBehaviour
         AS.loop = true;
 
         
-
         currentScene = SceneManager.GetActiveScene();
         if (FindObjectOfType<MenuManager>() != null)
         {

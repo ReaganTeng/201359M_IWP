@@ -41,6 +41,7 @@ public class Inventory : MonoBehaviour
         Application.wantsToQuit += SaveUpgradesOnQuit;
         slotsincontent = inventoryPanelContent.GetComponentsInChildren<InventorySlot>();
 
+        upgrades.LoadUpgrades();
 
         normalSlotScale = new Vector2(1, 1);
         largeSlotScale = new Vector2(2, 2);

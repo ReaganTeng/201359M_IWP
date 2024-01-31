@@ -16,7 +16,7 @@ public class VolumeManager : MonoBehaviour
 
 
     // Start is called before the first frame update
-    void Awake()
+    void Start()
     {
         mastervolume = PlayerPrefs.GetFloat("MasterVolume"); // Adjust this value as needed
 
@@ -24,26 +24,38 @@ public class VolumeManager : MonoBehaviour
         {
             MasterVolumeSlider.value = PlayerPrefs.GetFloat("MasterVolume");
         }
+        else
+        {
+            //Debug.Log("MASTER");
+            PlayerPrefs.SetFloat("MasterVolume", 1.0f);
+            MasterVolumeSlider.value = PlayerPrefs.GetFloat("MasterVolume");
+        }
 
         if (PlayerPrefs.HasKey("SoundVolume"))
         {
             SoundVolumeSlider.value = PlayerPrefs.GetFloat("SoundVolume");
+        }
+        else
+        {
+
+            PlayerPrefs.SetFloat("SoundVolume", 1.0f);
+            SoundVolumeSlider.value = PlayerPrefs.GetFloat("SoundVolume");
+
         }
 
         if (PlayerPrefs.HasKey("MusicVolume"))
         {
             MusicVolumeSlider.value = PlayerPrefs.GetFloat("MusicVolume");
         }
+        else
+        {
+            PlayerPrefs.SetFloat("MusicVolume", 1.0f);
+            MusicVolumeSlider.value = PlayerPrefs.GetFloat("MusicVolume");
+        }
 
         OnValueChangedSliders();
-        //AdjustAllVolumes();
+        AdjustAllVolumes();
 
-
-        //AdjustSoundVolume();
-        //AdjustMusicVolume();
-        //AdjustVolumeSlider("MasterVolume", MasterVolumeSlider);
-        //AdjustVolumeSlider("SoundVolume", SoundVolumeSlider);
-        //AdjustVolumeSlider("MusicVolume", MusicVolumeSlider);
     }
 
 
@@ -60,7 +72,7 @@ public class VolumeManager : MonoBehaviour
     {
         AdjustAllVolumes();
 
-        //AdjustAllVolumes();
+
     }
 
 
@@ -89,6 +101,8 @@ public class VolumeManager : MonoBehaviour
     {
         float volume = PlayerPrefs.GetFloat("SoundVolume"); // Adjust this value as needed
 
+        //Debug.Log($"VOLUME IS {volume}");
+
         // Find all GameObjects with AudioSource components in the scene
         GameObject[] playersAndEnemies = GameObject.FindGameObjectsWithTag("Player")
             .Concat(GameObject.FindGameObjectsWithTag("Enemy"))
@@ -111,18 +125,20 @@ public class VolumeManager : MonoBehaviour
         foreach (GameObject mp in musicPlayer)
         {
             AdjustVolumeRecursive(mp.transform, volume);
+            //Debug.Log($"VOLUME IS {mp.GetComponent<AudioSource>().volume}");
         }
     }
 
     void AdjustVolumeRecursive(Transform parent, float volume)
     {
-       
         foreach (AudioSource audioSource in parent.GetComponentsInChildren<AudioSource>())
         {
-            //soundvolume + percentage of sound volume
-            audioSource.volume = volume * 
-                ((mastervolume* 100) /100);
-            
+            if (audioSource.volume != volume)
+            {
+                //soundvolume + percentage of sound volume
+                audioSource.volume = volume *
+                    ((mastervolume * 100) / 100);
+            }
         }
     }
 

@@ -69,6 +69,11 @@ public class Upgrades : ScriptableObject
         }
     }
 
+    [System.Serializable]
+    public class UpgradesData
+    {
+        public List<SlotProperties> slotProp;
+    }
 
     // Function to save upgrades data to PlayerPrefs
     public void SaveUpgrades()
@@ -76,7 +81,7 @@ public class Upgrades : ScriptableObject
         // Serialize the upgrades data to a JSON string
         UpgradesData upgradesData = new UpgradesData
         {
-            slotProperty = slotProperty
+            slotProp = slotProperty
         };
         string upgradesDataJson = JsonUtility.ToJson(upgradesData);
 
@@ -87,16 +92,13 @@ public class Upgrades : ScriptableObject
 
         // Save the JSON string
         PlayerPrefs.SetString("UpgradesData", upgradesDataJson);
+        Debug.Log($"SLOTTY {upgradesDataJson}");
 
         // Make sure to call PlayerPrefs.Save() to persist the changes immediately
         PlayerPrefs.Save();
     }
 
-    [System.Serializable]
-    public class UpgradesData
-    {
-        public List<SlotProperties> slotProperty;
-    }
+    
 
     // Function to load upgrades data from PlayerPrefs
     public void LoadUpgrades()
@@ -112,7 +114,8 @@ public class Upgrades : ScriptableObject
         // Check if upgradesData is not null
         if (upgradesData != null)
         {
-            slotProperty = upgradesData.slotProperty;
+            slotProperty = upgradesData.slotProp;
+            Debug.Log($"SLOTTY {slotProperty}");
         }
     }
 
