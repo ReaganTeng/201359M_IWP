@@ -73,14 +73,22 @@ public class Upgrades : ScriptableObject
     // Function to save upgrades data to PlayerPrefs
     public void SaveUpgrades()
     {
+        // Serialize the upgrades data to a JSON string
+        UpgradesData upgradesData = new UpgradesData
+        {
+            slotProperty = slotProperty
+        };
+        string upgradesDataJson = JsonUtility.ToJson(upgradesData);
+
+        // Save other individual variables
         PlayerPrefs.SetInt("DamageBuff", DamageBuff);
         PlayerPrefs.SetInt("HealthBuff", HealthBuff);
         PlayerPrefs.SetInt("WonGame", WonGame ? 1 : 0);
 
-        // Serialize the list of SlotProperties to JSON
-        string slotPropertyJson = JsonUtility.ToJson(slotProperty);
-        PlayerPrefs.SetString("SlotProperty", slotPropertyJson);
+        // Save the JSON string
+        PlayerPrefs.SetString("UpgradesData", upgradesDataJson);
 
+        // Make sure to call PlayerPrefs.Save() to persist the changes immediately
         PlayerPrefs.Save();
     }
 
