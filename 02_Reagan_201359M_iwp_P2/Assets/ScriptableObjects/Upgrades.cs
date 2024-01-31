@@ -84,6 +84,12 @@ public class Upgrades : ScriptableObject
         PlayerPrefs.Save();
     }
 
+    [System.Serializable]
+    public class UpgradesData
+    {
+        public List<SlotProperties> slotProperty;
+    }
+
     // Function to load upgrades data from PlayerPrefs
     public void LoadUpgrades()
     {
@@ -91,9 +97,15 @@ public class Upgrades : ScriptableObject
         HealthBuff = PlayerPrefs.GetInt("HealthBuff", 0);
         WonGame = PlayerPrefs.GetInt("WonGame", 0) == 1;
 
-        // Deserialize the JSON string back to a list of SlotProperties
-        string slotPropertyJson = PlayerPrefs.GetString("SlotProperty", "");
-        slotProperty = JsonUtility.FromJson<List<SlotProperties>>(slotPropertyJson);
+        // Deserialize the JSON string back to UpgradesData
+        string upgradesDataJson = PlayerPrefs.GetString("UpgradesData", "");
+        UpgradesData upgradesData = JsonUtility.FromJson<UpgradesData>(upgradesDataJson);
+
+        // Check if upgradesData is not null
+        if (upgradesData != null)
+        {
+            slotProperty = upgradesData.slotProperty;
+        }
     }
 
 
