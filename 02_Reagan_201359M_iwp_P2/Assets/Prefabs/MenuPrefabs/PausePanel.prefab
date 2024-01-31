@@ -863,7 +863,6 @@ GameObject:
   - component: {fileID: 1340046209021223238}
   - component: {fileID: 4813485000882776520}
   - component: {fileID: 4793456020988924581}
-  - component: {fileID: 2807094682937002326}
   m_Layer: 5
   m_Name: PausePanel
   m_TagString: PausePanel
@@ -888,7 +887,7 @@ RectTransform:
   - {fileID: 3386512611485563461}
   - {fileID: 4256175276203833693}
   m_Father: {fileID: 0}
-  m_RootOrder: -1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -945,22 +944,6 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!114 &2807094682937002326
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2548587740467747030}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bd5c3f3ba28f982419424877012e6ce3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mastervolume: 0
-  MasterVolumeSlider: {fileID: 0}
-  MusicVolumeSlider: {fileID: 0}
-  SoundVolumeSlider: {fileID: 0}
 --- !u!1 &3042063316321149609
 GameObject:
   m_ObjectHideFlags: 0
