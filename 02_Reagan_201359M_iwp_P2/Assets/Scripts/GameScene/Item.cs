@@ -48,6 +48,11 @@ public class Item : MonoBehaviour
     GameObject[] player;
     GameObject gameManager;
 
+    public AudioClip collectedSound;
+
+    [HideInInspector]
+    public AudioSource AS;
+
     protected virtual void Awake()
     {
         duration = 0;
@@ -56,6 +61,16 @@ public class Item : MonoBehaviour
         gameManager = GameObject.FindGameObjectWithTag("GameMGT");
 
         transform.SetParent(GameObject.Find("ItemParent").transform);
+        AS = GetComponent<AudioSource>();
+
+        Collider2D[] playerColliders = FindObjectsOfType<Collider2D>()
+         .Where(playerCollider => playerCollider.CompareTag("Player"))
+         .ToArray();
+        foreach (Collider2D Collider in playerColliders)
+        {
+            Physics2D.IgnoreCollision(GetComponent<Collider2D>(), Collider);
+        }
+
 
     }
     public virtual void Update()
@@ -138,5 +153,11 @@ public class Item : MonoBehaviour
         //{
         //    Debug.LogError($"Sprite for ItemType {itemType} is missing.");
         //}
+    }
+
+    public virtual void OnDestroy()
+    {
+        AS.clip = collectedSound;
+        AS.Play();
     }
 }
