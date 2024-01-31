@@ -25,8 +25,6 @@ public class Upgrades : ScriptableObject
         public string quantitytext;
     }
 
-    //public List<InventorySlot> slotsToTransfer = new List<InventorySlot>();
-
     public List<SlotProperties> slotProperty = new List<SlotProperties>();
 
 
@@ -69,6 +67,33 @@ public class Upgrades : ScriptableObject
         {
             slotP.quantitytext = "";
         }
+    }
+
+
+    // Function to save upgrades data to PlayerPrefs
+    public void SaveUpgrades()
+    {
+        PlayerPrefs.SetInt("DamageBuff", DamageBuff);
+        PlayerPrefs.SetInt("HealthBuff", HealthBuff);
+        PlayerPrefs.SetInt("WonGame", WonGame ? 1 : 0);
+
+        // Serialize the list of SlotProperties to JSON
+        string slotPropertyJson = JsonUtility.ToJson(slotProperty);
+        PlayerPrefs.SetString("SlotProperty", slotPropertyJson);
+
+        PlayerPrefs.Save();
+    }
+
+    // Function to load upgrades data from PlayerPrefs
+    public void LoadUpgrades()
+    {
+        DamageBuff = PlayerPrefs.GetInt("DamageBuff", 0);
+        HealthBuff = PlayerPrefs.GetInt("HealthBuff", 0);
+        WonGame = PlayerPrefs.GetInt("WonGame", 0) == 1;
+
+        // Deserialize the JSON string back to a list of SlotProperties
+        string slotPropertyJson = PlayerPrefs.GetString("SlotProperty", "");
+        slotProperty = JsonUtility.FromJson<List<SlotProperties>>(slotPropertyJson);
     }
 
 

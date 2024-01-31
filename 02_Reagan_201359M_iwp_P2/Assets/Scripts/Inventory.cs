@@ -36,6 +36,9 @@ public class Inventory : MonoBehaviour
     //Inventory playerInventory;
     void Awake()
     {
+
+        upgrades.LoadUpgrades();
+
         slotsincontent = inventoryPanelContent.GetComponentsInChildren<InventorySlot>();
         normalSlotScale = new Vector2(1, 1);
         largeSlotScale = new Vector2(2, 2);
@@ -315,6 +318,10 @@ public class Inventory : MonoBehaviour
         }
     }
 
+    private void OnDestroy()
+    {
+        upgrades.SaveUpgrades();
+    }
 
 }
 
