@@ -202,6 +202,8 @@ public class Inventory : MonoBehaviour
         }
 
         FindObjectOfType<Shop>().CheckItemAvailability();
+
+        SaveUpgradesOnQuit2();
     }
 
     public void LoadInventory()
@@ -325,25 +327,37 @@ public class Inventory : MonoBehaviour
     }
 
 
-    
 
-    private void OnApplicationQuit()
-    {
-        // Save upgrades when the application is quitting
-        StartCoroutine(SaveUpgradesOnQuit());
-    }
-
-    private IEnumerator SaveUpgradesOnQuit()
+    private void SaveUpgradesOnQuit2()
     {
         // Save upgrades when the game is about to close
         upgrades.SaveUpgrades();
 
         // Wait for a short time to ensure the data is saved before quitting
-        yield return new WaitForSeconds(1f);
+        //yield return new WaitForSeconds(1f);
 
-        // Quit the application
-        Application.Quit();
+        //// Quit the application
+        //Application.Quit();
     }
+
+
+    //private void OnApplicationQuit()
+    //{
+    //    // Save upgrades when the application is quitting
+    //    StartCoroutine(SaveUpgradesOnQuit());
+    //}
+
+    //private IEnumerator SaveUpgradesOnQuit()
+    //{
+    //    // Save upgrades when the game is about to close
+    //    upgrades.SaveUpgrades();
+
+    //    // Wait for a short time to ensure the data is saved before quitting
+    //    yield return new WaitForSeconds(1f);
+
+    //    // Quit the application
+    //    Application.Quit();
+    //}
 
     //private void OnDestroy()
     //{

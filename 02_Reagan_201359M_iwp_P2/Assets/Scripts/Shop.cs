@@ -339,6 +339,7 @@ public class Shop : MonoBehaviour
                 break;
         }
 
+        upgradesScriptableObject.SaveUpgrades();
         CheckItemAvailability();
         //DisplayItems();
     }
