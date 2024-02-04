@@ -176,7 +176,7 @@ public class PlayerManager : MonoBehaviour
             float x = Mathf.Cos(Mathf.Deg2Rad * angle) * 90.0f;
             float y = Mathf.Sin(Mathf.Deg2Rad * angle) * 90.0f;
             GameObject playerSwitchButton = Instantiate(playerSwitchButtonPrefab, characterSwitchPanel.GetComponent<RectTransform>());
-            playerSwitchButton.GetComponent<RectTransform>().sizeDelta *= .2f;
+            playerSwitchButton.GetComponent<RectTransform>().sizeDelta *= .1f;
             playerSwitchButton.GetComponentInChildren<Image>().sprite = players[i].GetComponent<Player>().icon;
             // Set the position of the button
             playerSwitchButton.GetComponent<RectTransform>().anchoredPosition = new Vector2(x, y);

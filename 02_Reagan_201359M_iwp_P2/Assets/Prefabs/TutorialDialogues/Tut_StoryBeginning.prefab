@@ -74,7 +74,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4934074169046902289, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
       propertyPath: sentences.Array.data[4].text
-      value: They are closing down the mine in 100 DAYS
+      value: They are closing down the mine in 7 DAYS
       objectReference: {fileID: 0}
     - target: {fileID: 4934074169046902289, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
       propertyPath: sentences.Array.data[5].text

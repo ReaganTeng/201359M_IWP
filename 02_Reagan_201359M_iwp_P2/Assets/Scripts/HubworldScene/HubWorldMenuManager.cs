@@ -48,16 +48,11 @@ public class HubWorldMenuManager : MonoBehaviour
 
 
     public GameObject shopkeeperPrefab;
-
     public Upgrades upgrades;
     public CharacterUnlockManager characterUnlockManager;
-
-
     public DialogueRealTime winDialogue;
     public DialogueRealTime loseDialogue;
     DialogueManager dialogueManager;
-
-
 
 
     // Start is called before the first frame update
@@ -332,7 +327,7 @@ public class HubWorldMenuManager : MonoBehaviour
             if (dialogueManager.currentDialogue == winDialogue
                 && dialogueManager.currentSentenceidx == dialogueManager.currentDialogue.sentences.Count - 1)
             {
-                upgrades.SaveUpgrades();
+                //upgrades.SaveUpgrades();
                 WinPanel.SetActive(true);
             }
             if (dialogueManager.currentDialogue == loseDialogue
@@ -365,6 +360,8 @@ public class HubWorldMenuManager : MonoBehaviour
             }
         }
         invmanager.ChangesInInventory();
+        upgrades.SaveUpgrades();
+
         SceneManager.LoadScene("MainMenu");
     }
 

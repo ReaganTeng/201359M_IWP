@@ -44,6 +44,9 @@ public class Shop : MonoBehaviour
 
     void Awake()
     {
+        characterUnlockManager.LoadData();
+        //characterUnlockManager.SaveData();
+
         slotlimit = 10;
         canvasGroup = GetComponent<CanvasGroup>();
         DisplayItems();
@@ -58,14 +61,12 @@ public class Shop : MonoBehaviour
         switch (currentScene.name)
         {
             case "HubWorld":
-                {
-                   
+                {  
                     Money.text = $"${PlayerPrefs.GetFloat("GrossMoney")}";
                     break;
                 }
             case "GameScene":
                 {
-                
                     Money.text = $"${PlayerPrefs.GetFloat("MoneyEarned")}";
                     break;
                 }
@@ -153,6 +154,8 @@ public class Shop : MonoBehaviour
 
     private void Update()
     {
+
+
         Money.text = $"${PlayerPrefs.GetFloat("MoneyEarned")}";
 
     }
@@ -415,7 +418,10 @@ public class Shop : MonoBehaviour
     void BuyCharacter(CharacterUnlockManager.CharacterType characterType, ShopItemData item, GameObject itemGO)
     {
         characterUnlockManager.UnlockCharacter(characterType);
-        shopItems.Remove(item);
+        //characterUnlockManager.SaveData();
+        
+        
+        //shopItems.Remove(item);
         DeductPrice(item);
         //CanvasGroup cg = itemGO.GetComponent<CanvasGroup>();
         //cg.interactable = false;

@@ -30,6 +30,10 @@ public class TutorialSystem : ScriptableObject
         {
             JsonUtility.FromJsonOverwrite(PlayerPrefs.GetString(PlayerPrefsKey), this);
         }
+        else
+        {
+            ResetTutorials();
+        }
     }
 
     // Optional: Reset all tutorial flags to their initial state

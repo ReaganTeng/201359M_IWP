@@ -61,6 +61,8 @@ public class UIElementAnimations : MonoBehaviour
         float vibrationDuration, float vibrationIntensity
         , Vector3 originalPosition)
     {
+        
+
         //Debug.Log("VIBRATION");
         StartCoroutine(Vibrate(
         GO,
@@ -76,6 +78,11 @@ public class UIElementAnimations : MonoBehaviour
     {
         float elapsedTime = 0f;
 
+        RectTransform rectTransform = GO.GetComponent<RectTransform>();
+        Vector2 anchorMin = rectTransform.anchorMin;
+        Vector2 anchorMax = rectTransform.anchorMax;
+
+        //Debug.Log($"ORIGINAL POS {originalPosition}");
         while (elapsedTime < vibrationDuration)
         {
             // Calculate a random offset based on the vibration intensity
@@ -93,7 +100,12 @@ public class UIElementAnimations : MonoBehaviour
             // Update the elapsed time
             elapsedTime += Time.deltaTime;
         }
-        GO.transform.localPosition = Vector3.zero;
+
+        // Reset local position considering anchors
+        rectTransform.anchorMin = anchorMin;
+        rectTransform.anchorMax = anchorMax;
+        rectTransform.anchoredPosition = Vector2.zero;
+
     }
     #endregion
 

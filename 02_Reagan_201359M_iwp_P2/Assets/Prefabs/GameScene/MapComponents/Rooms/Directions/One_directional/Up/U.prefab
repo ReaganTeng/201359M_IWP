@@ -53,6 +53,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3067655655856339992, guid: e4aa53eaab4533343b6a6c275412fdda, type: 3}
+      propertyPath: prefabId
+      value: 45
+      objectReference: {fileID: 0}
+    - target: {fileID: 3067655655856339992, guid: e4aa53eaab4533343b6a6c275412fdda, type: 3}
       propertyPath: availableDirections.Array.size
       value: 1
       objectReference: {fileID: 0}

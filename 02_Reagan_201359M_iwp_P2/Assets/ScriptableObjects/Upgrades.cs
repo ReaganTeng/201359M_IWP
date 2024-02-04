@@ -27,6 +27,8 @@ public class Upgrades : ScriptableObject
 
     public List<SlotProperties> slotProperty = new List<SlotProperties>();
 
+    [HideInInspector]
+    public bool finishedLoaded;
 
     public void Reset()
     {
@@ -78,11 +80,28 @@ public class Upgrades : ScriptableObject
     // Function to save upgrades data to PlayerPrefs
     public void SaveUpgrades()
     {
+        //List<SlotProperties> SP = slotProperty;
+        //foreach (InventorySlot slot in SP.slots)
+        //{
+        //    if (slot.itemtype != Item.ItemType.BOMB
+        //        && slot.itemtype != Item.ItemType.POTION
+        //        && slot.itemtype != Item.ItemType.BULLET)
+        //    {
+        //        slot.itemtype = Item.ItemType.NOTHING;
+        //        slot.Quantity = 0;
+        //        slot.quantityText.text = "";
+        //        slot.CurrentItem = null;
+        //        slot.slotImage.sprite = null;
+        //    }
+        //}
+
+
         // Serialize the upgrades data to a JSON string
         UpgradesData upgradesData = new UpgradesData
         {
             slotProp = slotProperty
         };
+
         string upgradesDataJson = JsonUtility.ToJson(upgradesData);
 
         // Save other individual variables
@@ -92,7 +111,7 @@ public class Upgrades : ScriptableObject
 
         // Save the JSON string
         PlayerPrefs.SetString("UpgradesData", upgradesDataJson);
-        Debug.Log($"SLOTTY {upgradesDataJson}");
+        //Debug.Log($"SLOTTY {upgradesDataJson}");
 
         // Make sure to call PlayerPrefs.Save() to persist the changes immediately
         PlayerPrefs.Save();
@@ -103,6 +122,8 @@ public class Upgrades : ScriptableObject
     // Function to load upgrades data from PlayerPrefs
     public void LoadUpgrades()
     {
+        finishedLoaded = false;
+
         DamageBuff = PlayerPrefs.GetInt("DamageBuff", 0);
         HealthBuff = PlayerPrefs.GetInt("HealthBuff", 0);
         WonGame = PlayerPrefs.GetInt("WonGame", 0) == 1;
@@ -117,6 +138,8 @@ public class Upgrades : ScriptableObject
             slotProperty = upgradesData.slotProp;
             Debug.Log($"SLOTTY {slotProperty}");
         }
+
+        finishedLoaded = true;
     }
 
 

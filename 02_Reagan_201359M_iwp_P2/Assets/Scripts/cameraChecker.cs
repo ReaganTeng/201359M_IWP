@@ -36,7 +36,7 @@ public class cameraChecker : MonoBehaviour
                 }
 
                 // Compare squared distances to avoid using expensive square root
-                if (distanceSquared >= cam.orthographicSize * 2.0f)
+                if (distanceSquared >= cam.orthographicSize * 1.75f)
                 {
                     //if(childrenMonoBehaviour.gameObject.GetComponent<Enemy>())
 

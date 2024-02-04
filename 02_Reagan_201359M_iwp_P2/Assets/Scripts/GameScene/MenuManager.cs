@@ -37,6 +37,10 @@ public class MenuManager : MonoBehaviour
     [HideInInspector]
     public List<GameObject> panelsToFreezegame = new List<GameObject>();
 
+
+    public Upgrades upgrades;
+
+
     //bool buttonpressed;
 
     //public Slider MasterVolumeSlider;
@@ -227,7 +231,23 @@ public class MenuManager : MonoBehaviour
 
     public void ReturnToHubWorld()
     {
+        Inventory invmanager = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<Inventory>();
 
+        foreach (InventorySlot slot in invmanager.slots)
+        {
+            if (slot.itemtype != Item.ItemType.BOMB
+                && slot.itemtype != Item.ItemType.POTION
+                && slot.itemtype != Item.ItemType.BULLET)
+            {
+                slot.itemtype = Item.ItemType.NOTHING;
+                slot.Quantity = 0;
+                slot.quantityText.text = "";
+                slot.CurrentItem = null;
+                slot.slotImage.sprite = null;
+            }
+        }
+        invmanager.ChangesInInventory();
+        upgrades.SaveUpgrades();
         //LOAD BACK TO HUBWORLD;
         SceneManager.LoadScene("HubWorld");
     }
@@ -250,12 +270,30 @@ public class MenuManager : MonoBehaviour
             }
         }
         invmanager.ChangesInInventory();
+        upgrades.SaveUpgrades();
+
         SceneManager.LoadScene("HubWorld");
     }
 
     public void ReturnToHubWorldFromGameOver()
     {
+        Inventory invmanager = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<Inventory>();
 
+        foreach (InventorySlot slot in invmanager.slots)
+        {
+            if (slot.itemtype != Item.ItemType.BOMB
+                && slot.itemtype != Item.ItemType.POTION
+                && slot.itemtype != Item.ItemType.BULLET)
+            {
+                slot.itemtype = Item.ItemType.NOTHING;
+                slot.Quantity = 0;
+                slot.quantityText.text = "";
+                slot.CurrentItem = null;
+                slot.slotImage.sprite = null;
+            }
+        }
+        invmanager.ChangesInInventory();
+        upgrades.SaveUpgrades();
         SceneManager.LoadScene("HubWorld");
 
     }

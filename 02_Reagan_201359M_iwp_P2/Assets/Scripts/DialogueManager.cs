@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+
 
 public class DialogueManager : MonoBehaviour
 {
@@ -80,7 +80,15 @@ public class DialogueManager : MonoBehaviour
             {
                 sentences.Add(sentence.text); // Change from Enqueue to Add
             }
+            //if (currentSentenceidx + 1 >= sentences.Count
+            //         || currentSentenceidx < 0
+            //         || sentences[currentSentenceidx] == null)
+            //{
+            //    return;
+            //}
+
             StartCoroutine(DisplayNextSentence());
+
         }
     }
 
@@ -108,6 +116,7 @@ public class DialogueManager : MonoBehaviour
             dialogueText = dialoguePanel.GetComponentInChildren<TextMeshProUGUI>();
             dialogueText.text = "";
             dialoguePanelCG = dialoguePanel.GetComponent<CanvasGroup>();
+            return;
         }
 
         //PRESS ENTER TO SKIP DIALOGUE
@@ -117,14 +126,9 @@ public class DialogueManager : MonoBehaviour
             && dialoguePanelCG.blocksRaycasts
             )
         {
-            //Button buttonComponent = dialoguePanel.GetComponentInChildren<Button>();
-            //// if there is choice button, then we don't want to process game logic. user must click the option to continue
-            //if (buttonComponent != null)
-            //{
-            //    return;
-            //}
+            
             //IF NO OPTIONS
-            if (currentDialogue.sentences[currentSentenceidx].options.Count <= 0)
+            if (currentDialogue.sentences[currentSentenceidx].options == null)
             {
                 return;
             }
@@ -136,7 +140,14 @@ public class DialogueManager : MonoBehaviour
                 dialogueText.text = "";
                 dialogueText.text = sentences[currentSentenceidx];
                 currentSentenceidx++;
+                if (currentSentenceidx + 1 >= sentences.Count
+                     || currentSentenceidx < 0
+                     || sentences[currentSentenceidx] == null)
+                {
+                    return;
+                }
                 StartCoroutine(DisplayNextSentence());
+
             }
             else
             {
@@ -170,7 +181,15 @@ public class DialogueManager : MonoBehaviour
                     dialogueText.text = "";
                     dialogueText.text = sentences[currentSentenceidx];
                     currentSentenceidx++;
+                    if (currentSentenceidx + 1 >= sentences.Count
+                      || currentSentenceidx < 0
+                      || sentences[currentSentenceidx] == null)
+                    {
+                        return;
+
+                    }
                     StartCoroutine(DisplayNextSentence());
+
                 }
                 else
                 {
@@ -277,8 +296,18 @@ public class DialogueManager : MonoBehaviour
         dialogueText.text = "";
         dialogueText.text = sentences[currentSentenceidx];
         currentSentenceidx++;
-        // Move to the next sentence or close the dialogue
+
+        if (currentSentenceidx + 1 >= sentences.Count
+            || currentSentenceidx < 0
+            || sentences[currentSentenceidx] == null)
+        {
+
+            //Debug.Log("RETURN NULL");
+            return;
+            // Move to the next sentence or close the dialogue
+        }
         StartCoroutine(DisplayNextSentence());
+
     }
 
     public void CloseDialogue()
@@ -324,9 +353,12 @@ public class DialogueManager : MonoBehaviour
         ClearButtons();
         //Debug.Log($"SENTENCE IS {sentences.Dequeue()}");
 
+        
+
         if (sentences.Count > 0)
         {
             string sentence = $"{sentences[currentSentenceidx]}";
+            Debug.Log($"SENTENCE IS {sentence}");
             isTyping = true;
             typeSentenceCoroutine = StartCoroutine(TypeSentenceOrOption(sentence));
             //yield return TypeSentenceOrOption(sentence);

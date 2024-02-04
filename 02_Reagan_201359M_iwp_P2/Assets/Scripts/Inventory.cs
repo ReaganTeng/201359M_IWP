@@ -52,13 +52,15 @@ public class Inventory : MonoBehaviour
     //Inventory playerInventory;
     void Awake()
     {
+        upgrades.LoadUpgrades();
+
+
         if (moneyPanel != null)
         {
             moneyPanel.alpha = .0f;
         }
 
         fadeOutTimer = .0f;
-        upgrades.LoadUpgrades();
         slotsincontent = inventoryPanelContent.GetComponentsInChildren<InventorySlot>();
         normalSlotScale = new Vector2(1, 1);
         largeSlotScale = new Vector2(2, 2);
@@ -97,10 +99,10 @@ public class Inventory : MonoBehaviour
     public void InitialiseInventorySlots()
     {
         //FOR TEMPORARY TESTING, EMPTIES ALL THE SLOTS
-        foreach (SlotProperties slot in upgrades.slotProperty)
-        {
-            upgrades.emptySlotProperty(slot);
-        }
+        //foreach (SlotProperties slot in upgrades.slotProperty)
+        //{
+        //    upgrades.emptySlotProperty(slot);
+        //}
 
         //float totalWidth = 0;
 
@@ -168,7 +170,10 @@ public class Inventory : MonoBehaviour
 
     public void Update()
     {
-
+        if (!upgrades.finishedLoaded)
+        {
+            return;
+        }
         ChangesInInventory();
         InventorySelection();
 
@@ -192,6 +197,8 @@ public class Inventory : MonoBehaviour
 
     void InventorySelection()
     {
+        
+
         for (int i = 1; i < slots.Count + 1; i++)
         {
             if (Input.GetKeyDown(i.ToString()))
@@ -244,7 +251,7 @@ public class Inventory : MonoBehaviour
 
         FindObjectOfType<Shop>().CheckItemAvailability();
 
-        SaveUpgradesOnQuit2();
+        //SaveUpgradesOnQuit2();
     }
 
     
@@ -305,17 +312,11 @@ public class Inventory : MonoBehaviour
 
         if (moneyearned != null)
         {
-            moneyearned.text = $"${PlayerPrefs.GetFloat("MoneyEarned")}";
-            
+            moneyearned.text = $"${PlayerPrefs.GetFloat("MoneyEarned")}";   
         }
-
         AS.time = 0;
-       
         AS.clip = collectedSound;
-
         AS.Play();
-
-
 
         if (moneyPanel != null)
         {
