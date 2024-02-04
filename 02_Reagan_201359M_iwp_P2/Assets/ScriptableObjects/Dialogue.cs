@@ -52,47 +52,47 @@ public class Dialogue : ScriptableObject
     }
 
 
-    public void InitializeQuestGiver(ref QuestManager QM, string questName, string QuestDes, int requiredCount, int questGiverid, ref bool givenQuest, GameObject GO)
-    {
-        //HARD CODE THE POTENTIAL FUNCTIONS HERE BASED ON WHAT DIALOGUEGIVE IT IS
-        switch (dialogueGiver)
-        {
-            case DialogueGiver.QUEST_GIVER:
-                // Create a local variable to capture the correct reference of givenQuest
-                bool localGivenQuest = givenQuest;
-                QuestManager localQM = QM;
+    //public void InitializeQuestGiver(ref QuestManager QM, string questName, string QuestDes, int requiredCount, int questGiverid, ref bool givenQuest, GameObject GO)
+    //{
+    //    //HARD CODE THE POTENTIAL FUNCTIONS HERE BASED ON WHAT DIALOGUEGIVE IT IS
+    //    switch (dialogueGiver)
+    //    {
+    //        case DialogueGiver.QUEST_GIVER:
+    //            // Create a local variable to capture the correct reference of givenQuest
+    //            bool localGivenQuest = givenQuest;
+    //            QuestManager localQM = QM;
 
-                if (!givenQuest)
-                {
-                    // YES OPTION
-                    sentences[0].options[0].onOptionSelected += () => AcceptQuest(ref localQM, questName, QuestDes,
-                    requiredCount, questGiverid, ref localGivenQuest, GO);
-                    // NO OPTION
-                    sentences[0].options[1].onOptionSelected += DeclineQuest;
-                }
-                else
-                {
-                    Quest quest = localQM.quests.Find(template
-                        => template.hiddenVariables.questGiverID == questGiverid);
-                    if (quest.hiddenVariables.isCompleted)
-                    {
-                        Debug.Log("QUEST COMPLETED");
-                        int idx = QM.quests.IndexOf(quest);
-                        GameObject questUI = QM.questUIContent.GetComponent<RectTransform>().GetChild(idx).gameObject;
-                        Destroy(questUI);
-                        QM.quests.Remove(quest);
-                        Destroy(GO);
-                    }
-                    else
-                    {
-                        Debug.Log("QUEST NOT COMPLETED");
-                    }
-                }
-                break;
-            default:
-                break;
-        }
-    }
+    //            if (!givenQuest)
+    //            {
+    //                // YES OPTION
+    //                sentences[0].options[0].onOptionSelected += () => AcceptQuest(ref localQM, questName, QuestDes,
+    //                requiredCount, questGiverid, ref localGivenQuest, GO);
+    //                // NO OPTION
+    //                sentences[0].options[1].onOptionSelected += DeclineQuest;
+    //            }
+    //            else
+    //            {
+    //                Quest quest = localQM.quests.Find(template
+    //                    => template.hiddenVariables.questGiverID == questGiverid);
+    //                if (quest.hiddenVariables.isCompleted)
+    //                {
+    //                    Debug.Log("QUEST COMPLETED");
+    //                    int idx = QM.quests.IndexOf(quest);
+    //                    GameObject questUI = QM.questUIContent.GetComponent<RectTransform>().GetChild(idx).gameObject;
+    //                    Destroy(questUI);
+    //                    QM.quests.Remove(quest);
+    //                    Destroy(GO);
+    //                }
+    //                else
+    //                {
+    //                    Debug.Log("QUEST NOT COMPLETED");
+    //                }
+    //            }
+    //            break;
+    //        default:
+    //            break;
+    //    }
+    //}
 
 
 

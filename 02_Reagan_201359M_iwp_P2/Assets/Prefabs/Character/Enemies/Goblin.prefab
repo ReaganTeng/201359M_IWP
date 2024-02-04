@@ -26,7 +26,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5479193372864470963, guid: 25379c2e4fc28cb46b03aed1a6c6971b, type: 3}
       propertyPath: m_Name
-      value: Chaser
+      value: Goblin
       objectReference: {fileID: 0}
     - target: {fileID: 7002142510329498051, guid: 25379c2e4fc28cb46b03aed1a6c6971b, type: 3}
       propertyPath: m_SortingLayer
@@ -141,37 +141,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c86fc6bc55084b4982f8050c283f967, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  audioclips: []
+  audioclips:
+  - {fileID: 8300000, guid: dd57a792801d0b84d9692f18d8b47884, type: 3}
   characterAnimations:
   - characterType: 3
-    animationClips:
-    - {fileID: 7400000, guid: 0d826ef27a8e9424a96c07b81ea4b40a, type: 2}
-    - {fileID: 7400000, guid: 28c5a04945575ee48961eb443616e0cc, type: 2}
-    - {fileID: 7400000, guid: 28c5a04945575ee48961eb443616e0cc, type: 2}
-    - {fileID: 7400000, guid: 1cba19809b9f3b74e96085698615b7e6, type: 2}
-    - {fileID: 7400000, guid: 81704efd5c7d3ec40ab293ce8898f588, type: 2}
-    - {fileID: 7400000, guid: 81704efd5c7d3ec40ab293ce8898f588, type: 2}
     animcon: {fileID: 9100000, guid: 20a208bbe6d06a64e8aa2f399babbc51, type: 2}
   - characterType: 4
-    animationClips:
-    - {fileID: 7400000, guid: 780fc66367e391441b5ff92bce1795e7, type: 2}
-    - {fileID: 7400000, guid: 40d9af679b4e86849b47b88026c19ba4, type: 2}
-    - {fileID: 7400000, guid: 40d9af679b4e86849b47b88026c19ba4, type: 2}
-    - {fileID: 7400000, guid: 12ede461227b8d74abe454df920ca23b, type: 2}
-    - {fileID: 7400000, guid: 8895208e9159327448b779c475b3f010, type: 2}
-    - {fileID: 7400000, guid: 8895208e9159327448b779c475b3f010, type: 2}
     animcon: {fileID: 9100000, guid: e6e688a8959fd76409d727e2e8415393, type: 2}
   - characterType: 5
-    animationClips:
-    - {fileID: 7400000, guid: d6dfa3314ba02784b860cec858b6bff3, type: 2}
-    - {fileID: 7400000, guid: d6dfa3314ba02784b860cec858b6bff3, type: 2}
-    - {fileID: 7400000, guid: d6dfa3314ba02784b860cec858b6bff3, type: 2}
-    - {fileID: 7400000, guid: d6dfa3314ba02784b860cec858b6bff3, type: 2}
-    - {fileID: 7400000, guid: d6dfa3314ba02784b860cec858b6bff3, type: 2}
-    - {fileID: 7400000, guid: d6dfa3314ba02784b860cec858b6bff3, type: 2}
     animcon: {fileID: 9100000, guid: 05e3d8498af5f99439bdbb8cdfc1df16, type: 2}
   projectilePrefab: {fileID: 0}
-  currentAnimIdx: 0
+  currentAnimState: 
   animatorComponent: {fileID: 0}
   health: 0
   meleedamage: 0
@@ -181,10 +161,18 @@ MonoBehaviour:
   audioSource: {fileID: 0}
   disabled: 0
   projectileDamage: 0
+  speed: 0
   characterType: 4
-  powerupNotificationPanel: {fileID: 0}
+  GameManager: {fileID: 0}
+  ScreamClip: {fileID: 0}
   stoppingdistance: 5
   distanceToIdle: 10
+  IDLE: 
+  ABOUT_TO_ATTACK: 
+  ATTACK: 
+  HURT: 
+  DEATH: 
+  RUN: 
   itemPrefab: {fileID: 72955845208125536, guid: 5b0e3c7ba455c46408341d69e4f40f44, type: 3}
   healthbar: {fileID: 0}
   immunity_timer: 0

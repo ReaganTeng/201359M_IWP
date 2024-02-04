@@ -14,4 +14,37 @@ public class TutorialSystem : ScriptableObject
     public bool DayTrackerCompleted;
     public bool ATMCompleted;
     public bool CaveCompleted;
+
+
+    private const string PlayerPrefsKey = "TutorialSystemData";
+
+    public void SaveData()
+    {
+        PlayerPrefs.SetString(PlayerPrefsKey, JsonUtility.ToJson(this));
+        PlayerPrefs.Save();
+    }
+
+    public void LoadData()
+    {
+        if (PlayerPrefs.HasKey(PlayerPrefsKey))
+        {
+            JsonUtility.FromJsonOverwrite(PlayerPrefs.GetString(PlayerPrefsKey), this);
+        }
+    }
+
+    // Optional: Reset all tutorial flags to their initial state
+    public void ResetTutorials()
+    {
+        StoryBeginningCompleted = false;
+        MovementTutorialCompleted = false;
+        AttackTutorialCompleted = false;
+        GemTutorialCompleted = false;
+        SwitchCharactersCompleted = false;
+        ShopTutorialCompleted = false;
+        DayTrackerCompleted = false;
+        ATMCompleted = false;
+        CaveCompleted = false;
+
+        SaveData();
+    }
 }

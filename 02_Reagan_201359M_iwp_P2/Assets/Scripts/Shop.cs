@@ -39,6 +39,9 @@ public class Shop : MonoBehaviour
 
     [HideInInspector] public AudioSource AS;
     int slotlimit;
+
+    public TextMeshProUGUI Money;
+
     void Awake()
     {
         slotlimit = 10;
@@ -47,6 +50,29 @@ public class Shop : MonoBehaviour
         AS = GetComponent<AudioSource>();
 
         CloseDescriptionPanel();
+
+        Scene currentScene = SceneManager.GetActiveScene();
+
+        //DEDUCT PRICE
+        // Get the currently active scene
+        switch (currentScene.name)
+        {
+            case "HubWorld":
+                {
+                   
+                    Money.text = $"${PlayerPrefs.GetFloat("GrossMoney")}";
+                    break;
+                }
+            case "GameScene":
+                {
+                
+                    Money.text = $"${PlayerPrefs.GetFloat("MoneyEarned")}";
+                    break;
+                }
+            default:
+                break;
+        }
+
     }
 
 
@@ -125,7 +151,11 @@ public class Shop : MonoBehaviour
         //CheckItemAvailability();
     }
 
+    private void Update()
+    {
+        Money.text = $"${PlayerPrefs.GetFloat("MoneyEarned")}";
 
+    }
     public void CheckItemAvailability()
     {
         foreach (ShopItemUI item in shopContent.GetComponentsInChildren<ShopItemUI>())
@@ -259,7 +289,7 @@ public class Shop : MonoBehaviour
         }
 
         // Implement logic for buying the item
-        Debug.Log($"Bought {item.itemName} for {item.price} coins.");
+        //Debug.Log($"Bought {item.itemName} for {item.price} coins.");
 
         // Assuming you have a Player script on the player GameObject
         //PlayerHubWorld player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHubWorld>();
@@ -425,17 +455,22 @@ public class Shop : MonoBehaviour
                 {
                     PlayerPrefs.SetFloat("GrossMoney", PlayerPrefs.GetFloat("GrossMoney")
                         - item.price);
+                    Money.text = $"${PlayerPrefs.GetFloat("GrossMoney")}";
                     break;
                 }
             case "GameScene":
                 {
                     PlayerPrefs.SetFloat("MoneyEarned", PlayerPrefs.GetFloat("MoneyEarned")
                         - item.price);
+                    Money.text = $"${PlayerPrefs.GetFloat("MoneyEarned")}";
                     break;
                 }
             default:
                 break;
         }
+
+        FindAnyObjectByType<UIElementAnimations>().VibrateUI(Money.gameObject, .5f, 
+            2.0f, Money.gameObject.transform.position); 
 
         //PLAY CHACHING SOUND
         AS.clip = chaChingClip;

@@ -60,19 +60,14 @@ public class DialogueRealTime : MonoBehaviour
         switch (dialogueGiver)
         {
             case DialogueGiver.QUEST_GIVER:
-                // Create a local variable to capture the correct reference of givenQuest
-                //QuestTrigger localQuestTrigger = QT;
-                //Debug.Log($"LOC BOOL IS {localGivenQuest}");
                 QuestManager localQM = QM;
                 // YES OPTION
                 sentences[0].options[0].onOptionSelected += () => {
                     //Debug.Log($"GIVEN QUEST IS {localGivenQuest}");
                     AcceptQuest(ref localQM, QT);
-                    //Debug.Log($"GIVEN QUEST IS {localGivenQuest}");
                 };
                 // NO OPTION
                 sentences[0].options[1].onOptionSelected += DeclineQuest;
-                //QT.givenQuest = true;
                 break;
             default:
                 break;
@@ -83,8 +78,7 @@ public class DialogueRealTime : MonoBehaviour
 
     void EnableShopPanel()
     {
-
-        Debug.Log("EnableShopPanel called");
+        //Debug.Log("EnableShopPanel called");
         GameObject gameManager = GameObject.FindGameObjectWithTag("GameMGT");
         CanvasGroup shopPanel = null;
 
@@ -123,6 +117,8 @@ public class DialogueRealTime : MonoBehaviour
     {
         GameObject gameManager = GameObject.FindGameObjectWithTag("GameMGT");
         gameManager.GetComponent<DialogueManager>().CloseDialogue();
+
+
         //gameManager.GetComponent<DialogueManager>().dialoguePanel.GetComponent<CanvasGroup>().interactable = false;
         //gameManager.GetComponent<DialogueManager>().dialoguePanel.GetComponent<CanvasGroup>().blocksRaycasts = false;
         //gameManager.GetComponent<DialogueManager>().dialoguePanel.GetComponent<CanvasGroup>().alpha = 0;
@@ -139,7 +135,7 @@ public class DialogueRealTime : MonoBehaviour
             //if (foundQuest != null)
             //{
             //Debug.Log("TRIGGERED");
-            QT.requiredCount = 1;
+            QT.requiredCount = Random.Range(1, 6);
             //QT.requiredCount = Random.Range(1, 11);
             //AddQuest(string questName, string description, int requiredCount);
             QM.AddQuest(QT.questName, QT.QuestDes, QT.requiredCount, QT.questGiverid);
@@ -150,6 +146,8 @@ public class DialogueRealTime : MonoBehaviour
 
 
         CloseDialogue();
+
+        Destroy(QT.gameObject);
     }
 
 

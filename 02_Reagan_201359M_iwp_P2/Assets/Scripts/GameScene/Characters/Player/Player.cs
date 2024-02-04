@@ -31,10 +31,9 @@ public class Player : Character
         ATTACK,
         HURT
     }
-
     public TextMeshProUGUI pressEText;
 
-
+    [HideInInspector]
     public TextMeshProUGUI moneyearnerd;
 
     public Upgrades upgrades;
@@ -46,11 +45,12 @@ public class Player : Character
     [HideInInspector] public float horizontalInput;
     [HideInInspector] public float verticalInput;
 
-    bool effectactive;
+    //bool effectactive;
+    [HideInInspector]
     public Transform playerTransform;
-    TileBase closestTile;
+    //TileBase closestTile;
     public TileBase wallTile;
-    bool attacked;
+    //bool attacked;
     Camera playercam;
     //float time;
     //int idx;
@@ -69,9 +69,9 @@ public class Player : Character
     bool useditem;
     //bool gotInput;
 
+    public AudioClip powerUpSound;
+    public AudioClip drinkSound;
 
-    //[HideInInspector]
-    //public CharacterUnlockManager.CharacterType characterType;
 
     [HideInInspector]
     public GameObject nearestEnemy;
@@ -110,13 +110,12 @@ public class Player : Character
     public List<PlayerIcons> playericon = new List<PlayerIcons>();
 
 
-   
+
+    public GameObject aimArrow;
 
     protected override void Awake()
     {
         base.Awake();
-
-     
 
         PowerUpNotificationUI = GameManager.GetComponent<MenuManager>().powerupNotificationPanel.GetComponent<PowerUpNotificationUI>();
 
@@ -171,7 +170,11 @@ public class Player : Character
             Camera.main.ScreenToWorldPoint(Input.mousePosition),
             transform.position) },
               { ItemType.POTION, () =>
-               health += 99
+                {
+                    audioSource.clip = drinkSound;
+                    audioSource.Play();
+                    health += 99;
+                }
               },
             { ItemType.BULLET, () =>
             ShootProjectiles(ProjectileType.NORMAL,
@@ -193,13 +196,13 @@ public class Player : Character
 
         useditem = false;
         playerInventory = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<Inventory>();
-        effectactive = false;
+        //effectactive = false;
         health = 100;
         health += health * (upgrades.HealthBuff / 100);
         Debug.Log($"PLAYER HEALTH IS {health}");
 
         playercam = GetComponentInChildren<Camera>();
-        attacked = false;
+        //attacked = false;
         playerTransform = transform;
 
         moneyearnerd = GameObject.FindGameObjectWithTag("MoneyEarnedText").GetComponent<TextMeshProUGUI>();
@@ -209,16 +212,22 @@ public class Player : Character
         //ApplyEffect(EffectType.ONE_HIT);
     }
 
+
+
+
     public void PowerUpUsed(EffectType effect)
     {
         int currentslot = playerInventory.selectedSlot;
         Sprite sprite = playerInventory.slots[currentslot].slotImage.sprite;
-      
+
         //PowerUpNotificationUI.powerupName.text
         //                = powerupName;
         PowerUpNotificationUI.GetComponent<PowerUpNotificationUI>()
                .NotifyPowerUp(effect, sprite);
         ApplyEffect(effect);
+
+        audioSource.clip = powerUpSound;
+        audioSource.Play();
     }
 
     void SpawnRandomObject()
@@ -258,6 +267,9 @@ public class Player : Character
             return;
         }
         base.Update();
+
+       
+
 
         //PlayAnimation("player_Attack");
 
@@ -366,17 +378,50 @@ public class Player : Character
         {
             //if (Input.GetKeyDown(KeyCode.Space))
             //{
-            //    health -= 10;
+            //    health -= health;
             //}
+
+            //ENABLE AIM ARROW WHEN IT'S EITHER RED GEM OR GREEN GEM
+            ItemType currentItemTypeSelected = playerInventory.slots[playerInventory.selectedSlot].itemtype;
+            switch(currentItemTypeSelected)
+            {
+                case ItemType.RED_GEM:
+                    {
+                        Vector3 directionToTarget = Camera.main.ScreenToWorldPoint(Input.mousePosition)
+                            - transform.position;
+                        float angle = 90 + Mathf.Atan2(directionToTarget.y, directionToTarget.x) * Mathf.Rad2Deg; 
+                        aimArrow.GetComponent<RectTransform>().rotation = Quaternion.Euler(0f, 0f, angle);
+                        aimArrow.GetComponent<CanvasGroup>().alpha = 1.0f;
+                        aimArrow.GetComponentInChildren<Image>().color = Color.red;
+
+                        break;
+                    }
+                case ItemType.GREEN_GEM:
+                    {
+                        Vector3 directionToTarget = Camera.main.ScreenToWorldPoint(Input.mousePosition)
+                           - transform.position;
+                        float angle = 90 + Mathf.Atan2(directionToTarget.y, directionToTarget.x) * Mathf.Rad2Deg;
+                        aimArrow.GetComponent<RectTransform>().rotation = Quaternion.Euler(0f, 0f, angle);
+                        aimArrow.GetComponent<CanvasGroup>().alpha = 1.0f;
+                        aimArrow.GetComponentInChildren<Image>().color = Color.green;
+                        break;
+                    }
+                default:
+                    {
+                        
+                        aimArrow.GetComponent<CanvasGroup>().alpha = 0.0f;
+                        break;
+                    }
+            }
+           
+            //
+
             InteractableInteraction();
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                //if (activeEffects.Count <= 0)
-                {
-                    //Debug.Log("EFFECT APPLIED");
-                    //ApplyEffect(EffectType.GHOST);
-                    //ApplyEffect(EffectType.ONE_HIT);
-                }
+
+                //ApplyEffect(EffectType.MINER_SENSE);
+                
             }
 
             if (verticalInput == 0
@@ -399,6 +444,7 @@ public class Player : Character
         }
         else
         {
+            aimArrow.GetComponent<CanvasGroup>().alpha = 0.0f;
             FSManager();
         }
     }

@@ -54,7 +54,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4934074169046902289, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
       propertyPath: sentences.Array.size
-      value: 8
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 4934074169046902289, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
       propertyPath: sentences.Array.data[0].text
@@ -62,15 +62,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4934074169046902289, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
       propertyPath: sentences.Array.data[1].text
-      value: GREEN Gem can poison and slow enemies
+      value: GREEN Gem poisons and slows
       objectReference: {fileID: 0}
     - target: {fileID: 4934074169046902289, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
       propertyPath: sentences.Array.data[2].text
-      value: The RED one does fire damage
+      value: RED Gem burns
       objectReference: {fileID: 0}
     - target: {fileID: 4934074169046902289, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
       propertyPath: sentences.Array.data[3].text
-      value: The BLUE one conjures up a shield
+      value: BLUE Gem activates a shield
       objectReference: {fileID: 0}
     - target: {fileID: 4934074169046902289, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
       propertyPath: sentences.Array.data[4].text
@@ -78,12 +78,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4934074169046902289, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
       propertyPath: sentences.Array.data[5].text
-      value: RIGHT CLICK to throw either the green gem or red gem when they are selected
-        in the inventory at the enemies based on your MOUSE'S DIRECTION.
+      value: RIGHT CLICK to use the selected item in your inventory
       objectReference: {fileID: 0}
     - target: {fileID: 4934074169046902289, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
       propertyPath: sentences.Array.data[6].text
-      value: RIGHT CLICK TO use blue gem when it is selected in your inventory
+      value: You can also RIGHT CLICK to use whatever's in your selected inventouy
+        slot
       objectReference: {fileID: 0}
     - target: {fileID: 4934074169046902289, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
       propertyPath: sentences.Array.data[7].text

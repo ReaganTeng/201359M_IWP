@@ -35,6 +35,10 @@ public class blade : MonoBehaviour
             Debug.Log("HIT ENEMY");
 
             Enemy enemyScript = collision.gameObject.GetComponent<Enemy>();
+            Character enemyCharacter = collision.gameObject.GetComponent<Character>();
+
+
+
             Player playerscript 
                 = GetComponentInParent<Transform>().GetComponentInParent<Weapon>().playerscript;
 
@@ -48,15 +52,16 @@ public class blade : MonoBehaviour
             //DAMAGE ENEMY
             int playerDamage = playerscript.meleedamage;
             //enemyScript.health -= 1000000;
-            
             enemyScript.health -= playerDamage;
+            //PLAY HURT SOUND
+            enemyCharacter.audioSource.clip = enemyScript.audioclips[0];
+            enemyCharacter.audioSource.Play();
 
             //SET ENEMY TO HURT STATE
             enemyScript.currentState = Enemy.EnemyState.HURT;
             enemyScript.immunity_timer = .5f;
             enemyScript.hurt_timer = 0.0f;
-
-            Debug.Log("ENEMY HEALTH " + enemyScript.health);
+            //Debug.Log("ENEMY HEALTH " + enemyScript.health);
 
 
             AS.clip = HitClip;

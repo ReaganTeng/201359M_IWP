@@ -316,7 +316,7 @@ public class Character : MonoBehaviour
                 template => template.Type == type
                 );
             effectChosen.Duration = 10;
-            Debug.Log($"DURATION {effectChosen.Duration}");
+            //Debug.Log($"DURATION {effectChosen.Duration}");
             //effectChosen =
         }
     }
@@ -381,7 +381,7 @@ public class Character : MonoBehaviour
                 }
             case EffectType.MINER_SENSE:
                 {
-                    return new MinerSenseEffect(10f);
+                    return new MinerSenseEffect(10f, this);
                 }
             case EffectType.GHOST:
                 {

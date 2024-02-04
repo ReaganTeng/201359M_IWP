@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,10 +11,14 @@ public class compass : MonoBehaviour
 
     [HideInInspector]
     public GameObject[] playerlist;
+    [HideInInspector]
     public GameObject player; // The target the arrow should point to
+    [HideInInspector]
     public GameObject endzoneTarget; // The target the arrow should point to
+    [HideInInspector]
     public bool compassSet;
 
+    public TextMeshProUGUI Distance;
 
     private void Awake()
     {
@@ -66,6 +71,11 @@ public class compass : MonoBehaviour
 
             // Set the rotation of the arrow image to point towards the target
             arrowImage.rectTransform.rotation = Quaternion.Euler(0f, 0f, angle);
+
+
+            //DISTANCE BETWEEN PLAYER AND ENDZONE
+            float distance = Vector2.Distance(player.transform.position, endzoneTarget.transform.position);
+            Distance.text = $"{(int)distance}M\nfrom exit";
         }
     }
 }

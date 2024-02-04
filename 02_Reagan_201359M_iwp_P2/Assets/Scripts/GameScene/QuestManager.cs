@@ -1,10 +1,11 @@
 // QuestManager.cs
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using static ShopItem;
+using Debug = UnityEngine.Debug;
+
 
 public class QuestManager : MonoBehaviour
 {
@@ -28,8 +29,13 @@ public class QuestManager : MonoBehaviour
     public Image newQuestNotification;
     public Image questUpdatedNotification;
 
+    public GameObject toggleQuestButton;
+
+    UIElementAnimations UIAnims;
+
     void Awake()
     {
+        UIAnims = GetComponent<UIElementAnimations>();
         //questText.text = "";
         //InitializeQuests();
         AS = GetComponent<AudioSource>();
@@ -50,9 +56,15 @@ public class QuestManager : MonoBehaviour
         //}
     }
 
+    
 
     public void DisableNotifications()
     {
+        //Debug.Log("NOTIFICATIONS DISABLED");
+        
+        UIAnims.StopScaleAnimation(toggleQuestButton);
+        toggleQuestButton.transform.localScale = Vector3.one;
+
         newQuestNotification.enabled = false;
         questUpdatedNotification.enabled = false;
     }
@@ -71,75 +83,64 @@ public class QuestManager : MonoBehaviour
                 currentCount = 0,
             }
         };
-        Debug.Log("QUEST ADDED");
+        //Debug.Log("QUEST ADDED");
         quests.Add(newQuest);
         
         GameObject itemObject = Instantiate(questPrefab, questUIContent.transform);
         itemObject.GetComponent<QuestUI>().UpdateUI(newQuest);
-        
-
-        questUIContent.GetComponent<RectTransform>().sizeDelta =
-            new Vector2(questUIContent.GetComponent<RectTransform>().sizeDelta.x
-             , questUIContent.GetComponent<RectTransform>().sizeDelta.y + itemObject.GetComponent<RectTransform>().sizeDelta.y);
-
-
-        itemObject.GetComponent<RectTransform>().sizeDelta
-            = new Vector2(questUIContent.GetComponent<RectTransform>().sizeDelta.x
-             , itemObject.GetComponent<RectTransform>().sizeDelta.y);
+        itemObject.GetComponent<QuestUI>().giverID = QuestGiverId;
 
         //questUIContent.GetComponent<RectTransform>().sizeDelta =
-        //   new Vector2(questUIContent.GetComponent<RectTransform>().sizeDelta.x
-        //    , questUIContent.GetComponent<RectTransform>().sizeDelta.y + itemObject.GetComponent<RectTransform>().sizeDelta.y);
-
+        //    new Vector2(questUIContent.GetComponent<RectTransform>().sizeDelta.x
+        //     , questUIContent.GetComponent<RectTransform>().sizeDelta.y + itemObject.GetComponent<RectTransform>().sizeDelta.y);
+        //itemObject.GetComponent<RectTransform>().sizeDelta
+        //    = new Vector2(questUIContent.GetComponent<RectTransform>().sizeDelta.x
+        //     , itemObject.GetComponent<RectTransform>().sizeDelta.y);
 
         //foreach(RectTransform trans )
         //updateContentSize();
         newQuestNotification.enabled = true;
         questUpdatedNotification.enabled = false;
 
+        UIAnims.SetScaleAnimation(1.5f, .5f, toggleQuestButton);
+
+
         AS.clip = newQuestClip;
+        //Debug.Log($"CLIP SWITCHED TO {AS.clip}");
         AS.Play();
     }
 
 
-    public void updateContentSize()
-    {
-        int childCount = 0;
+    //public void updateContentSize()
+    //{
+    //    int childCount = 0;
+    //    //GameObject itemObject = Instantiate(questPrefab);
 
-        //GameObject itemObject = Instantiate(questPrefab);
+    //    foreach (RectTransform trans in questUIContent.GetComponentsInChildren<RectTransform>())
+    //    {
+    //        QuestUI questUIComponent = trans.GetComponent<QuestUI>();
+
+    //        if (questUIComponent != null)
+    //        {
+    //            childCount++;
+    //            Debug.Log($"FOUND CHILD {childCount}");
+    //        }
+    //    }
+
+    //    questUIContent.GetComponent<RectTransform>().sizeDelta =
+    //       new Vector2(questUIContent.GetComponent<RectTransform>().sizeDelta.x
+    //        , questPrefab.GetComponent<RectTransform>().sizeDelta.y * childCount);
+
+    //    //Destroy(itemObject);
+
+    //}
 
 
-        foreach (RectTransform trans in questUIContent.GetComponentsInChildren<RectTransform>())
-        {
-            QuestUI questUIComponent = trans.GetComponent<QuestUI>();
-
-            if (questUIComponent != null)
-            {
-                childCount++;
-                Debug.Log($"FOUND CHILD {childCount}");
-            }
-        }
-
-        questUIContent.GetComponent<RectTransform>().sizeDelta =
-           new Vector2(questUIContent.GetComponent<RectTransform>().sizeDelta.x
-            , questPrefab.GetComponent<RectTransform>().sizeDelta.y * childCount);
-
-        //Destroy(itemObject);
-
-    }
     private void Update()
     {
+        
+        
 
-        updateContentSize();
-        //UpdateQuestProgress("Killing Monster");
-
-        //foreach (RectTransform trans in questUIContent.GetComponentsInChildren<RectTransform>())
-        //{
-        //    if(trans.GetComponent<QuestUI>() != null)
-        //    {
-        //        int childcount = questUIContent.transform.GetComponent<QuestUI>().childCount;
-        //    }
-        //}
     }
 
     //UPDATE WHENEVER PLAYER PERFORMS CERTAIN SPECIFIC ACTIONS
@@ -153,14 +154,13 @@ public class QuestManager : MonoBehaviour
         {
             if (quest != null && !quest.hiddenVariables.isCompleted)
             {
-                Debug.Log("QUEST UPDATED");
+                //Debug.Log("QUEST UPDATED");
                 quest.UpdateProgress();
                 CheckQuestCompletion(quest);
             }
             int idx = quests.IndexOf(quest);
             QuestUI questUIComponent = questUIContent.transform.GetChild(idx).GetComponent<QuestUI>();
             if (questUIComponent != null
-                //&& questUIComponent.questStr == quest.hiddenVariables.questName
                 && quest.hiddenVariables.currentCount <= quest.hiddenVariables.requiredCount
                 )
             {
@@ -171,21 +171,17 @@ public class QuestManager : MonoBehaviour
 
     void CheckQuestCompletion(Quest quest)
     {
-
         //UPDATE QUEST UI
         if (quest.hiddenVariables.isCompleted)
         {
             Debug.Log($"Quest '{quest.hiddenVariables.questName}' completed!");
-            //questText.text = "Completed";
-            //menuManager.newQuestNot.SetActive(false);
-            //menuManager.questCompletedNot.SetActive(true);
-
+            
             newQuestNotification.enabled = false;
             questUpdatedNotification.enabled = true;
+            UIAnims.SetScaleAnimation(1.5f, .5f, toggleQuestButton);
 
             AS.clip = questCompletedClip;
             AS.Play();
-            // Provide rewards or trigger other events
         }
     }
 

@@ -17,10 +17,10 @@ MonoBehaviour:
   WonGame: 0
   slotProperty:
   - currentitem: {fileID: 0}
-    itemtype: 11
+    itemtype: 5
     iconsprite: {fileID: 0}
-    Quantity: 0
-    quantitytext: 
+    Quantity: 2
+    quantitytext: 2
   - currentitem: {fileID: 0}
     itemtype: 11
     iconsprite: {fileID: 0}

@@ -48,11 +48,8 @@ public class Item : MonoBehaviour
     GameObject[] player;
     GameObject gameManager;
 
-    public AudioClip collectedSound;
 
-    [HideInInspector]
-    public AudioSource AS;
-
+    
     protected virtual void Awake()
     {
         duration = 0;
@@ -61,7 +58,6 @@ public class Item : MonoBehaviour
         gameManager = GameObject.FindGameObjectWithTag("GameMGT");
 
         transform.SetParent(GameObject.Find("ItemParent").transform);
-        AS = GetComponent<AudioSource>();
 
         Collider2D[] playerColliders = FindObjectsOfType<Collider2D>()
          .Where(playerCollider => playerCollider.CompareTag("Player"))
@@ -75,7 +71,6 @@ public class Item : MonoBehaviour
     }
     public virtual void Update()
     {
-
         //RESPONSIBLE FOR THE COLLECTION OF ITEMS
         if (StackSize > 0)
         {
@@ -88,9 +83,12 @@ public class Item : MonoBehaviour
                     //player.GetComponent<Inventory>().AddItem(this, 1);
                     gameManager.GetComponent<Inventory>().AddItem(this, 1);
 
+                   
                 }
             }
         }
+
+       
 
         Collider2D[] playerColliders = FindObjectsOfType<Collider2D>()
          .Where(playerCollider => playerCollider.CompareTag("Player"))
@@ -155,9 +153,8 @@ public class Item : MonoBehaviour
         //}
     }
 
-    public virtual void OnDestroy()
-    {
-        AS.clip = collectedSound;
-        AS.Play();
-    }
+    //public virtual void OnDestroy()
+    //{
+       
+    //}
 }

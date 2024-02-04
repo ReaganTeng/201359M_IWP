@@ -2,13 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
-using Unity.Mathematics;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UIElements;
 using static Item;
 using static Projectile;
-using static UnityEngine.RuleTile.TilingRuleOutput;
 
 // Base class for player effects
 public abstract class Effect
@@ -402,8 +398,10 @@ public class MinerSenseEffect : Effect
     int originalSortOrder;
     Treasure[] treasureChests;
 
-    public MinerSenseEffect(float duration)
+    public MinerSenseEffect(float duration, Character targetCharacter)
     {
+
+        TargetCharacter = targetCharacter;
         name = "POWER UP: MINER SENSE";
         Type = EffectType.MINER_SENSE;
         Duration = duration;
@@ -432,6 +430,7 @@ public class MinerSenseEffect : Effect
                 t.sr.sortingOrder = originalSortOrder;
                 //TargetCharacter.spriteRenderer.sortingOrder += sortOrderIncrease;
             }
+            Debug.Log("GEM WISDOM OVER");
         }
         // Apply projectile damage increase
         //TargetCharacter.projectileDamage += projectileDamageIncrease;

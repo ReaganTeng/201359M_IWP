@@ -17,7 +17,7 @@ public class DialogueManager : MonoBehaviour
 
     [HideInInspector]
     public float typingSpeed = 0.05f;
-    Queue<string> sentences;
+    List<string> sentences = new List<string>();
 
     [HideInInspector]
     public AudioSource AS;
@@ -40,13 +40,15 @@ public class DialogueManager : MonoBehaviour
     [HideInInspector]
     public HubWorldMenuManager hubWorldMM;
 
+
+    Coroutine typeSentenceCoroutine;
+
+
     void Awake()
     {
         MM = GetComponent<MenuManager>();
         hubWorldMM = GetComponent<HubWorldMenuManager>();
-
         currentSentenceidx = 0;
-        sentences = new Queue<string>();
         AS = GetComponent<AudioSource>();
         currentDialogue = null;
     }
@@ -76,7 +78,7 @@ public class DialogueManager : MonoBehaviour
 
             foreach (DialogueRealTime.Sentence sentence in dialogue.sentences)
             {
-                sentences.Enqueue(sentence.text);
+                sentences.Add(sentence.text); // Change from Enqueue to Add
             }
             StartCoroutine(DisplayNextSentence());
         }
@@ -108,8 +110,44 @@ public class DialogueManager : MonoBehaviour
             dialoguePanelCG = dialoguePanel.GetComponent<CanvasGroup>();
         }
 
+        //PRESS ENTER TO SKIP DIALOGUE
+        if (Input.GetKeyDown(KeyCode.Return)
+            && dialoguePanelCG.interactable
+            && dialoguePanelCG.alpha == 1
+            && dialoguePanelCG.blocksRaycasts
+            )
+        {
+            //Button buttonComponent = dialoguePanel.GetComponentInChildren<Button>();
+            //// if there is choice button, then we don't want to process game logic. user must click the option to continue
+            //if (buttonComponent != null)
+            //{
+            //    return;
+            //}
+            //IF NO OPTIONS
+            if (currentDialogue.sentences[currentSentenceidx].options.Count <= 0)
+            {
+                return;
+            }
 
-        if (Input.GetMouseButtonDown(0)
+            if (currentSentenceidx < currentDialogue.sentences.Count - 1)
+            {
+                StopCoroutine(typeSentenceCoroutine);
+                StopCoroutine(DisplayNextSentence());
+                dialogueText.text = "";
+                dialogueText.text = sentences[currentSentenceidx];
+                currentSentenceidx++;
+                StartCoroutine(DisplayNextSentence());
+            }
+            else
+            {
+                //Debug.Log("CLOSE DIALOGUE");
+                CloseDialogue();
+            }
+        }
+
+        //SPEED UP ANIMATION
+        if ((Input.GetMouseButtonDown(0)
+            ||Input.GetKeyDown(KeyCode.E))
             && dialoguePanelCG.interactable
             && dialoguePanelCG.alpha == 1
             && dialoguePanelCG.blocksRaycasts)
@@ -120,24 +158,23 @@ public class DialogueManager : MonoBehaviour
             // if there is choice button, then we don't want to process game logic. user must click the option to continue
             if (buttonComponent != null)
             {
-                //GameObject clickedObject = EventSystem.current.currentSelectedGameObject;
-
-                //if (clickedObject != null && clickedObject.GetComponent<Button>() != null)
-                //{
-                    return;
-                //}
+                return;   
             }
 
             if (!isTyping)
             {
                 if (currentSentenceidx < currentDialogue.sentences.Count - 1)
                 {
+                    StopCoroutine(typeSentenceCoroutine);
+                    StopCoroutine(DisplayNextSentence());
+                    dialogueText.text = "";
+                    dialogueText.text = sentences[currentSentenceidx];
                     currentSentenceidx++;
                     StartCoroutine(DisplayNextSentence());
                 }
                 else
                 {
-                    //Debug.Log("CLOSE");
+                    //Debug.Log("CLOSE DIALOGUE");
                     CloseDialogue();
                 }
             }
@@ -148,30 +185,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    IEnumerator DisplayNextSentence()
-    {
-        typingSpeed = 0.05f;
-        // Clear existing buttons
-        ClearButtons();
-
-        if (sentences.Count > 0)
-        {
-            string sentence = sentences.Dequeue();
-            isTyping = true;
-            yield return TypeSentenceOrOption(sentence);
-        }
-        else if (currentDialogue != null 
-            && currentDialogue.sentences != null
-            && currentDialogue.sentences.Count > 0)
-        {
-            DisplayOptions();
-        }
-        else
-        {
-            //Debug.Log("CLOSE");
-            CloseDialogue();
-        }
-    }
+   
 
     //DISPLAY OPTION BUTTONS
     void DisplayOptions()
@@ -251,25 +265,33 @@ public class DialogueManager : MonoBehaviour
     void OnOptionSelected(DialogueRealTime.DialogueOption option)
     {
         // Handle the selected option
-        Debug.Log($"Selected option: {option.optionText}");
+        //Debug.Log($"Selected option: {option.optionText}");
         // Perform any action associated with the selected option
         if (option.onOptionSelected != null)
         {
             option.onOptionSelected.Invoke();
         }
+
+        StopCoroutine(typeSentenceCoroutine);
+        StopCoroutine(DisplayNextSentence());
+        dialogueText.text = "";
+        dialogueText.text = sentences[currentSentenceidx];
+        currentSentenceidx++;
         // Move to the next sentence or close the dialogue
         StartCoroutine(DisplayNextSentence());
     }
 
     public void CloseDialogue()
     {
+        StopCoroutine(typeSentenceCoroutine);
+        StopCoroutine(DisplayNextSentence());
+
         currentSentenceidx = 0;
         Scene currentScene = SceneManager.GetActiveScene();
         switch (currentScene.name)
         {
             case "HubWorld":
                 {
-                    //hubWorldMM.togglePanel(dialoguePanel);
                     hubWorldMM.dialoguePanel.GetComponent<CanvasGroup>().interactable = false;
                     hubWorldMM.dialoguePanel.GetComponent<CanvasGroup>().blocksRaycasts = false;
                     hubWorldMM.dialoguePanel.GetComponent<CanvasGroup>().alpha = 0;
@@ -278,7 +300,6 @@ public class DialogueManager : MonoBehaviour
                 }
             case "GameScene":
                 {
-                    //MM.togglePanel(dialoguePanel);
                     MM.dialoguePanel.GetComponent<CanvasGroup>().interactable = false;
                     MM.dialoguePanel.GetComponent<CanvasGroup>().blocksRaycasts = false;
                     MM.dialoguePanel.GetComponent<CanvasGroup>().alpha = 0;
@@ -289,14 +310,48 @@ public class DialogueManager : MonoBehaviour
                 break;
         }
 
+        //AS.clip = null;
+        //Debug.Log("SET TO NULL");
         currentDialogue = null; // Reset currentDialogue
     }
 
-    IEnumerator TypeSentenceOrOption(string text)
+
+    IEnumerator DisplayNextSentence()
     {
         dialogueText.text = "";
+        typingSpeed = 0.05f;
+        // Clear existing buttons
+        ClearButtons();
+        //Debug.Log($"SENTENCE IS {sentences.Dequeue()}");
+
+        if (sentences.Count > 0)
+        {
+            string sentence = $"{sentences[currentSentenceidx]}";
+            isTyping = true;
+            typeSentenceCoroutine = StartCoroutine(TypeSentenceOrOption(sentence));
+            //yield return TypeSentenceOrOption(sentence);
+            yield return typeSentenceCoroutine;
+        }
+        else if (currentDialogue != null
+            && currentDialogue.sentences != null
+            && currentDialogue.sentences.Count > 0)
+        {
+            DisplayOptions();
+        }
+        else
+        {
+            //Debug.Log("CLOSE");
+            CloseDialogue();
+        }
+    }
+
+
+    IEnumerator TypeSentenceOrOption(string text)
+    {
+        //dialogueText.text = "";
         foreach (char letter in text.ToCharArray())
         {
+            //Debug.Log($"LETTER IS {text}");
             AS.clip = beepClip;
             AS.Play();
             dialogueText.text += letter;

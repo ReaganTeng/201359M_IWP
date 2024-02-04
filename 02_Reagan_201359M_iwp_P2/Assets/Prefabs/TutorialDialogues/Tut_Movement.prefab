@@ -70,7 +70,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4934074169046902289, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
       propertyPath: sentences.Array.data[3].text
-      value: Use the compass to the left to reach the exit
+      value: Use the compass to reach the exit
       objectReference: {fileID: 0}
     - target: {fileID: 7477714005744658407, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
       propertyPath: m_Name

@@ -104,14 +104,13 @@ public class VolumeManager : MonoBehaviour
         //Debug.Log($"VOLUME IS {volume}");
 
         // Find all GameObjects with AudioSource components in the scene
-        GameObject[] playersAndEnemies = GameObject.FindGameObjectsWithTag("Player")
-            .Concat(GameObject.FindGameObjectsWithTag("Enemy"))
-             .Concat(GameObject.FindGameObjectsWithTag("GameMGT"))
-            .ToArray();
+        GameObject[] soundeffects = FindObjectsOfType<GameObject>()
+      .Where(obj => obj.CompareTag("MusicPlayer") == false)
+      .ToArray();
 
-        foreach (GameObject playerOrEnemy in playersAndEnemies)
+        foreach (GameObject obj in soundeffects)
         {
-            AdjustVolumeRecursive(playerOrEnemy.transform, volume);
+            AdjustVolumeRecursive(obj.transform, volume);
         }
     }
 

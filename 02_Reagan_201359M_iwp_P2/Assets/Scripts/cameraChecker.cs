@@ -29,9 +29,17 @@ public class cameraChecker : MonoBehaviour
                 Renderer renderer = childrenMonoBehaviour.gameObject.GetComponent<Renderer>();
 
 
-                // Compare squared distances to avoid using expensive square root
-                if (distanceSquared >= cam.orthographicSize * 1.75f)
+                if(childrenMonoBehaviour.gameObject.GetComponent<Enemy>() != null
+                    && childrenMonoBehaviour.gameObject.GetComponent<Enemy>().currentState != Enemy.EnemyState.IDLE)
                 {
+                    childrenMonoBehaviour.gameObject.GetComponent<Enemy>().currentState = Enemy.EnemyState.IDLE;
+                }
+
+                // Compare squared distances to avoid using expensive square root
+                if (distanceSquared >= cam.orthographicSize * 2.0f)
+                {
+                    //if(childrenMonoBehaviour.gameObject.GetComponent<Enemy>())
+
                     if (childrenMonoBehaviour.enabled)
                     {
                         if (renderer != null)
@@ -39,6 +47,7 @@ public class cameraChecker : MonoBehaviour
                             renderer.enabled = false;
                         }
                         childrenMonoBehaviour.enabled = false;
+
                     }
                 }
                 else
@@ -56,39 +65,5 @@ public class cameraChecker : MonoBehaviour
             
         }
 
-
-        //foreach (GameObject GO in FindObjectsOfType<GameObject>())
-        //{
-        //    if (!GO.CompareTag("Item") && !GO.CompareTag("Enemy"))
-        //    {
-        //        continue;
-        //    }
-
-
-        //    Vector2 gopos = GO.transform.position;
-        //    Vector2 camerapos = cam.transform.position;
-
-        //    // Use sqrMagnitude for distance comparison as it's faster than Distance
-        //    float distanceSquared = (gopos - camerapos).sqrMagnitude;
-        //    float maxDistanceSquared = cam.orthographicSize * cam.orthographicSize;
-
-        //    // Check if the object is active before making decisions
-        //    if (GO.activeSelf)
-        //    {
-        //        // Compare squared distances to avoid using expensive square root
-        //        if (distanceSquared >= maxDistanceSquared)
-        //        {
-        //            GO.SetActive(false);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        // If the object is already inactive and within the view, set it active
-        //        if (distanceSquared < maxDistanceSquared)
-        //        {
-        //            GO.SetActive(true);
-        //        }
-        //    }
-        //}
     }
 }

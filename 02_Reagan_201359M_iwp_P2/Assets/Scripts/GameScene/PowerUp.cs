@@ -110,9 +110,9 @@ public class PowerUp : Item
         base.Update();
     }
 
-    public override void OnDestroy()
-    {
-        base.OnDestroy();
-    }
+    //public override void OnDestroy()
+    //{
+    //    base.OnDestroy();
+    //}
 
 }

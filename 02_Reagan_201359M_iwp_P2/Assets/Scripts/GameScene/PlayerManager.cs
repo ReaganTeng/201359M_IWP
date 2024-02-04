@@ -120,19 +120,6 @@ public class PlayerManager : MonoBehaviour
             playerScript.characterType = character;
 
 
-            //Professor - weak in basic attacks but can deal higher damage with Gems
-            //Veteran - weak in gem attacks but can absorb more damage and damage dealt
-
-            //AnimatorController newController
-            //    = playerScript.characterAnimations.Find(entry 
-            //    => entry.characterType == playerScript.characterType).animcon;
-            //if (newController != null)
-            //{
-            //    // Assign the new controller to the animatorComponent
-            //    playerScript.animatorComponent.runtimeAnimatorController = newController;
-            //}
-
-
             RuntimeAnimatorController overrideController = playerScript.characterAnimations.Find(entry => 
             entry.characterType == playerScript.characterType).animcon;
             if (overrideController != null)
@@ -255,6 +242,22 @@ public class PlayerManager : MonoBehaviour
         bool allDead = players.All(p => p.GetComponent<Player>().health <= 0);
         if (allDead)
         {
+            Inventory invmanager = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<Inventory>();
+            foreach (InventorySlot slot in invmanager.slots)
+            {
+                if (slot.itemtype != Item.ItemType.BOMB
+                    && slot.itemtype != Item.ItemType.POTION
+                    && slot.itemtype != Item.ItemType.BULLET)
+                {
+                    slot.itemtype = Item.ItemType.NOTHING;
+                    slot.Quantity = 0;
+                    slot.quantityText.text = "";
+                    slot.CurrentItem = null;
+                    slot.slotImage.sprite = null;
+                }
+            }
+            invmanager.ChangesInInventory();
+
             MM.togglePanel(gameOverPanel);
         }
 

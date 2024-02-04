@@ -13,8 +13,6 @@ using Random = UnityEngine.Random;
 public class Enemy : Character
 {
 
-    //String[] tilemaptags;
-
     QuestManager questManager;
 
     //TileBase closestTile;
@@ -56,18 +54,7 @@ public class Enemy : Character
     //4 _ death
     //5 _ hurt
 
-    [HideInInspector]
-    public string IDLE;
-    [HideInInspector]
-    public string ABOUT_TO_ATTACK;
-    [HideInInspector]
-    public string ATTACK;
-    [HideInInspector]
-    public string HURT;
-    [HideInInspector]
-    public string DEATH;
-    [HideInInspector]
-    public string RUN;
+    
 
 
 
@@ -89,6 +76,19 @@ public class Enemy : Character
     public float hurt_timer;
     [HideInInspector]
     public Rigidbody2D enemyrb;
+    [HideInInspector]
+    public string IDLE;
+    [HideInInspector]
+    public string ABOUT_TO_ATTACK;
+    [HideInInspector]
+    public string ATTACK;
+    [HideInInspector]
+    public string HURT;
+    [HideInInspector]
+    public string DEATH;
+    [HideInInspector]
+    public string RUN;
+
 
     EnemyManager enemymgt;
 
@@ -100,6 +100,8 @@ public class Enemy : Character
         base.Awake();
 
         checker = false;
+
+
 
         questManager = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<QuestManager>();
         attackcooldown = 0;
@@ -178,7 +180,7 @@ public class Enemy : Character
         // Normalize the direction vector (optional, keeps the movement consistent)
         direction.Normalize();
         // Update the position of the follower toward the target
-        transform.position += direction * 5 * speed * Time.deltaTime;
+        transform.position += direction * 7 * speed * Time.deltaTime;
 
        
 
@@ -320,7 +322,9 @@ public class Enemy : Character
         }
         else
         {
-            if (currentState == EnemyState.IDLE)
+            if (enemymgt.enemiesInChaseMode.Count < 5 &&
+                currentState == EnemyState.IDLE
+                )
             {
                 //Debug.Log("SET TO CHASE");
                 currentState = EnemyState.CHASE;

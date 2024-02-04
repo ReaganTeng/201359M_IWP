@@ -10,15 +10,7 @@ public class EnemyManager : MonoBehaviour
     float timer;
 
 
-    //public Camera playercam;
-
-    public bool disabled;
-
-    //public AnimatorController animcon;
-
-    //THE NUMBER OF ENEMIES DECIDED TO GO CHASE MODE
-    int enemiesChosen;
-
+ 
     int numberofEnemiesChosen;
 
     [HideInInspector]
@@ -28,7 +20,8 @@ public class EnemyManager : MonoBehaviour
 
     public MapGenerator mapGenerator;
 
-    List<GameObject> enemiesInChaseMode = new List<GameObject>();
+    [HideInInspector]
+    public List<GameObject> enemiesInChaseMode = new List<GameObject>();
     List<Vector2> takenPos = new List<Vector2>();
 
     //FOR ORGANIZATION PURPOSES IN INSPECTOR
@@ -37,7 +30,6 @@ public class EnemyManager : MonoBehaviour
     //public GameObject enemyPrefab;
     [HideInInspector]
     public float spawnInterval = 3f;
-    Vector3 prevpos = Vector3.zero;
     bool generationover = false;
 
     public void StartItself()
@@ -45,7 +37,7 @@ public class EnemyManager : MonoBehaviour
         if (!generationover)
         {
             timer = 0;
-            maxnumberenemies = 100;
+            maxnumberenemies = 300;
             SpawnEnemy();
         }
     }
@@ -86,30 +78,7 @@ public class EnemyManager : MonoBehaviour
                 //GameObject enemy = Instantiate(enemyPrefabs[0], randomPosition, Quaternion.identity);
                 Enemy enemyScript = enemy.GetComponent<Enemy>();
 
-                //GET THE CLIP YOU WANT TO ASSIGN
-                //int idx = 0;
-                //CharacterAnimationClips characterAnimationEntry =
-                //enemyScript.characterAnimations.Find(entry => entry.characterType 
-                //== enemyScript.characterType);
-                //AnimationClip clipToPlay = characterAnimationEntry.animationClips[idx];
-                ////
-                //enemyScript.AssignClipToState(enemyScript.IDLE, clipToPlay);
-                //idx++;
-                //clipToPlay = characterAnimationEntry.animationClips[idx];
-                //enemyScript.AssignClipToState(enemyScript.ABOUT_TO_ATTACK, clipToPlay);
-                //idx++;
-                //clipToPlay = characterAnimationEntry.animationClips[idx];
-                //enemyScript.AssignClipToState(enemyScript.ATTACK, clipToPlay);
-                //idx++;
-                //clipToPlay = characterAnimationEntry.animationClips[idx];
-                //enemyScript.AssignClipToState(enemyScript.RUN, clipToPlay);
-                //idx++;
-                //clipToPlay = characterAnimationEntry.animationClips[idx];
-                //enemyScript.AssignClipToState(enemyScript.DEATH, clipToPlay);
-                //idx++;
-                //clipToPlay = characterAnimationEntry.animationClips[idx];
-                //enemyScript.AssignClipToState(enemyScript.HURT, clipToPlay);
-
+                
                 enemyList.Add(enemy);
                 enemy.transform.SetParent(enemyparent.transform);
                 takenPos.Add(randomPosition);
@@ -222,6 +191,16 @@ public class EnemyManager : MonoBehaviour
            != Enemy.EnemyState.ATTACK);
         //bool anynotAttack
         //   = enemyList.All(enemy => enemy.GetComponent<Enemy>().currentState != Enemy.EnemyState.ATTACK)
+
+        foreach (var enemies in enemyList)
+        {
+            if (!enemies.GetComponent<MonoBehaviour>().enabled
+                && enemies.GetComponent<Enemy>().currentState != Enemy.EnemyState.IDLE)
+            {
+                enemies.GetComponent<Enemy>().currentState = Enemy.EnemyState.IDLE;
+            }
+        }
+
         if (allNotAboutToAttack
             && allnotAttack)
         {
@@ -252,14 +231,11 @@ public class EnemyManager : MonoBehaviour
                 {
 
                     int enemyindex = Random.Range(0, enemiesInChaseMode.Count);
-
-                    if (enemiesInChaseMode[enemyindex].GetComponent<MonoBehaviour>().enabled)
-                    {
-                        Enemy enemyScript = enemiesInChaseMode[enemyindex].GetComponent<Enemy>();
-                        enemyScript.currentState = Enemy.EnemyState.ABOUT_TO_ATTACK;
-                        //enemyScript.spriteRenderer.color = Color.red;
-                        //Debug.Log("ABOUT TO ATTACK");
-                    }
+                    Enemy enemyScript = enemiesInChaseMode[enemyindex].GetComponent<Enemy>();
+                    enemyScript.currentState = Enemy.EnemyState.ABOUT_TO_ATTACK;
+                    i++;
+                    
+                   
                 }
             }
             enemiesInChaseMode.Clear();

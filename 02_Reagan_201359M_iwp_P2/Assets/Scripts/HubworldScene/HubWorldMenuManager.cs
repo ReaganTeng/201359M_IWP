@@ -63,9 +63,9 @@ public class HubWorldMenuManager : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
+        //PlayerPrefs.DeleteAll();
 
         GamePlayPanel = GameObject.FindGameObjectWithTag("GamePlayPanel");
-
 
         dialoguePanel = GameObject.FindGameObjectWithTag("DialoguePanel");
         ShopPanel = GameObject.FindGameObjectWithTag("ShopPanel");
@@ -73,7 +73,6 @@ public class HubWorldMenuManager : MonoBehaviour
         DayPanel = GameObject.FindGameObjectWithTag("DayPanel");
         SettingsPanel = GameObject.FindGameObjectWithTag("SettingsPanel");
         PausePanel = GameObject.FindGameObjectWithTag("PausePanel");
-
 
         dialogueManager = GetComponent<DialogueManager>();
 
@@ -107,9 +106,9 @@ public class HubWorldMenuManager : MonoBehaviour
         }
         if (!PlayerPrefs.HasKey("DaysLeft"))
         {
-            PlayerPrefs.SetInt("DaysLeft", 100);
+            PlayerPrefs.SetInt("DaysLeft", 7);
         }
-        PlayerPrefs.SetInt("DaysLeft", 100);
+        //PlayerPrefs.SetInt("DaysLeft", 100);
 
 
         if (!PlayerPrefs.HasKey("MoneyDonated"))
@@ -193,7 +192,7 @@ public class HubWorldMenuManager : MonoBehaviour
         }
         if (PlayerPrefs.HasKey("DaysLeft"))
         {
-            PlayerPrefs.SetInt("DaysLeft", 100);
+            PlayerPrefs.SetInt("DaysLeft", 7);
         }
         if (PlayerPrefs.HasKey("MoneyDonated"))
         {
@@ -212,10 +211,10 @@ public class HubWorldMenuManager : MonoBehaviour
         WinPanel.SetActive(false);
         GameOverPanel.SetActive(false);
 
-        FindObjectOfType<Inventory>().EmptyInventory();
+        //FindObjectOfType<Inventory>().EmptyInventory();
         upgrades.Reset();
 
-       
+
 
     }
 
@@ -301,18 +300,31 @@ public class HubWorldMenuManager : MonoBehaviour
             && !upgrades.WonGame)
         {
 
-            GetComponent<DialogueManager>().StartDialogue(loseDialogue);
+            dialogueManager.StartDialogue(loseDialogue);
         }
 
+        //DISABLE IN FINAL BUILD
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            PlayerPrefs.SetFloat("MoneyDonated",
+                PlayerPrefs.GetFloat("MoneyDonated") + 100000);
+            Debug.Log($"MONEY DONATED {PlayerPrefs.GetFloat("MoneyDonated")}");
+        }
+
+        //if (PlayerPrefs.GetFloat("MoneyDonated") >= goalamount)
+        //{
+        //    Debug.Log("YOU WON");
+        //}
 
         //WINNING CONDITION
         if (PlayerPrefs.GetFloat("MoneyDonated") >= goalamount
-            && PlayerPrefs.GetInt("DaysLeft") <= 0
+            && PlayerPrefs.GetInt("DaysLeft") > 0
             && !WinPanel.activeSelf
             && !upgrades.WonGame)
         {
-            upgrades.WonGame = true;
+            Debug.Log("YOU WON");
             dialogueManager.StartDialogue(winDialogue);
+            upgrades.WonGame = true;
         }
 
         if (Input.GetMouseButtonDown(0))
@@ -320,6 +332,7 @@ public class HubWorldMenuManager : MonoBehaviour
             if (dialogueManager.currentDialogue == winDialogue
                 && dialogueManager.currentSentenceidx == dialogueManager.currentDialogue.sentences.Count - 1)
             {
+                upgrades.SaveUpgrades();
                 WinPanel.SetActive(true);
             }
             if (dialogueManager.currentDialogue == loseDialogue
@@ -384,10 +397,10 @@ public class HubWorldMenuManager : MonoBehaviour
     //    HelpPanel.SetActive(!HelpPanel.activeSelf);
     //}
 
-    //public void TogglePanel()
-    //{
-    //    StoryPanel.SetActive(!StoryPanel.activeSelf);
-    //}
+    public void TogglePanelActive(GameObject panel)
+    {
+       panel.SetActive(!panel.activeSelf);
+    }
 
 
     public void Endday()

@@ -43,6 +43,9 @@ public class TutorialTrigger : MonoBehaviour
 
     public void Awake()
     {
+
+        tutorialSystem.LoadData();
+
         GameScene = "GameScene";
         HubWorldScene = "HubWorld";
         DM = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<DialogueManager>();
@@ -76,6 +79,8 @@ public class TutorialTrigger : MonoBehaviour
             DM.StartDialogue(d);
             boolToSet = true;
         }
+
+        tutorialSystem.SaveData();
     }
 
     public void OnTriggerEnter2D(Collider2D other)

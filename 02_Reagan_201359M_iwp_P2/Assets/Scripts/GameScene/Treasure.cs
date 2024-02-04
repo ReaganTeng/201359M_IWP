@@ -14,11 +14,17 @@ public class Treasure : Interactables
     public GameObject itemPrefab;
     public GameObject powerUpPrefab;
 
+    [HideInInspector]
+    public AudioSource AS;
+
+    public AudioClip openSound;
+
     bool unlocked;
     // Start is called before the first frame update
     public override void Awake()
     {
         base.Awake();
+        AS = GetComponent<AudioSource>();
         unlocked = false;
         sr.sprite = chestSprites[0];
     }
@@ -43,6 +49,8 @@ public class Treasure : Interactables
         //Debug.Log("INTERACTED");
         if (!unlocked)
         {
+            AS.clip = openSound;
+            AS.Play();
             //Debug
             UnlockChest();
         }

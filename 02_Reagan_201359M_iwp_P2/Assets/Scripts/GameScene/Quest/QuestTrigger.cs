@@ -107,68 +107,58 @@ public class QuestTrigger : DialogueTrigger
         {
             base.Interact();
         }
-        else
-        {
+        //else
+        //{
 
-            Quest quest = QM.quests.Find(template
-            => template.hiddenVariables.questGiverID == questGiverid);
-            if (quest != null &&
-                quest.hiddenVariables.isCompleted)
-            {
-                Debug.Log("QUEST COMPLETED");
-                int idx = QM.quests.IndexOf(quest);
-                GameObject questUI = QM.questUIContent.GetComponent<RectTransform>().GetChild(idx).gameObject;
-                Destroy(questUI);
-                QM.quests.Remove(quest);
+        //Quest quest = QM.quests.Find(template
+        //    => template.hiddenVariables.questGiverID == questGiverid);
+        //if (quest != null &&
+        //    quest.hiddenVariables.isCompleted)
+        //{
+        //    Debug.Log("QUEST COMPLETED");
+        //    int idx = QM.quests.IndexOf(quest);
+        //    GameObject questUI = QM.questUIContent.GetComponent<RectTransform>().GetChild(idx).gameObject;
+        //    Destroy(questUI);
+        //    QM.quests.Remove(quest);
 
-                for (int i = 0; i < 10; i++)
-                {
-                    //int enumLength = Enum.GetValues(typeof(ItemType)).Length - 1;
-                    ItemType itemchosen = (ItemType)(Random.Range(0, 3));
-                    GameObject item = Instantiate(itemPrefab, transform.position, Quaternion.identity);
-                    item.GetComponent<Item>().SetItem(itemchosen, 99);
-                }
+        //    for (int i = 0; i < 10; i++)
+        //    {
+        //        //int enumLength = Enum.GetValues(typeof(ItemType)).Length - 1;
+        //        ItemType itemchosen = (ItemType)(Random.Range(0, 3));
+        //        GameObject item = Instantiate(itemPrefab, transform.position, Quaternion.identity);
+        //        item.GetComponent<Item>().SetItem(itemchosen, 99);
+        //    }
 
-                //drop powerups
-                int powerupdropper = (Random.Range(1, 3));
-                if (powerupdropper % 2 == 0)
-                {
-                    PowerUps powerupchosen = (PowerUps)(Random.Range(0,
-                        Enum.GetValues(typeof(PowerUps)).Length - 1));
+        //    //drop powerups
+        //    int powerupdropper = (Random.Range(1, 3));
+        //    if (powerupdropper % 2 == 0)
+        //    {
+        //        PowerUps powerupchosen = (PowerUps)(Random.Range(0,
+        //            Enum.GetValues(typeof(PowerUps)).Length - 1));
 
-                    GameObject item = Instantiate(powerUpPrefab, transform.position, Quaternion.identity);
-                    item.GetComponent<PowerUp>().SetPowerUpItem(powerupchosen, 1);
-                }
-
-
-            }
-
-
-            //List<Quest> quests = QM.quests.FindAll(template
-            //   => template.hiddenVariables.questGiverID == questGiverid);
-            //foreach (Quest q in quests)
-            //{
-            //    if (q != null &&
-            //        q.hiddenVariables.isCompleted)
-            //    {
-            //        //Debug.Log("QUEST COMPLETED");
-            //        int idx = QM.quests.IndexOf(q);
-            //        GameObject questUI = QM.questUIContent.GetComponent<RectTransform>().GetChild(idx).gameObject;
-            //        Destroy(questUI);
-            //        QM.quests.Remove(q);
+        //        GameObject item = Instantiate(powerUpPrefab, transform.position, Quaternion.identity);
+        //        item.GetComponent<PowerUp>().SetPowerUpItem(powerupchosen, 1);
+        //    }
+        //}
+        //Destroy(gameObject);
 
 
-            //        QM.updateContentSize();
-
-            //    }
-            //}
-
-            Destroy(gameObject);
-            
-
-
-
-        }
+        //    //List<Quest> quests = QM.quests.FindAll(template
+        //    //   => template.hiddenVariables.questGiverID == questGiverid);
+        //    //foreach (Quest q in quests)
+        //    //{
+        //    //    if (q != null &&
+        //    //        q.hiddenVariables.isCompleted)
+        //    //    {
+        //    //        //Debug.Log("QUEST COMPLETED");
+        //    //        int idx = QM.quests.IndexOf(q);
+        //    //        GameObject questUI = QM.questUIContent.GetComponent<RectTransform>().GetChild(idx).gameObject;
+        //    //        Destroy(questUI);
+        //    //        QM.quests.Remove(q);
+        //    //        QM.updateContentSize();
+        //    //    }
+        //    //}
+        //}
 
         //QM.updateContentSize();
 

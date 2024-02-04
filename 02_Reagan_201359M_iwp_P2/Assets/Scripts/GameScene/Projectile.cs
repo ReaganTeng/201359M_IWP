@@ -18,6 +18,9 @@ public class Projectile : MonoBehaviour
     [HideInInspector]
     public ProjectileType projectiletype;
 
+    [HideInInspector]
+    public AudioSource AS;
+
     SpriteRenderer projectileSprite;
 
     public List<Sprite> sprites = new List<Sprite>();
@@ -32,11 +35,19 @@ public class Projectile : MonoBehaviour
 
     bool hitsomething;
 
+    public AudioClip shootsound;
+    public AudioClip explosionSound;
+
+
     private void Awake()
     {
         projectileSprite = GetComponent<SpriteRenderer>();
         hitsomething = false;
         player = GameObject.FindGameObjectWithTag("Player");
+
+        AS = GetComponent<AudioSource>();
+        AS.clip = shootsound;
+        AS.Play();
     }
 
     public void setdata(int damage, float speed, Vector3 dir, GameObject source)
@@ -66,6 +77,12 @@ public class Projectile : MonoBehaviour
     // Handle collisions with other objects
     void OnTriggerEnter2D(Collider2D collision)
     {
+        //IF IT IS NOT PLAYING EXPLOSION SOUND
+        //if (AS.clip == explosionSound)
+        //{
+        //    return;
+        //}
+
         //damage either player or enemy
         if (
             ((collision.gameObject.CompareTag("Player")
@@ -94,7 +111,8 @@ public class Projectile : MonoBehaviour
 
             //SHIELD
             if (collisionCharacter.playerShield != null
-                && collisionCharacter.playerShield.shieldActive)
+                && collisionCharacter.playerShield.shieldActive
+                )
             {
                 for (int i = 0; i < collisionCharacter.activeEffects.Count; i++)
                 {
@@ -116,16 +134,21 @@ public class Projectile : MonoBehaviour
                 }
                 collisionCharacter.health -= Damage;
             }
-            hitsomething = true;
 
-            Destroy(gameObject);
-            Debug.Log($"{collision.gameObject.name} HEALTH {collision.gameObject.GetComponent<Character>().health}");
+            projectileSprite.enabled = false;
+            AS.clip = explosionSound;
+            AS.Play();
+            StartCoroutine(DestroyAfterSound(explosionSound.length));
+
+            hitsomething = true;
+           
+            //Debug.Log($"{collision.gameObject.name} HEALTH {collision.gameObject.GetComponent<Character>().health}");
         }
 
         //FOR THE EXPLOSION OF RED PROJECTILE
-        if (collision.CompareTag("WallTilemap") 
-            || collision.CompareTag("UnbreakableWall")
-            )
+        if ((collision.CompareTag("WallTilemap") 
+            || collision.CompareTag("UnbreakableWall"))
+            && !hitsomething)
         {
             if (projectiletype == ProjectileType.RED_GEM
                 || projectiletype == ProjectileType.BOMB)
@@ -133,7 +156,14 @@ public class Projectile : MonoBehaviour
                 Explode(transform.position, 3, collision.gameObject);
             }
             //direction = new Vector3(0, 0, 0);
-            Destroy(gameObject);
+            //Destroy(gameObject);
+
+            projectileSprite.enabled = false;
+            AS.clip = explosionSound;
+            AS.Play();
+            StartCoroutine(DestroyAfterSound(explosionSound.length));
+
+            hitsomething = true;
         }
 
     }
@@ -160,7 +190,7 @@ public class Projectile : MonoBehaviour
                 Vector3Int cellPosition = wallTilemap.WorldToCell(
                     new Vector3(explosionPosition.x, explosionPosition.y, 0)
                     );
-                Debug.Log($"CELL POS {cellPosition}");
+                //Debug.Log($"CELL POS {cellPosition}");
                 // Loop through tiles within the explosion radius.
                 for (int x = -Mathf.FloorToInt(explosionRadius); x <= Mathf.FloorToInt(explosionRadius); x++)
                 {
@@ -185,5 +215,14 @@ public class Projectile : MonoBehaviour
             }
         }
 
+    }
+
+    IEnumerator DestroyAfterSound(float delay)
+    {
+        // Wait for the specified delay
+        yield return new WaitForSeconds(delay);
+
+        // Destroy the Projectile object
+        Destroy(gameObject);
     }
 }

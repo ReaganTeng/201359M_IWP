@@ -16,11 +16,15 @@ public class Inventory : MonoBehaviour
 
     public GameObject inventoryPanelContent;
 
+
+    public AudioClip PowerUpAudio;
+    //public AudioClip
+
     [HideInInspector]
     public List<InventorySlot> slots;
 
     //public List<ItemType> typesInUpgrade = new List<ItemType>();
-
+    [HideInInspector]
     public int selectedSlot;
 
     //public GameObject slotPrefab;
@@ -32,23 +36,34 @@ public class Inventory : MonoBehaviour
 
     InventorySlot[] slotsincontent;
 
+
+    [HideInInspector]
+    public AudioSource AS;
+
+    public AudioClip collectedSound;
+
+    UIElementAnimations UIAnims;
+    //DECIDES WHEN TO FADE OUT
+    float fadeOutTimer;
+    public CanvasGroup moneyPanel;
+
+
     //int slotScale;
     //Inventory playerInventory;
     void Awake()
     {
-       
-        // Subscribe to the application quit event to save upgrades when the game is about to close
-        //Application.wantsToQuit += SaveUpgradesOnQuit;
-        //Application. += SaveUpgradesOnQuit;
+        if (moneyPanel != null)
+        {
+            moneyPanel.alpha = .0f;
+        }
+
+        fadeOutTimer = .0f;
         upgrades.LoadUpgrades();
-
-
         slotsincontent = inventoryPanelContent.GetComponentsInChildren<InventorySlot>();
-
-
         normalSlotScale = new Vector2(1, 1);
         largeSlotScale = new Vector2(2, 2);
-
+        AS = GetComponent<AudioSource>();
+        UIAnims = GetComponent<UIElementAnimations>();
         //slotScale = 1;
         //itempicked.SetItem(ItemType.RED_GEM, 5);
         //AddItem(itempicked, 18);
@@ -56,10 +71,21 @@ public class Inventory : MonoBehaviour
         InitialiseInventorySlots();
         //SelectSlot(0);
 
-        
+        //MANUALLY SET THE VOLUME OF THE COLLECTIBLE CLIP ITSELD
+        if (collectedSound != null)
+        {
+            float[] samples = new float[collectedSound.samples * collectedSound.channels];
+            collectedSound.GetData(samples, 0);
+            for (int i = 0; i < samples.Length; i++)
+            {
+                samples[i] *= 5;
+            }
+            collectedSound.SetData(samples, 0);
+        }
+        //
     }
 
-   
+
     public void EmptyInventory()
     {
         foreach (var slot in slots)
@@ -71,10 +97,10 @@ public class Inventory : MonoBehaviour
     public void InitialiseInventorySlots()
     {
         //FOR TEMPORARY TESTING, EMPTIES ALL THE SLOTS
-        //foreach (SlotProperties slot in upgrades.slotProperty)
-        //{
-        //    upgrades.emptySlotProperty(slot);
-        //}
+        foreach (SlotProperties slot in upgrades.slotProperty)
+        {
+            upgrades.emptySlotProperty(slot);
+        }
 
         //float totalWidth = 0;
 
@@ -145,6 +171,21 @@ public class Inventory : MonoBehaviour
 
         ChangesInInventory();
         InventorySelection();
+
+
+        if(moneyPanel == null)
+        {
+            return;
+        }
+        if (fadeOutTimer > 0)
+        {
+            fadeOutTimer -= Time.deltaTime;
+
+            if(fadeOutTimer <= 0)
+            {
+                UIAnims.FadeOutAnimation(moneyPanel, 5.0f);
+            }
+        }
     }
 
 
@@ -206,10 +247,7 @@ public class Inventory : MonoBehaviour
         SaveUpgradesOnQuit2();
     }
 
-    public void LoadInventory()
-    {
-
-    }
+    
 
     //amount = amount of items added
     public bool AddItem(Item item, int amount)
@@ -229,6 +267,7 @@ public class Inventory : MonoBehaviour
             AddItemToSlot(item, SuitableSlot, amount);
             successFullyAddedItem = true;
         }
+        //IF DID NOT FINS
         else
         {
             foreach (InventorySlot slot in slots)
@@ -266,8 +305,33 @@ public class Inventory : MonoBehaviour
 
         if (moneyearned != null)
         {
-            moneyearned.text = $"{PlayerPrefs.GetFloat("MoneyEarned")}";
+            moneyearned.text = $"${PlayerPrefs.GetFloat("MoneyEarned")}";
+            
         }
+
+        AS.time = 0;
+       
+        AS.clip = collectedSound;
+
+        AS.Play();
+
+
+
+        if (moneyPanel != null)
+        {
+
+            if (UIAnims.fadeOutCoroutine != null)
+            {
+                StopCoroutine(UIAnims.fadeOutCoroutine);
+            }
+            fadeOutTimer = 2.0f;
+            UIAnims.FadeInAnimation(moneyPanel, .5f);
+            UIAnims.VibrateUI(moneyearned.gameObject, 1.0f,
+                2.0f, moneyearned.gameObject.transform.position);
+            //UIAnims.FadeOutAnimation(moneyPanel, fadeTimer);
+        }
+
+
         Destroy(item.gameObject);
     }
 
