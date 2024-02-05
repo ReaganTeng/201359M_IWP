@@ -29,16 +29,18 @@ public class cameraChecker : MonoBehaviour
                 Renderer renderer = childrenMonoBehaviour.gameObject.GetComponent<Renderer>();
 
 
-                if(childrenMonoBehaviour.gameObject.GetComponent<Enemy>() != null
-                    && childrenMonoBehaviour.gameObject.GetComponent<Enemy>().currentState != Enemy.EnemyState.IDLE)
-                {
-                    childrenMonoBehaviour.gameObject.GetComponent<Enemy>().currentState = Enemy.EnemyState.IDLE;
-                }
+               
 
                 // Compare squared distances to avoid using expensive square root
                 if (distanceSquared >= cam.orthographicSize * 1.75f)
                 {
                     //if(childrenMonoBehaviour.gameObject.GetComponent<Enemy>())
+
+                    if (childrenMonoBehaviour.gameObject.GetComponent<Enemy>() != null
+                   && childrenMonoBehaviour.gameObject.GetComponent<Enemy>().currentState != Enemy.EnemyState.IDLE)
+                    {
+                        childrenMonoBehaviour.gameObject.GetComponent<Enemy>().currentState = Enemy.EnemyState.IDLE;
+                    }
 
                     if (childrenMonoBehaviour.enabled)
                     {

@@ -652,19 +652,22 @@ public class Player : Character
     GameObject FindNearestEnemy(Vector3 position)
     {
        
-
-
         GameObject nearestEnemy = null;
         float minDistance = 10;
         foreach (GameObject enemy in listOfEnemies)
         {
-            // Calculate the distance between the position and the enemy's position
-            float distance = Vector3.Distance(position, enemy.transform.position);
-            // Check if the current enemy is closer than the previous nearest enemy
-            if (distance < minDistance)
+            if (enemy.GetComponent<Enemy>().currentState
+                != Enemy.EnemyState.IDLE)
             {
-                minDistance = distance;
-                nearestEnemy = enemy;
+                Debug.Log("FOUND NEAREST ENEMY");
+                // Calculate the distance between the position and the enemy's position
+                float distance = Vector3.Distance(position, enemy.transform.position);
+                // Check if the current enemy is closer than the previous nearest enemy
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    nearestEnemy = enemy;
+                }
             }
         }
 
