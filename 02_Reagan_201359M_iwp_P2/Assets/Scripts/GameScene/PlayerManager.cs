@@ -232,17 +232,17 @@ public class PlayerManager : MonoBehaviour
             .Where(template => template.GetComponent<Player>() != null 
             && template.GetComponent<Player>().AIMode)
             .ToArray();
-            int chosenPlayerIdx = Random.Range(0, AIPlayers.Length);
 
             //for (int i = 0; i < players.Count;i++)
+            if(AIPlayers.Length > 0)
             {
+                int chosenPlayerIdx = Random.Range(0, AIPlayers.Length);
 
                 //float distance = Vector3.Distance(
                 //    leadingPlayer.transform.position,
                 //    AIPlayers[chosenPlayerIdx].transform.position);
 
-                if (//AIPlayers[chosenPlayerIdx].GetComponent<Player>().AIMode
-                //&& 
+                if (//AIPlayers[chosenPlayerIdx].GetComponent<Player>().AIMode && 
                 AIPlayers[chosenPlayerIdx].GetComponent<Player>().currentstate != Player.PlayerState.ATTACK
                 //&& distance < 5
                 )
