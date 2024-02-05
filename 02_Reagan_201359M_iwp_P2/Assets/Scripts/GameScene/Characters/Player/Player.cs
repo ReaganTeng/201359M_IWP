@@ -436,7 +436,7 @@ public class Player : Character
             verticalInput = Input.GetAxis("Vertical");
 
             //PRESENTER MODE
-            PresenterMode();
+            //PresenterMode();
             //
             UpdateActiveEffectsUI();
 
