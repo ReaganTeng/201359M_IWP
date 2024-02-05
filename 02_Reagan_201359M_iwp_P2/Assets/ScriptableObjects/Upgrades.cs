@@ -102,6 +102,7 @@ public class Upgrades : ScriptableObject
         //    }
         //}
 
+       
 
         // Serialize the upgrades data to a JSON string
         UpgradesData upgradesData = new UpgradesData
@@ -123,7 +124,7 @@ public class Upgrades : ScriptableObject
         // Make sure to call PlayerPrefs.Save() to persist the changes immediately
         PlayerPrefs.Save();
 
-        //Debug.Log($"UPGRADES SAVED {PlayerPrefs.GetString("UpgradesData")}");
+        Debug.Log($"UPGRADES SAVED {PlayerPrefs.GetString("UpgradesData")}");
     }
 
 
@@ -132,6 +133,28 @@ public class Upgrades : ScriptableObject
     public void LoadUpgrades()
     {
         finishedLoaded = false;
+
+        //if (
+        //    !PlayerPrefs.HasKey("DamageBuff") ||
+        //    !PlayerPrefs.HasKey("HealthBuff") ||
+        //    !PlayerPrefs.HasKey("UpgradesData")
+        //)
+        //{
+        //    PlayerPrefs.SetInt("DamageBuff", 0);
+        //    PlayerPrefs.SetInt("HealthBuff", 0);
+        //    PlayerPrefs.SetString("UpgradesData", "");
+        //}
+
+        DamageBuff = 0;
+        HealthBuff = 0;
+        WonGame = false;
+        for (int i = 0; i < slotProperty.Count; i++)
+        {
+            //SlotProperties sp = new SlotProperties();
+            emptySlotProperty(slotProperty[i]);
+        }
+
+
 
         DamageBuff = PlayerPrefs.GetInt("DamageBuff", 0);
         HealthBuff = PlayerPrefs.GetInt("HealthBuff", 0);
@@ -145,8 +168,10 @@ public class Upgrades : ScriptableObject
         if (upgradesData != null)
         {
             slotProperty = upgradesData.slotProp;
-            Debug.Log($"SLOTTY {slotProperty}");
+            //Debug.Log($"SLOTTY {slotProperty}");
         }
+
+        //SaveUpgrades();
 
         finishedLoaded = true;
     }

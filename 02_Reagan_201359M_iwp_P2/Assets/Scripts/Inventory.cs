@@ -85,12 +85,12 @@ public class Inventory : MonoBehaviour
         }
         //
 
-        //Debug.Log("init");
-
+        //upgrades.SaveUpgrades();
+        //upgrades.LoadUpgrades();
     }
 
 
-   
+
 
     public void EmptyInventory()
     {

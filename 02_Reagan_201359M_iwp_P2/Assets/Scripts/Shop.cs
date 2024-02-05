@@ -405,6 +405,7 @@ public class Shop : MonoBehaviour
         if (statToUpgrade < statLimit)
         {
             statToUpgrade += statIncreaseIncrement;
+            upgradesScriptableObject.SaveUpgrades();
             DeductPrice(item);
         }
 
