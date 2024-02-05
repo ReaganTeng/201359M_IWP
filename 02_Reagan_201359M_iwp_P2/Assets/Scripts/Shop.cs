@@ -343,6 +343,7 @@ public class Shop : MonoBehaviour
                         sp.itemtype = ItemType.NOTHING;
                         upgradesScriptableObject.slotProperty.Add(sp);
                         inventoryManager.NewSlotBought();
+                        upgradesScriptableObject.SaveUpgrades();
                         DeductPrice(item);
                     }
 
