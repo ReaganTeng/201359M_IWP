@@ -18,7 +18,6 @@ public class VolumeManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        mastervolume = PlayerPrefs.GetFloat("MasterVolume"); // Adjust this value as needed
 
         if (PlayerPrefs.HasKey("MasterVolume"))
         {
@@ -52,6 +51,9 @@ public class VolumeManager : MonoBehaviour
             PlayerPrefs.SetFloat("MusicVolume", 1.0f);
             MusicVolumeSlider.value = PlayerPrefs.GetFloat("MusicVolume");
         }
+
+        mastervolume = PlayerPrefs.GetFloat("MasterVolume"); // Adjust this value as needed
+
 
         OnValueChangedSliders();
         AdjustAllVolumes();

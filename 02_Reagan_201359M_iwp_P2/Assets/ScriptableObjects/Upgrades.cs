@@ -30,29 +30,36 @@ public class Upgrades : ScriptableObject
     [HideInInspector]
     public bool finishedLoaded;
 
+    //RESET WHEN GAME OVER
     public void Reset()
     {
         DamageBuff = 0; 
         HealthBuff = 0; 
         WonGame = false;
 
+
         //RESET INVENTORY
-        for (int i = slotProperty.Count - 1; i >= 0; i--)
-        {
-            emptySlotProperty(slotProperty[i]);
-            // Alternatively, you can remove the line above and just do the following:
-            // slotProperty.RemoveAt(i);
-        }
+        //for (int i = slotProperty.Count - 1; i >= 0; i--)
+        //{
+        //    emptySlotProperty(slotProperty[i]);
+        //    // Alternatively, you can remove the line above and just do the following:
+        //    // slotProperty.RemoveAt(i);
+        //}
+
+        slotProperty.Clear();
+
 
         for (int i = 0; i < 4; i++)
         {
-            Upgrades.SlotProperties sp = new Upgrades.SlotProperties();
-            sp.itemtype = ItemType.NOTHING;
+            SlotProperties sp = new SlotProperties();
             slotProperty.Add(sp);
+            emptySlotProperty(sp);
+
             //inventoryManager.NewSlotBought();
             //DeductPrice(item);
         }
 
+        SaveUpgrades();
     }
 
     public void emptySlotProperty(SlotProperties slotP)

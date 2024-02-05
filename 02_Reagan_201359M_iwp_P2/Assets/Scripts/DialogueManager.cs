@@ -55,11 +55,12 @@ public class DialogueManager : MonoBehaviour
 
     public void StartDialogue(DialogueRealTime dialogue)
     {
-        Debug.Log("Dialogue STARTED");
+        //Debug.Log("Dialogue STARTED");
         if (currentDialogue == null 
-            //&& dialoguePanel != null
+            && dialoguePanel != null
             && !dialoguePanel.GetComponent<CanvasGroup>().interactable)
         {
+            //Debug.Log("DIALOGUE STARTED");
             Scene currentScene = SceneManager.GetActiveScene();
             switch (currentScene.name)
             {
@@ -128,7 +129,8 @@ public class DialogueManager : MonoBehaviour
         {
             
             //IF NO OPTIONS
-            if (currentDialogue.sentences[currentSentenceidx].options == null)
+            if (currentDialogue.sentences[currentSentenceidx].options == null
+                || currentDialogue.sentences.Count <= 1)
             {
                 return;
             }

@@ -58,6 +58,8 @@ public class HubWorldMenuManager : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
+        //upgrades.Reset();
+
         //PlayerPrefs.DeleteAll();
 
         GamePlayPanel = GameObject.FindGameObjectWithTag("GamePlayPanel");
@@ -119,6 +121,10 @@ public class HubWorldMenuManager : MonoBehaviour
         Instantiate(shopkeeperPrefab, new Vector3(-13.0599995f, -0.409999847f, 0), Quaternion.identity);
 
         goalamount = 100000;
+
+
+        //ResetGame();
+
     }
 
 
@@ -178,7 +184,7 @@ public class HubWorldMenuManager : MonoBehaviour
         }
     }
 
-
+    //RESET THE GAME WHEN LOST
     public void ResetGame()
     {
         if (PlayerPrefs.HasKey("GrossMoney"))
@@ -202,13 +208,13 @@ public class HubWorldMenuManager : MonoBehaviour
             PlayerPrefs.SetInt("RoundsCompleted", 0);
         }
 
-
         WinPanel.SetActive(false);
         GameOverPanel.SetActive(false);
-
         //FindObjectOfType<Inventory>().EmptyInventory();
         upgrades.Reset();
 
+        Inventory inv = FindObjectOfType<Inventory>();
+        inv.InitialiseInventorySlots();
 
 
     }
@@ -281,13 +287,12 @@ public class HubWorldMenuManager : MonoBehaviour
         }
 
 
-        if (PlayerPrefs.GetInt("DaysLeft") > 0)
+        if (panelsToFreezegame.Any(
+             template => template.GetComponent<CanvasGroup>().interactable))
         {
-            //GameOverPanel.SetActive(false);
-            //WinPanel.SetActive(false);
-           
+            return;
         }
-
+ 
         //LOSING CONDITION
         if (PlayerPrefs.GetFloat("MoneyDonated") < goalamount
             && PlayerPrefs.GetInt("DaysLeft") <= 0
@@ -298,19 +303,7 @@ public class HubWorldMenuManager : MonoBehaviour
             dialogueManager.StartDialogue(loseDialogue);
         }
 
-        //DISABLE IN FINAL BUILD
-        if(Input.GetKeyDown(KeyCode.Space))
-        {
-            PlayerPrefs.SetFloat("MoneyDonated",
-                PlayerPrefs.GetFloat("MoneyDonated") + 100000);
-            Debug.Log($"MONEY DONATED {PlayerPrefs.GetFloat("MoneyDonated")}");
-        }
-
-        //if (PlayerPrefs.GetFloat("MoneyDonated") >= goalamount)
-        //{
-        //    Debug.Log("YOU WON");
-        //}
-
+     
         //WINNING CONDITION
         if (PlayerPrefs.GetFloat("MoneyDonated") >= goalamount
             && PlayerPrefs.GetInt("DaysLeft") > 0
@@ -400,8 +393,20 @@ public class HubWorldMenuManager : MonoBehaviour
     }
 
 
+   
+
+
+    #region Development Purposed
+    public void IncreaseMoney()
+    {
+        PlayerPrefs.SetFloat("GrossMoney", 
+            PlayerPrefs.GetFloat("GrossMoney") + 100000);
+    }
+
     public void Endday()
     {
         PlayerPrefs.SetInt("DaysLeft", 0);
     }
+    #endregion
+
 }

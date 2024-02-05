@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 069157eb9160ce84f94d44c11de0a2db, type: 3}
   m_Name: CharacterUnlockManager
   m_EditorClassIdentifier: 
-  unlockedCharacters: 010000000200000000000000
-  selectedCharacters: 010000000200000000000000
+  unlockedCharacters: 00000000
+  selectedCharacters: 00000000

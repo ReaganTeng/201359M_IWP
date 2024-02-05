@@ -108,6 +108,7 @@ public class PlayerManager : MonoBehaviour
 
         //INSTANTIATE PLAYERS FIRST
         selectedCharacters = characterUnlockManager.selectedCharacters;
+        //Debug.Log($"NUMBER OF CHARACTERS {selectedCharacters.Count}");
         foreach (CharacterUnlockManager.CharacterType character in selectedCharacters)
         {
             // Instantiate characters in the game scene based on unlocked characters

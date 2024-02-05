@@ -56,8 +56,14 @@ public class CharacterUnlockManager : ScriptableObject
         unlockedCharacters = unlockedWrapper != null ? unlockedWrapper.characterList : new List<CharacterType>();
         selectedCharacters = selectedWrapper != null ? selectedWrapper.characterList : new List<CharacterType>();
 
-        selectedCharacters.Add(CharacterType.JOE);
-        unlockedCharacters.Add(CharacterType.JOE);
+        if (!selectedCharacters.Contains(CharacterType.JOE))
+        {
+            selectedCharacters.Add(CharacterType.JOE);
+        }
+        if (!unlockedCharacters.Contains(CharacterType.JOE))
+        {
+            unlockedCharacters.Add(CharacterType.JOE);
+        }
     }
 
 

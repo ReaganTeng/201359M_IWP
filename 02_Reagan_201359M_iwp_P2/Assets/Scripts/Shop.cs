@@ -154,9 +154,28 @@ public class Shop : MonoBehaviour
 
     private void Update()
     {
+        Scene currentScene = SceneManager.GetActiveScene();
 
+        //DEDUCT PRICE
+        // Get the currently active scene
+        switch (currentScene.name)
+        {
+            case "HubWorld":
+                {
+                    Money.text = $"${PlayerPrefs.GetFloat("GrossMoney")}";
 
-        Money.text = $"${PlayerPrefs.GetFloat("MoneyEarned")}";
+                    break;
+                }
+            case "GameScene":
+                {
+                    Money.text = $"${PlayerPrefs.GetFloat("MoneyEarned")}";
+
+                    break;
+                }
+            default:
+                break;
+        }
+
 
     }
     public void CheckItemAvailability()
@@ -189,9 +208,11 @@ public class Shop : MonoBehaviour
                     (itemtobuy == ShopItemData.ShopItem.INVENTORY_UPGRADE
                     && upgradesScriptableObject.slotProperty.Count < slotlimit) ||
                     (itemtobuy == ShopItemData.ShopItem.VETERAN_CHARACTER
-                    && !characterUnlockManager.unlockedCharacters.Contains(CharacterUnlockManager.CharacterType.VETERAN)) ||
+                    && !characterUnlockManager.unlockedCharacters.Contains(
+                        CharacterUnlockManager.CharacterType.VETERAN)) ||
                     (itemtobuy == ShopItemData.ShopItem.PROFESSOR_CHARACTER
-                    && !characterUnlockManager.unlockedCharacters.Contains(CharacterUnlockManager.CharacterType.PROFESSOR)) ||
+                    && !characterUnlockManager.unlockedCharacters.Contains(
+                        CharacterUnlockManager.CharacterType.PROFESSOR)) ||
                      (itemtobuy == ShopItemData.ShopItem.BOMB
                     && InventoryValid(10, ItemType.BOMB)) ||
                      (itemtobuy == ShopItemData.ShopItem.BULLET

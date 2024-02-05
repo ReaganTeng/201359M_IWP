@@ -17,7 +17,7 @@ MonoBehaviour:
   AttackTutorialCompleted: 0
   GemTutorialCompleted: 0
   SwitchCharactersCompleted: 0
-  ShopTutorialCompleted: 0
+  ShopTutorialCompleted: 1
   DayTrackerCompleted: 0
   ATMCompleted: 0
   CaveCompleted: 0

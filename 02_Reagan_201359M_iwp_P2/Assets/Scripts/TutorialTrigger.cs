@@ -43,7 +43,6 @@ public class TutorialTrigger : MonoBehaviour
 
     public void Awake()
     {
-
         tutorialSystem.LoadData();
 
         GameScene = "GameScene";
@@ -73,8 +72,11 @@ public class TutorialTrigger : MonoBehaviour
             return;
         }
 
+
         DialogueRealTime d = tutorialDialogues.Find(entry => entry.tutType == tutType).dialogue;
-        if (!boolToSet && currentScene.name == requiredScene)
+        if (!boolToSet 
+            && currentScene.name == requiredScene
+            && DM.dialoguePanel != null)
         {
             DM.StartDialogue(d);
             boolToSet = true;

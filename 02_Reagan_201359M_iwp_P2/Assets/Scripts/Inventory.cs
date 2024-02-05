@@ -47,7 +47,6 @@ public class Inventory : MonoBehaviour
     float fadeOutTimer;
     public CanvasGroup moneyPanel;
 
-
     //int slotScale;
     //Inventory playerInventory;
     void Awake()
@@ -66,12 +65,12 @@ public class Inventory : MonoBehaviour
         largeSlotScale = new Vector2(2, 2);
         AS = GetComponent<AudioSource>();
         UIAnims = GetComponent<UIElementAnimations>();
-        //slotScale = 1;
-        //itempicked.SetItem(ItemType.RED_GEM, 5);
-        //AddItem(itempicked, 18);
         selectedSlot = 0;
         InitialiseInventorySlots();
         //SelectSlot(0);
+        //slotScale = 1;
+        //itempicked.SetItem(ItemType.RED_GEM, 5);
+        //AddItem(itempicked, 18);
 
         //MANUALLY SET THE VOLUME OF THE COLLECTIBLE CLIP ITSELD
         if (collectedSound != null)
@@ -85,8 +84,13 @@ public class Inventory : MonoBehaviour
             collectedSound.SetData(samples, 0);
         }
         //
+
+        //Debug.Log("init");
+
     }
 
+
+   
 
     public void EmptyInventory()
     {
@@ -174,8 +178,11 @@ public class Inventory : MonoBehaviour
         {
             return;
         }
-        ChangesInInventory();
+
+
         InventorySelection();
+
+        ChangesInInventory();
 
 
         if(moneyPanel == null)
@@ -199,7 +206,7 @@ public class Inventory : MonoBehaviour
     {
         
 
-        for (int i = 1; i < slots.Count + 1; i++)
+        for (int i = 1; i < upgrades.slotProperty.Count + 1; i++)
         {
             if (Input.GetKeyDown(i.ToString()))
             {

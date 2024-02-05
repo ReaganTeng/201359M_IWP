@@ -269,8 +269,11 @@ public class MenuManager : MonoBehaviour
                 slot.slotImage.sprite = null;
             }
         }
+
+
         invmanager.ChangesInInventory();
         upgrades.SaveUpgrades();
+        PlayerPrefs.SetFloat("MoneyEarned", 0);
 
         SceneManager.LoadScene("HubWorld");
     }
@@ -278,22 +281,24 @@ public class MenuManager : MonoBehaviour
     public void ReturnToHubWorldFromGameOver()
     {
         Inventory invmanager = GameObject.FindGameObjectWithTag("GameMGT").GetComponent<Inventory>();
+        PlayerPrefs.SetFloat("MoneyEarned", 0);
+        //foreach (InventorySlot slot in invmanager.slots)
+        //{
+        //    if (slot.itemtype != Item.ItemType.BOMB
+        //        && slot.itemtype != Item.ItemType.POTION
+        //        && slot.itemtype != Item.ItemType.BULLET)
+        //    {
+        //        slot.itemtype = Item.ItemType.NOTHING;
+        //        slot.Quantity = 0;
+        //        slot.quantityText.text = "";
+        //        slot.CurrentItem = null;
+        //        slot.slotImage.sprite = null;
+        //    }
+        //}
+        //invmanager.ChangesInInventory();
+        //upgrades.SaveUpgrades();
 
-        foreach (InventorySlot slot in invmanager.slots)
-        {
-            if (slot.itemtype != Item.ItemType.BOMB
-                && slot.itemtype != Item.ItemType.POTION
-                && slot.itemtype != Item.ItemType.BULLET)
-            {
-                slot.itemtype = Item.ItemType.NOTHING;
-                slot.Quantity = 0;
-                slot.quantityText.text = "";
-                slot.CurrentItem = null;
-                slot.slotImage.sprite = null;
-            }
-        }
-        invmanager.ChangesInInventory();
-        upgrades.SaveUpgrades();
+
         SceneManager.LoadScene("HubWorld");
 
     }

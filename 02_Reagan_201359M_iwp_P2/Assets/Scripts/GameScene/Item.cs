@@ -57,8 +57,10 @@ public class Item : MonoBehaviour
         player = GameObject.FindGameObjectsWithTag("Player");
         gameManager = GameObject.FindGameObjectWithTag("GameMGT");
 
-        transform.SetParent(GameObject.Find("ItemParent").transform);
-
+        if (GameObject.Find("ItemParent") != null)
+        {
+            transform.SetParent(GameObject.Find("ItemParent").transform);
+        }
         Collider2D[] playerColliders = FindObjectsOfType<Collider2D>()
          .Where(playerCollider => playerCollider.CompareTag("Player"))
          .ToArray();
