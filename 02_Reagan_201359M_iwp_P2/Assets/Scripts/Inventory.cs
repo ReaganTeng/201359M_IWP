@@ -208,6 +208,8 @@ public class Inventory : MonoBehaviour
 
         for (int i = 1; i < upgrades.slotProperty.Count + 1; i++)
         {
+            
+
             if (Input.GetKeyDown(i.ToString()))
             {
                 selectedSlot = i - 1; // Adjust to zero-based index

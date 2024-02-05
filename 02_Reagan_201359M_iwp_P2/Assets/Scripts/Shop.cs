@@ -47,7 +47,7 @@ public class Shop : MonoBehaviour
         characterUnlockManager.LoadData();
         //characterUnlockManager.SaveData();
 
-        slotlimit = 10;
+        slotlimit = 8;
         canvasGroup = GetComponent<CanvasGroup>();
         DisplayItems();
         AS = GetComponent<AudioSource>();
