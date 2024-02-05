@@ -71,7 +71,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4934074169046902289, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
       propertyPath: sentences.Array.data[3].text
-      value: Make sure you donated the goal before reaching 100 days are reached
+      value: Make sure you donated the goal before the days are reached
       objectReference: {fileID: 0}
     - target: {fileID: 4934074169046902289, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
       propertyPath: sentences.Array.data[4].text
