@@ -122,9 +122,11 @@ public class Upgrades : ScriptableObject
 
         // Make sure to call PlayerPrefs.Save() to persist the changes immediately
         PlayerPrefs.Save();
+
+        //Debug.Log($"UPGRADES SAVED {PlayerPrefs.GetString("UpgradesData")}");
     }
 
-    
+
 
     // Function to load upgrades data from PlayerPrefs
     public void LoadUpgrades()

@@ -27,11 +27,21 @@ public class InventorySlot : MonoBehaviour
 
     public void EmptySlot()
     {
-        CurrentItem = null;
+        
+
+       CurrentItem = null;
         itemtype = ItemType.NOTHING;
         Quantity = 0;
-        quantityText.text = "";
-        slotImage.sprite = null;
+      slotImage.sprite = null;
+        if (Quantity > 0)
+        {
+            quantityText.text = $"{Quantity}";
+        }
+        else
+        {
+            quantityText.text = "";
+        }
+
 
     }
 

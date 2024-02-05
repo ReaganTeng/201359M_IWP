@@ -208,13 +208,18 @@ public class HubWorldMenuManager : MonoBehaviour
             PlayerPrefs.SetInt("RoundsCompleted", 0);
         }
 
-        WinPanel.SetActive(false);
-        GameOverPanel.SetActive(false);
-        //FindObjectOfType<Inventory>().EmptyInventory();
-        upgrades.Reset();
 
         Inventory inv = FindObjectOfType<Inventory>();
+
+        WinPanel.SetActive(false);
+        GameOverPanel.SetActive(false);
+        inv.EmptyInventory();
+
+        upgrades.Reset();
+
         inv.InitialiseInventorySlots();
+
+
 
 
     }
@@ -271,18 +276,14 @@ public class HubWorldMenuManager : MonoBehaviour
         {
             if (GamePlayPanel.GetComponent<CanvasGroup>().interactable)
             {
-
                 PlayerHubWorld[] charactersInScene = FindObjectsOfType<PlayerHubWorld>();
                 foreach (PlayerHubWorld character in charactersInScene)
                 {
                     character.disabled = true;
                 }
-
                 GamePlayPanel.GetComponent<CanvasGroup>().interactable = false;
                 GamePlayPanel.GetComponent<CanvasGroup>().alpha = 0;
-                GamePlayPanel.GetComponent<CanvasGroup>().blocksRaycasts = false;
-
-                
+                GamePlayPanel.GetComponent<CanvasGroup>().blocksRaycasts = false;   
             }
         }
 

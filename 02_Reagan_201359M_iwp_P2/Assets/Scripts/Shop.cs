@@ -393,7 +393,6 @@ public class Shop : MonoBehaviour
                 break;
         }
 
-        upgradesScriptableObject.SaveUpgrades();
         CheckItemAvailability();
         //DisplayItems();
     }
@@ -420,6 +419,7 @@ public class Shop : MonoBehaviour
 
     void BuyEquipment(ItemType typebought, int stacksize, ShopItemData item)
     {
+
         ItemType itemchosen = typebought;
         GameObject it = Instantiate(itemPrefab, transform.position, Quaternion.identity);
         it.GetComponent<Item>().SetItem(itemchosen, stacksize);
@@ -427,12 +427,25 @@ public class Shop : MonoBehaviour
         {
             if (inventoryManager.AddItem(it.GetComponent<Item>(), 1))
             {
+                inventoryManager.ChangesInInventory();
+
+                Scene currentScene = SceneManager.GetActiveScene();
+                switch (currentScene.name)
+                {
+                    case "HubWorld":
+                        {
+                            upgradesScriptableObject.SaveUpgrades();
+                            break;
+                        }
+                    default : 
+                        break;
+                }
+
                 DeductPrice(item);
             }
-            else
-            {
-                Destroy(it);
-            }
+            
+             Destroy(it);
+            
         }
     }
 

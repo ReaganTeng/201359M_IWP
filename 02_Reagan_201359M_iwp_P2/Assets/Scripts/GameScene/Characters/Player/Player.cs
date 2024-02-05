@@ -372,68 +372,73 @@ public class Player : Character
     }
 
 
+    void PresenterMode()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            health -= health;
+        }
+
+        if (Input.GetKeyDown(KeyCode.J))
+        {
+            transform.position =
+                FindObjectOfType<EndZone>().gameObject.transform.position
+                + new Vector3(6, 6, 0);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Y))
+        {
+            Sprite sprite = null;
+            PowerUpNotificationUI.GetComponent<PowerUpNotificationUI>()
+                   .NotifyPowerUp(EffectType.MINER_SENSE, sprite);
+            ApplyEffect(EffectType.MINER_SENSE);
+
+        }
+
+        if (Input.GetKeyDown(KeyCode.U))
+        {
+            Sprite sprite = null;
+            PowerUpNotificationUI.GetComponent<PowerUpNotificationUI>()
+                   .NotifyPowerUp(EffectType.SPIRIT_FIRE, sprite);
+            ApplyEffect(EffectType.SPIRIT_FIRE);
+
+        }
+
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            Sprite sprite = null;
+            PowerUpNotificationUI.GetComponent<PowerUpNotificationUI>()
+                   .NotifyPowerUp(EffectType.ONE_HIT, sprite);
+            ApplyEffect(EffectType.ONE_HIT);
+
+        }
+
+        if (Input.GetKeyDown(KeyCode.O))
+        {
+            Sprite sprite = null;
+            PowerUpNotificationUI.GetComponent<PowerUpNotificationUI>()
+                   .NotifyPowerUp(EffectType.GEM_WISDOM, sprite);
+            ApplyEffect(EffectType.GEM_WISDOM);
+
+        }
+
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            Sprite sprite = null;
+            PowerUpNotificationUI.GetComponent<PowerUpNotificationUI>()
+                   .NotifyPowerUp(EffectType.GHOST, sprite);
+            ApplyEffect(EffectType.GHOST);
+
+        }
+    }
+
     public void ControlManager()
     {
         if (!AIMode)
         {
 
             //PRESENTER MODE
-            //if (Input.GetKeyDown(KeyCode.Space))
-            //{
-            //    health -= health;
-            //}
-
-            //if (Input.GetKeyDown(KeyCode.J))
-            //{
-            //    transform.position =
-            //        FindObjectOfType<EndZone>().gameObject.transform.position 
-            //        + new Vector3(6, 6, 0);
-            //}
-
-            //if (Input.GetKeyDown(KeyCode.Y))
-            //{
-            //    Sprite sprite = null;                
-            //    PowerUpNotificationUI.GetComponent<PowerUpNotificationUI>()
-            //           .NotifyPowerUp(EffectType.MINER_SENSE, sprite);
-            //    ApplyEffect(EffectType.MINER_SENSE);
-
-            //}
-
-            //if (Input.GetKeyDown(KeyCode.U))
-            //{
-            //    Sprite sprite = null;
-            //    PowerUpNotificationUI.GetComponent<PowerUpNotificationUI>()
-            //           .NotifyPowerUp(EffectType.SPIRIT_FIRE, sprite);
-            //    ApplyEffect(EffectType.SPIRIT_FIRE);
-
-            //}
-
-            //if (Input.GetKeyDown(KeyCode.I))
-            //{
-            //    Sprite sprite = null;
-            //    PowerUpNotificationUI.GetComponent<PowerUpNotificationUI>()
-            //           .NotifyPowerUp(EffectType.ONE_HIT, sprite);
-            //    ApplyEffect(EffectType.ONE_HIT);
-
-            //}
-
-            //if (Input.GetKeyDown(KeyCode.O))
-            //{
-            //    Sprite sprite = null;
-            //    PowerUpNotificationUI.GetComponent<PowerUpNotificationUI>()
-            //           .NotifyPowerUp(EffectType.GEM_WISDOM, sprite);
-            //    ApplyEffect(EffectType.GEM_WISDOM);
-
-            //}
-
-            //if (Input.GetKeyDown(KeyCode.P))
-            //{
-            //    Sprite sprite = null;
-            //    PowerUpNotificationUI.GetComponent<PowerUpNotificationUI>()
-            //           .NotifyPowerUp(EffectType.GHOST, sprite);
-            //    ApplyEffect(EffectType.GHOST);
-
-            //}
+            PresenterMode();
 
             //
 
