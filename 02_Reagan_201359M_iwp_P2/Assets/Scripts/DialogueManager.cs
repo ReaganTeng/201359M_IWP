@@ -127,14 +127,12 @@ public class DialogueManager : MonoBehaviour
             && dialoguePanelCG.blocksRaycasts
             )
         {
-            
             //IF NO OPTIONS
-            if (currentDialogue.sentences[currentSentenceidx].options == null
-                || currentDialogue.sentences.Count <= 1)
+
+            if (currentDialogue.sentences[currentSentenceidx].options == null)
             {
                 return;
             }
-
             if (currentSentenceidx < currentDialogue.sentences.Count - 1)
             {
                 StopCoroutine(typeSentenceCoroutine);
@@ -142,7 +140,10 @@ public class DialogueManager : MonoBehaviour
                 dialogueText.text = "";
                 dialogueText.text = sentences[currentSentenceidx];
                 currentSentenceidx++;
-                if (currentSentenceidx + 1 >= sentences.Count
+
+
+              
+                if (currentSentenceidx >= sentences.Count
                      || currentSentenceidx < 0
                      || sentences[currentSentenceidx] == null)
                 {
@@ -183,7 +184,7 @@ public class DialogueManager : MonoBehaviour
                     dialogueText.text = "";
                     dialogueText.text = sentences[currentSentenceidx];
                     currentSentenceidx++;
-                    if (currentSentenceidx + 1 >= sentences.Count
+                    if (currentSentenceidx >= sentences.Count
                       || currentSentenceidx < 0
                       || sentences[currentSentenceidx] == null)
                     {
@@ -353,7 +354,7 @@ public class DialogueManager : MonoBehaviour
         typingSpeed = 0.05f;
         // Clear existing buttons
         ClearButtons();
-        //Debug.Log($"SENTENCE IS {sentences.Dequeue()}");
+        //Debug.Log($"SENTENCE IS {sentences.Dequeue}");
 
         
 

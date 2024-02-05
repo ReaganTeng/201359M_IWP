@@ -11,6 +11,7 @@ using Vector2 = UnityEngine.Vector2;
 using static Projectile;
 using static Item;
 using TMPro;
+using System.Linq;
 
 
 
@@ -268,15 +269,8 @@ public class Player : Character
         }
         base.Update();
 
+      
        
-
-
-        //PlayAnimation("player_Attack");
-
-        horizontalInput = Input.GetAxis("Horizontal");
-        verticalInput = Input.GetAxis("Vertical");
-        listOfEnemies = GameObject.FindGameObjectsWithTag("Enemy");
-
         if (health <= 0)
         {
             return;
@@ -285,7 +279,6 @@ public class Player : Character
 
         //CONTROLS WHAT HAPPENS IF PLAYER IF IS IN PLAYER MODE OR AI MODE
         ControlManager();
-        UpdateActiveEffectsUI();
     }
 
     //DISPLAY WHAT ARE THE CURRENT EFFECTS THE PLAYER HAS
@@ -300,12 +293,18 @@ public class Player : Character
             {
                 effectName += $"{effects.name} {(int)effects.Duration}\n";
             }
-            activeEffectsText.text = effectName;
-            Debug.Log("EFFECTS UPDATED");
+            if (activeEffectsText.text != effectName)
+            {
+                activeEffectsText.text = effectName;
+                //Debug.Log($"EFFECTS UPDATED {effectName}");
+            }
         }
         else
         {
-            activeEffectsText.text = "";
+            if (activeEffectsText.text != "")
+            {
+                activeEffectsText.text = "";
+            }
         }
     }
 
@@ -326,12 +325,10 @@ public class Player : Character
             {
                 interactable.gameObject.GetComponent<SpriteRenderer>().color = Color.white;
             }
-
             
             // Check if the distance is within the search radius and closer than the current nearest
             if (distance < 2.0f && distance < nearestDistance)
             {
-
                 nearestInteractable = interactable;
                 if (nearestInteractable.gameObject.GetComponent<SpriteRenderer>() != null)
                 {
@@ -339,10 +336,6 @@ public class Player : Character
                 }
                 nearestDistance = distance;
             }
-            //else
-            //{
-            //    pressEText.enabled = false;
-            //}
         }
 
         // Check if a nearest interactable was found
@@ -439,11 +432,13 @@ public class Player : Character
     {
         if (!AIMode)
         {
+            horizontalInput = Input.GetAxis("Horizontal");
+            verticalInput = Input.GetAxis("Vertical");
 
             //PRESENTER MODE
             PresenterMode();
-
             //
+            UpdateActiveEffectsUI();
 
             //ENABLE AIM ARROW WHEN IT'S EITHER RED GEM OR GREEN GEM
             ItemType currentItemTypeSelected = playerInventory.slots[playerInventory.selectedSlot].itemtype;
@@ -477,7 +472,6 @@ public class Player : Character
                         break;
                     }
             }
-           
             //
 
             InteractableInteraction();
@@ -537,16 +531,14 @@ public class Player : Character
         Vector2 playerPosition = leadingPlayer.transform.position;
         Vector2 Position = transform.position;
         Vector3 targetpos = FindPath(playerPosition, Position);
-
         //positonGameObject.transform.position = targetpos;
-
         //float speed = 5.0f;
         // Calculate the direction from the follower to the target
         Vector3 direction = targetpos - transform.position;
         // Normalize the direction vector (optional, keeps the movement consistent)
         direction.Normalize();
         // Update the position of the follower toward the target
-        transform.position += direction * 6.0f * speed * Time.deltaTime;
+        transform.position += direction * speed * 8.0f * Time.deltaTime;
 
         if (transform.position.x < leadingPlayer.transform.position.x)
         {
@@ -563,11 +555,7 @@ public class Player : Character
 
     void FSManager()
     {
-        float distance = Vector3.Distance(transform.position, leadingPlayer.transform.position);
-        if(distance >= 10)
-        {
-            currentstate = PlayerState.FOLLOW;
-        }
+
         //public enum PlayerState
         //{
         //    FOLLOW,
@@ -575,66 +563,82 @@ public class Player : Character
         //    HURT
         //}
 
-
-
-        switch (currentstate)
+        float distance = Vector3.Distance(transform.position, leadingPlayer.transform.position);
+        if (distance >= 3.5f)
         {
-            case PlayerState.FOLLOW:
-            //case PlayerState.ATTACK:
+            currentstate = PlayerState.FOLLOW;
+            //FollowPlayer();
+        }
+        //else
+        {
+
+            switch (currentstate)
             {
-                if (distance >= 2.0)
-                {
-                    FollowPlayer();
-                }
-                else
-                {
-                    currentAnimState = WALK_FRONT;
-                }
-                nearestEnemy = FindNearestEnemy(transform.position);
-                break;
-            }
-            case PlayerState.ATTACK:
-                {
-                    //FOLLOW THE NEAREST ENEMY
-                    if (nearestEnemy != null)
+                case PlayerState.FOLLOW:
+                    //case PlayerState.ATTACK:
                     {
-                        float distanceBetweenEnemy = Vector2.Distance(nearestEnemy.transform.position, transform.position);
-                        //ATTACK THE ENEMY WHEN NEAR
-                        if (distanceBetweenEnemy < 2.0f)
+                        if (distance >= 3.0)
                         {
-                            currentAnimState = ATTACK;
-                            Enemy enemyScript = nearestEnemy.gameObject.GetComponent<Enemy>();
-                            // Calculate the direction from this object to the enemy
-                            Vector2 directionToEnemy =
-                                (nearestEnemy.transform.position - transform.position).normalized;
-                            // Set a force to launch the object in the opposite direction
-                            float launchForce = .1f * Time.deltaTime; // Adjust the force as needed
-                            enemyScript.enemyrb.AddForce(directionToEnemy * launchForce, ForceMode2D.Impulse);
-                            //DAMAGE ENEMY
-                            int playerDamage = meleedamage;
-                            //enemyScript.health -= 1000000;
-                            enemyScript.health -= playerDamage;
-                            //SET ENEMY TO HURT STATE
-                            enemyScript.currentState = Enemy.EnemyState.HURT;
-                            enemyScript.immunity_timer = .5f;
-                            enemyScript.hurt_timer = 0.0f;
-                            currentstate = PlayerState.FOLLOW;
+                            FollowPlayer();
                         }
                         else
                         {
-                            MoveTowardsNearestEnemy();
+                            currentAnimState = WALK_FRONT;
                         }
+                        //nearestEnemy = FindNearestEnemy(transform.position);
+                        break;
                     }
+                case PlayerState.ATTACK:
+                    {
+                        //dhhsdjhasdhjskj
+                        if (nearestEnemy == null)
+                        {
+                            nearestEnemy = FindNearestEnemy(leadingPlayer.transform.position);
+                            //break;
 
-                    break;
-                }
-            case PlayerState.HURT:
-                {
-                    break;
-                }
-            default:
-            {
-                break;
+                        }
+                        //FOLLOW THE NEAREST ENEMY
+                        if (nearestEnemy != null)
+                        {
+                            float distanceBetweenEnemy = Vector2.Distance(nearestEnemy.transform.position, 
+                                transform.position);
+                            //ATTACK THE ENEMY WHEN NEAR
+                            if (distanceBetweenEnemy < 5.0f)
+                            {
+                                currentAnimState = ATTACK;
+                                Enemy enemyScript = nearestEnemy.gameObject.GetComponent<Enemy>();
+                                // Calculate the direction from this object to the enemy
+                                Vector2 directionToEnemy =
+                                    (nearestEnemy.transform.position - transform.position).normalized;
+                                // Set a force to launch the object in the opposite direction
+                                float launchForce = .05f * Time.deltaTime; // Adjust the force as needed
+                                enemyScript.enemyrb.AddForce(directionToEnemy * launchForce, ForceMode2D.Impulse);
+                                //DAMAGE ENEMY
+                                int playerDamage = meleedamage;
+                                //enemyScript.health -= 1000000;
+                                enemyScript.health -= playerDamage;
+                                //SET ENEMY TO HURT STATE
+                                enemyScript.currentState = Enemy.EnemyState.HURT;
+                                enemyScript.immunity_timer = .5f;
+                                enemyScript.hurt_timer = 0.0f;
+                                currentstate = PlayerState.FOLLOW;
+                            }
+                            else
+                            {
+                                MoveTowardsNearestEnemy();
+                            }
+                        }
+
+                        break;
+                    }
+                case PlayerState.HURT:
+                    {
+                        break;
+                    }
+                default:
+                    {
+                        break;
+                    }
             }
         }
     }
@@ -649,17 +653,22 @@ public class Player : Character
 
     // This method is called when a collision occurs
     
-    GameObject FindNearestEnemy(Vector3 position)
+    public GameObject FindNearestEnemy(Vector3 position)
     {
-       
+        listOfEnemies =
+             GameObject.FindGameObjectsWithTag("Enemy").Where(
+                 template => 
+                 template.GetComponent<MonoBehaviour>().enabled
+                 && template.GetComponent<Enemy>().currentState
+                 != Enemy.EnemyState.IDLE).ToArray();
         GameObject nearestEnemy = null;
         float minDistance = 10;
         foreach (GameObject enemy in listOfEnemies)
         {
-            if (enemy.GetComponent<MonoBehaviour>().enabled
-                &&
-                enemy.GetComponent<Enemy>().currentState
-                != Enemy.EnemyState.IDLE)
+            //if (enemy.GetComponent<MonoBehaviour>().enabled
+            //    &&
+            //    enemy.GetComponent<Enemy>().currentState
+            //    != Enemy.EnemyState.IDLE)
             {
                 //Debug.Log("FOUND NEAREST ENEMY");
                 // Calculate the distance between the position and the enemy's position

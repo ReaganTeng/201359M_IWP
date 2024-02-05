@@ -58,7 +58,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4934074169046902289, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
       propertyPath: sentences.Array.data[0].text
-      value: Oh look, herer comes the enemy
+      value: Oh look, here comes the enemy
       objectReference: {fileID: 0}
     - target: {fileID: 4934074169046902289, guid: 8983aada36e433b439bc37bdc0923f06, type: 3}
       propertyPath: sentences.Array.data[1].text

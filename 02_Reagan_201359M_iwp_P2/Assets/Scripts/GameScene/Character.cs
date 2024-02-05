@@ -94,7 +94,13 @@ public class Character : MonoBehaviour
         // Check if the layer index is valid
         if (layerIndex >= 0 && layerIndex < animatorComponent.layerCount)
         {
-            animatorComponent.Play(state, layerIndex);
+            if (animatorComponent.HasState(layerIndex, Animator.StringToHash(state)))
+            {
+                //if (animatorComponent.GetCurrentAnimatorStateInfo(layerIndex) != null)
+                //{
+                animatorComponent.Play(state, layerIndex);
+                //}
+            }
         }
        
     }
@@ -125,7 +131,7 @@ public class Character : MonoBehaviour
         directionToPlayer.Normalize();
         float raycastDistance = 10.0f;
         //DRAW RAYS
-        for (float angle = 0; angle < 360; angle += 1)
+        for (float angle = 0; angle < 360; angle += 20)
         {
             //float x = 1.0f;
             Vector3 direction = Quaternion.Euler(0, 0, angle) * Vector3.right;
@@ -146,7 +152,7 @@ public class Character : MonoBehaviour
             float minDistance = float.MaxValue;
             Vector3 closestIntersection = Vector3.zero;
 
-            for (float angle = 0; angle < 360; angle += 1)
+            for (float angle = 0; angle < 360; angle += 20)
             {
                 Vector2 direction = Quaternion.Euler(0, 0, angle) * Vector3.right;
                 Vector2 endPoint = followerPos + direction * raycastDistance;

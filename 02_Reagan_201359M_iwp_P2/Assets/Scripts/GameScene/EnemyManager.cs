@@ -37,7 +37,7 @@ public class EnemyManager : MonoBehaviour
         if (!generationover)
         {
             timer = 0;
-            maxnumberenemies = 300;
+            maxnumberenemies = 225;
             SpawnEnemy();
         }
     }

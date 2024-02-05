@@ -27,12 +27,9 @@ public class cameraChecker : MonoBehaviour
                 Vector2 camerapos = cam.transform.position;
                 float distanceSquared = Vector2.Distance(gopos, camerapos);
                 Renderer renderer = childrenMonoBehaviour.gameObject.GetComponent<Renderer>();
+                Collider collider = childrenMonoBehaviour.gameObject.GetComponent<Collider>();
 
-
-               
-
-                // Compare squared distances to avoid using expensive square root
-                if (distanceSquared >= cam.orthographicSize * 1.75f)
+                if (distanceSquared >= cam.orthographicSize * 1.3f)
                 {
                     //if(childrenMonoBehaviour.gameObject.GetComponent<Enemy>())
 
@@ -48,6 +45,11 @@ public class cameraChecker : MonoBehaviour
                         { 
                             renderer.enabled = false;
                         }
+                        if(collider != null)
+                        {
+                            collider.enabled = false;
+                        }
+
                         childrenMonoBehaviour.enabled = false;
 
                     }
@@ -59,6 +61,11 @@ public class cameraChecker : MonoBehaviour
                         if (renderer != null)
                         {
                             renderer.enabled = true;
+                        }
+
+                        if (collider != null)
+                        {
+                            collider.enabled = true;
                         }
                         childrenMonoBehaviour.enabled = true;
                     }

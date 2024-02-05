@@ -64,6 +64,8 @@ public class PlayerManager : MonoBehaviour
 
     public GameObject PlayerParent;
 
+    GameObject leadingPlayer;
+
     List<CharacterUnlockManager.CharacterType> selectedCharacters;
     //bool effectapplied = false;
     void Awake()
@@ -223,14 +225,42 @@ public class PlayerManager : MonoBehaviour
 
         aiTimer += 1 * Time.deltaTime;
 
-        if(aiTimer > 5.0)
-        { 
-            for(int i = 0; i < players.Count;i++)
+        if(aiTimer > 2.0)
+        {
+
+           GameObject[] AIPlayers = players
+            .Where(template => template.GetComponent<Player>() != null 
+            && template.GetComponent<Player>().AIMode)
+            .ToArray();
+            int chosenPlayerIdx = Random.Range(0, AIPlayers.Length);
+
+            //for (int i = 0; i < players.Count;i++)
             {
-                if (players[i].GetComponent<Player>().AIMode
-                    && players[i].GetComponent<Player>().currentstate != Player.PlayerState.ATTACK)
+
+                //float distance = Vector3.Distance(
+                //    leadingPlayer.transform.position,
+                //    AIPlayers[chosenPlayerIdx].transform.position);
+
+                if (//AIPlayers[chosenPlayerIdx].GetComponent<Player>().AIMode
+                //&& 
+                AIPlayers[chosenPlayerIdx].GetComponent<Player>().currentstate != Player.PlayerState.ATTACK
+                //&& distance < 5
+                )
                 {
-                    players[i].GetComponent<Player>().currentstate = Player.PlayerState.ATTACK;
+
+                    //if(AIPlayers[chosenPlayerIdx].GetComponent<Player>().nearestEnemy == null)
+                    //{
+                    //    //FIND NEAREST ENEMY
+                    //    AIPlayers[chosenPlayerIdx].GetComponent<Player>().nearestEnemy
+                    //        = AIPlayers[chosenPlayerIdx].GetComponent<Player>().
+                    //        FindNearestEnemy(AIPlayers[chosenPlayerIdx].GetComponent<Player>().playerTransform.position);
+                    //    //return;
+                    //}
+
+                    //if (AIPlayers[chosenPlayerIdx].GetComponent<Player>().nearestEnemy != null)
+                    {
+                        AIPlayers[chosenPlayerIdx].GetComponent<Player>().currentstate = Player.PlayerState.ATTACK;
+                    }
                 }
             }
 
@@ -391,6 +421,8 @@ public class PlayerManager : MonoBehaviour
 
             }
             playerIcon.sprite = players[currentPlayerIndex].GetComponent<Player>().icon;
+
+            leadingPlayer = players[currentPlayerIndex];
             //characterSwitchpanel.SetActive(false);
         }
 

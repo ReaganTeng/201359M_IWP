@@ -28665,6 +28665,8 @@ MonoBehaviour:
   - {fileID: 4856223}
   - {fileID: 72833420}
   - {fileID: 563143445}
+  - {fileID: 1064602965}
+  - {fileID: 2136087909}
 --- !u!1001 &947449941
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -33676,10 +33678,10 @@ RectTransform:
   m_Father: {fileID: 335888336}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.164}
-  m_AnchorMax: {x: 0.25789145, y: 0.6184752}
-  m_AnchoredPosition: {x: 1.5410767, y: -0.34799194}
-  m_SizeDelta: {x: -10.7898, y: -0.6949997}
+  m_AnchorMin: {x: 0, y: 0.16827808}
+  m_AnchorMax: {x: 0.37186298, y: 0.6184752}
+  m_AnchoredPosition: {x: 4.272003, y: -1.3477478}
+  m_SizeDelta: {x: -5.328003, y: 1.3045}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1156825424
 MonoBehaviour:
