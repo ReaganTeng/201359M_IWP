@@ -656,10 +656,12 @@ public class Player : Character
         float minDistance = 10;
         foreach (GameObject enemy in listOfEnemies)
         {
-            if (enemy.GetComponent<Enemy>().currentState
+            if (enemy.GetComponent<MonoBehaviour>().enabled
+                &&
+                enemy.GetComponent<Enemy>().currentState
                 != Enemy.EnemyState.IDLE)
             {
-                Debug.Log("FOUND NEAREST ENEMY");
+                //Debug.Log("FOUND NEAREST ENEMY");
                 // Calculate the distance between the position and the enemy's position
                 float distance = Vector3.Distance(position, enemy.transform.position);
                 // Check if the current enemy is closer than the previous nearest enemy
