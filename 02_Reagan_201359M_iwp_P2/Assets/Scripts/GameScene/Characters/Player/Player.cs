@@ -381,9 +381,12 @@ public class Player : Character
 
         if (Input.GetKeyDown(KeyCode.J))
         {
-            transform.position =
-                FindObjectOfType<EndZone>().gameObject.transform.position
-                + new Vector3(6, 6, 0);
+            foreach (GameObject player in FindObjectOfType<PlayerManager>().players)
+            {//fore
+               player.transform.position =
+                    FindObjectOfType<EndZone>().gameObject.transform.position
+                    + new Vector3(6, 6, 0);
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.Y))

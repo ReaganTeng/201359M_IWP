@@ -80,8 +80,6 @@ public class CharacterUnlockManager : ScriptableObject
         string unlockedCharactersJson = JsonUtility.ToJson(unlockedWrapper);
         string selectedCharactersJson = JsonUtility.ToJson(selectedWrapper);
 
-
-
         // Log serialized JSON data (for debugging)
         Debug.Log($"Serialized Unlocked Characters: {unlockedCharactersJson}");
         Debug.Log($"Serialized Selected Characters: {selectedCharactersJson}");
@@ -99,7 +97,23 @@ public class CharacterUnlockManager : ScriptableObject
                  );
     }
 
+    public void EmptyCharacterList()
+    {
+        unlockedCharacters.Clear();
+        selectedCharacters.Clear();
 
+
+        if (!selectedCharacters.Contains(CharacterType.JOE))
+        {
+            selectedCharacters.Add(CharacterType.JOE);
+        }
+        if (!unlockedCharacters.Contains(CharacterType.JOE))
+        {
+            unlockedCharacters.Add(CharacterType.JOE);
+        }
+
+        SaveData();
+    }
     public void UnlockCharacter(CharacterType character)
     {
         if (!unlockedCharacters.Contains(character))

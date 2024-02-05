@@ -219,6 +219,7 @@ public class HubWorldMenuManager : MonoBehaviour
 
         inv.InitialiseInventorySlots();
 
+        characterUnlockManager.EmptyCharacterList();
 
 
 
@@ -289,16 +290,26 @@ public class HubWorldMenuManager : MonoBehaviour
 
 
         if (panelsToFreezegame.Any(
-             template => template.GetComponent<CanvasGroup>().interactable))
+             template => template.GetComponent<CanvasGroup>().interactable
+             && template != dialoguePanel))
         {
             return;
         }
- 
-        //LOSING CONDITION
+
+        if (upgrades.WonGame)
+        {
+            if (GameObject.FindGameObjectWithTag("DayTracker") != null
+                && GameObject.FindGameObjectWithTag("DayTracker").activeSelf)
+            {
+                GameObject.FindGameObjectWithTag("DayTracker").SetActive(false);
+            }
+        }
+
+            //LOSING CONDITION
         if (PlayerPrefs.GetFloat("MoneyDonated") < goalamount
-            && PlayerPrefs.GetInt("DaysLeft") <= 0
-            && !GameOverPanel.activeSelf
-            && !upgrades.WonGame)
+        && PlayerPrefs.GetInt("DaysLeft") <= 0
+        && !GameOverPanel.activeSelf
+        && !upgrades.WonGame)
         {
 
             dialogueManager.StartDialogue(loseDialogue);
@@ -316,22 +327,27 @@ public class HubWorldMenuManager : MonoBehaviour
             upgrades.WonGame = true;
         }
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0)
+            || Input.GetKeyDown(KeyCode.Return)
+            || Input.GetKeyDown(KeyCode.E))
         {
             if (dialogueManager.currentDialogue == winDialogue
                 && dialogueManager.currentSentenceidx == dialogueManager.currentDialogue.sentences.Count - 1)
             {
-                //upgrades.SaveUpgrades();
+                upgrades.SaveUpgrades();
+
                 WinPanel.SetActive(true);
             }
             if (dialogueManager.currentDialogue == loseDialogue
                 && dialogueManager.currentSentenceidx == dialogueManager.currentDialogue.sentences.Count - 1)
             {
+                upgrades.SaveUpgrades();
+
                 GameOverPanel.SetActive(true);
             }
+
+
         }
-
-
 
     }
 
