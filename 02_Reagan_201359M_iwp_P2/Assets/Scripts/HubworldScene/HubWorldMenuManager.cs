@@ -166,7 +166,24 @@ public class HubWorldMenuManager : MonoBehaviour
 
     }
 
+    public void PresenterMode()
+    {
+        if(Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            IncreaseMoney();
+        }
 
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            Endday();
+        }
+
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            ResetGame();
+        }
+    }
     public void togglePanel(GameObject panel)
     {
         //Debug.Log("TOGGLING PANEL");
@@ -228,6 +245,8 @@ public class HubWorldMenuManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        PresenterMode();
+
         //if(HelpPanel != null &&
         //    HelpPanel.activeSelf)
         //{
