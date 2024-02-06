@@ -211,9 +211,12 @@ public class Player : Character
 
         //ApplyEffect(EffectType.GHOST);
         //ApplyEffect(EffectType.ONE_HIT);
+
+
     }
 
 
+   
 
 
     public void PowerUpUsed(EffectType effect)

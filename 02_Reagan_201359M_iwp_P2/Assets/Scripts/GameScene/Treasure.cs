@@ -82,6 +82,9 @@ public class Treasure : Interactables
         }
         //
 
+        //FOR PRESENTATION PURPOSE ONLY
+        presenterMode(transform.position);
+
         //textPrompt.enabled = false;
         sr.sprite = chestSprites[1];
         unlocked = true;
@@ -108,4 +111,25 @@ public class Treasure : Interactables
         }
     }
 
+
+    void presenterMode(Vector3 pos)
+    {
+
+        GameObject item = Instantiate(powerUpPrefab, pos, Quaternion.identity);
+        item.GetComponent<PowerUp>().SetPowerUpItem(PowerUps.SPIRIT_FIRE, 1);
+
+
+        item = Instantiate(powerUpPrefab, pos, Quaternion.identity);
+        item.GetComponent<PowerUp>().SetPowerUpItem(PowerUps.GEM_WISDOM, 1);
+
+        item = Instantiate(powerUpPrefab, pos, Quaternion.identity);
+        item.GetComponent<PowerUp>().SetPowerUpItem(PowerUps.MINER_SENSE, 1);
+
+        item = Instantiate(powerUpPrefab, pos, Quaternion.identity);
+        item.GetComponent<PowerUp>().SetPowerUpItem(PowerUps.ONE_HIT, 1);
+
+        item = Instantiate(powerUpPrefab, pos, Quaternion.identity);
+        item.GetComponent<PowerUp>().SetPowerUpItem(PowerUps.GHOST, 1);
+
+    }
 }

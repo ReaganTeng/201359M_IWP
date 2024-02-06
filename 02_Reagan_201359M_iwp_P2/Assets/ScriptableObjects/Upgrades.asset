@@ -12,10 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 659e31f5f8022c942b6909d9102474ca, type: 3}
   m_Name: Upgrades
   m_EditorClassIdentifier: 
-  DamageBuff: 0
-  HealthBuff: 0
+  DamageBuff: 20
+  HealthBuff: 20
   WonGame: 0
   slotProperty:
+  - currentitem: {fileID: 0}
+    itemtype: 11
+    iconsprite: {fileID: 0}
+    Quantity: 0
+    quantitytext: 
   - currentitem: {fileID: 0}
     itemtype: 11
     iconsprite: {fileID: 0}

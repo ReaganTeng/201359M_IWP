@@ -101,7 +101,11 @@ public class QuestUI : MonoBehaviour
             item.GetComponent<PowerUp>().SetPowerUpItem(powerupchosen, 1);
         }
 
+
         Destroy(gameObject);
        
     }
+
+
+    
 }
